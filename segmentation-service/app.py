@@ -21,8 +21,13 @@ def get_model():
     if model is None:
         weights = os.getenv("YOLO_SEG_WEIGHTS", "models/road-defects-yolov8-seg.pt")
         if not os.path.isfile(weights):
-            raise HTTPException(503, "YOLO segmentation weights are missing. Set YOLO_SEG_WEIGHTS to a trained road-defect .pt file.")
+            raise HTTPException(503, "YOLO segmentation weights are missing.")
         model = YOLO(weights)
+        class_names = {str(name).lower().replace(" ", "_") for name in model.names.values()}
+        required_classes = {"pothole"} # Relaxed to only require pothole for the ONNX model
+        if not required_classes.issubset(class_names):
+            model = None
+            raise HTTPException(503, "YOLO weights must contain pothole class.")
     return model
 
 
