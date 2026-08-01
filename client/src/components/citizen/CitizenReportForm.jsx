@@ -6,7 +6,7 @@ import { Button } from '../ui/Button.jsx';
 import GpsPicker from './GpsPicker.jsx';
 import { getProjects } from '../../services/monitoringService.js';
 import { submitCitizenReport } from '../../services/citizenService.js';
-import { Camera, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import { Camera, ShieldAlert, CheckCircle2, Ruler } from 'lucide-react';
 
 export const CitizenReportForm = ({ onSubmitSuccess }) => {
   const [projects, setProjects] = useState([]);
@@ -15,6 +15,7 @@ export const CitizenReportForm = ({ onSubmitSuccess }) => {
   const [gps, setGps] = useState({ lat: '', lng: '' });
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [referenceScaleCmPerPixel, setReferenceScaleCmPerPixel] = useState('');
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -58,8 +59,8 @@ export const CitizenReportForm = ({ onSubmitSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!projectId || !description || !gps.lat || !gps.lng || !image) {
-      setError('All fields, GPS coordinates, and an image are required');
+    if (!projectId || !description || !gps.lat || !gps.lng || !image || !Number(referenceScaleCmPerPixel) || Number(referenceScaleCmPerPixel) <= 0) {
+      setError('All fields, GPS coordinates, an image, and a positive reference scale are required');
       return;
     }
 
@@ -74,6 +75,7 @@ export const CitizenReportForm = ({ onSubmitSuccess }) => {
       formData.append('lat', gps.lat);
       formData.append('lng', gps.lng);
       formData.append('image', image);
+      if (referenceScaleCmPerPixel) formData.append('referenceScaleCmPerPixel', referenceScaleCmPerPixel);
 
       const result = await submitCitizenReport(formData);
       setSuccess(true);
@@ -84,6 +86,7 @@ export const CitizenReportForm = ({ onSubmitSuccess }) => {
       setGps({ lat: '', lng: '' });
       setImage(null);
       setPreview(null);
+      setReferenceScaleCmPerPixel('');
 
       if (onSubmitSuccess) {
         onSubmitSuccess(result);
@@ -178,6 +181,27 @@ export const CitizenReportForm = ({ onSubmitSuccess }) => {
                 </div>
               )}
             </div>
+          </div>
+
+          <div className="rounded-md border border-brand-100 bg-brand-50/10 p-3.5">
+            <label htmlFor="reference-scale" className="flex items-center gap-1.5 text-xs font-semibold text-dark-800">
+              <Ruler className="h-3.5 w-3.5 text-brand-650" /> Reference scale (cm per pixel) <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="reference-scale"
+              type="number"
+              min="0.001"
+              step="0.001"
+              value={referenceScaleCmPerPixel}
+              onChange={(e) => setReferenceScaleCmPerPixel(e.target.value)}
+              disabled={loading}
+              placeholder="e.g. 0.25"
+              required
+              className="mt-2 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-brand-500"
+            />
+            <p className="mt-1.5 text-[11px] leading-relaxed text-slate-500">
+              Place a known-size marker beside the defect and enter its calibrated centimetres-per-pixel value. Calibrated measurements are required for each submitted report.
+            </p>
           </div>
 
           <Button

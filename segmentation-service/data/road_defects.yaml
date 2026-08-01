@@ -1,0 +1,10 @@
+# Dataset definition for GramSetu road-defect semantic segmentation.
+# Keep the directory structure described in the root README.
+path: ../datasets/road-defects
+train: images/train
+val: images/val
+test: images/test
+
+names:
+  0: pothole
+  1: crack

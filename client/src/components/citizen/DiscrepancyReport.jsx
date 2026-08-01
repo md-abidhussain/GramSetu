@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card.jsx';
-import { AlertCircle, CheckCircle2, ShieldAlert, MessageSquare } from 'lucide-react';
+import { AlertCircle, CheckCircle2, ShieldAlert, MessageSquare, Ruler } from 'lucide-react';
 
 export const DiscrepancyReport = ({ result }) => {
   if (!result) return null;
@@ -10,6 +10,7 @@ export const DiscrepancyReport = ({ result }) => {
     matchScore = 100,
     flaggedAsDiscrepancy = false,
     aiReport = '',
+    segmentation,
   } = result;
 
   const getMatchScoreStyle = (score) => {
@@ -22,6 +23,7 @@ export const DiscrepancyReport = ({ result }) => {
     // Map code to user-friendly label
     const labels = {
       crack: 'Cracks Detected',
+      pothole: 'Pothole Detected',
       road_damage: 'Road Structural Damage',
       leakage: 'Fluid/Water Leakage',
       broken_infrastructure: 'Broken Infrastructure',
@@ -93,7 +95,29 @@ export const DiscrepancyReport = ({ result }) => {
           </div>
         </div>
 
-        {/* report narrative */}
+        {segmentation?.status === 'completed' && (
+          <div>
+            <span className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500">
+              <Ruler className="h-4 w-4 text-brand-650" /> Defect Measurements
+            </span>
+            {segmentation.defects?.length ? (
+              <div className="space-y-2">
+                {segmentation.defects.map((defect, index) => (
+                  <div key={`${defect.type}-${index}`} className="rounded-md border border-brand-100 bg-brand-50/10 p-3 text-xs text-dark-800">
+                    <div className="flex justify-between font-bold capitalize"><span>{defect.type.replaceAll('_', ' ')}</span><span>{Math.round(defect.confidence * 100)}% confidence</span></div>
+                    <p className="mt-1 text-slate-600">Area: {defect.areaCm2} cm² · Width: {defect.widthCm} cm · Height: {defect.heightCm} cm · Equivalent diameter: {defect.equivalentDiameterCm} cm</p>
+                    <p className="mt-1 text-[11px] text-slate-500">{defect.depthNote}</p>
+                  </div>
+                ))}
+              </div>
+            ) : <p className="rounded-md bg-slate-50 border border-slate-200 p-3 text-xs text-slate-500">No defects were segmented in this image.</p>}
+          </div>
+        )}
+
+        {segmentation?.status === 'scale_missing' && (
+          <p className="rounded-md bg-amber-50 border border-amber-250 p-3 text-xs text-amber-800">Defect size was not calculated: add a calibrated reference scale when submitting the photo.</p>
+        )}
+
         <div className="border-t border-slate-200 pt-4">
           <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
             <MessageSquare className="h-4 w-4 text-slate-400" /> Executive Compliance Report

@@ -4,6 +4,7 @@ import User from '../models/User.js';
 import Notification from '../models/Notification.js';
 import { uploadBuffer } from '../services/cloudinaryService.js';
 import { detectDamageAndDiscrepancies } from '../services/geminiDamageDetectionService.js';
+import { quantifyDefects } from '../services/segmentationService.js';
 import { updateContractorScore } from '../services/contractorScoreService.js';
 
 // Helper to notify authority users
@@ -26,7 +27,7 @@ const notifyAuthorities = async (message, type = 'info') => {
 
 export const createCitizenReport = async (req, res, next) => {
   try {
-    const { projectId, lat, lng, description } = req.body;
+    const { projectId, lat, lng, description, referenceScaleCmPerPixel } = req.body;
 
     if (!projectId || !lat || !lng || !description) {
       return res.status(400).json({ message: 'projectId, lat, lng, and description are required' });
@@ -53,8 +54,16 @@ export const createCitizenReport = async (req, res, next) => {
       return res.status(400).json({ message: 'Project does not have any completion or progress images to verify against' });
     }
 
-    // 2. Call Gemini Damage Detection
-    const aiAnalysis = await detectDamageAndDiscrepancies(citizenImageUrl, targetImageUrl);
+    // 2. Compare against the official image and segment defects in parallel.
+    const [aiAnalysis, segmentation] = await Promise.all([
+      detectDamageAndDiscrepancies(citizenImageUrl, targetImageUrl),
+      quantifyDefects(req.file, referenceScaleCmPerPixel)
+    ]);
+
+    const segmentedIssueTypes = segmentation.defects
+      .map(({ type }) => type)
+      .filter(type => ['crack', 'pothole', 'road_damage', 'leakage', 'broken_infrastructure', 'garbage'].includes(type));
+    const detectedIssues = [...new Set([...(aiAnalysis.detectedIssues || []), ...segmentedIssueTypes])];
 
     // 3. Create Citizen Report
     const report = await CitizenReport.create({
@@ -65,10 +74,12 @@ export const createCitizenReport = async (req, res, next) => {
         lng: Number(lng)
       },
       description,
-      detectedIssues: aiAnalysis.detectedIssues || [],
+      detectedIssues,
       aiReport: aiAnalysis.aiReport,
       matchScore: aiAnalysis.matchScore,
       flaggedAsDiscrepancy: aiAnalysis.flaggedAsDiscrepancy || false,
+      referenceScaleCmPerPixel: Number(referenceScaleCmPerPixel) || undefined,
+      segmentation,
       status: 'New'
     });
 

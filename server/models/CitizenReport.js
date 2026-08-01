@@ -10,8 +10,25 @@ const citizenReportSchema = new mongoose.Schema({
   description: { type: String, required: true },
   detectedIssues: [{ 
     type: String, 
-    enum: ['crack', 'road_damage', 'leakage', 'broken_infrastructure', 'garbage', 'none']
+    enum: ['crack', 'pothole', 'road_damage', 'leakage', 'broken_infrastructure', 'garbage', 'none']
   }],
+  referenceScaleCmPerPixel: { type: Number, min: 0 },
+  segmentation: {
+    status: { type: String, enum: ['completed'], required: true },
+    message: { type: String },
+    defects: [{
+      type: { type: String },
+      confidence: { type: Number },
+      maskAreaPixels: { type: Number },
+      areaCm2: { type: Number },
+      widthCm: { type: Number },
+      heightCm: { type: Number },
+      equivalentDiameterCm: { type: Number },
+      boundingBoxPixels: { x: Number, y: Number, width: Number, height: Number },
+      depth: { type: Number, default: null },
+      depthNote: { type: String }
+    }]
+  },
   aiReport: { type: String },
   matchScore: { type: Number, min: 0, max: 100 },
   flaggedAsDiscrepancy: { type: Boolean, default: false },
