@@ -38,10 +38,14 @@ const HomeRedirect = () => {
   
   if (loading) return null;
   
-  if (user && user.role !== 'citizen') {
-    return <Navigate to="/dashboard" replace />;
+  if (user) {
+    if (user.role !== 'citizen') {
+      return <Navigate to="/dashboard" replace />;
+    } else {
+      return <Navigate to="/verify" replace />;
+    }
   }
-  return <Navigate to="/verify" replace />;
+  return <Navigate to="/login" replace />;
 };
 
 export const AppRoutes = () => {

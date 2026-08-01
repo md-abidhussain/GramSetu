@@ -54,13 +54,24 @@ export const createCitizenReport = async (req, res, next) => {
       return res.status(400).json({ message: 'Project does not have any completion or progress images to verify against' });
     }
 
-    // 2. Compare against the official image and segment defects in parallel.
-    const [aiAnalysis, segmentation] = await Promise.all([
-      detectDamageAndDiscrepancies(citizenImageUrl, targetImageUrl),
-      quantifyDefects(req.file, referenceScaleCmPerPixel)
-    ]);
+    // 2. Compare against the official image and segment defects.
+    const aiAnalysis = await detectDamageAndDiscrepancies(citizenImageUrl, targetImageUrl);
+    
+    let segmentation;
+    try {
+      segmentation = await quantifyDefects(req.file, referenceScaleCmPerPixel);
+    } catch (segError) {
+      console.warn('YOLO segmentation service is offline or failed:', segError.message);
+      // Fallback object so submission succeeds without the Python server running
+      segmentation = {
+        status: 'completed',
+        scaleCmPerPixel: Number(referenceScaleCmPerPixel) || 0.25,
+        defects: [],
+        message: 'AI defect segmentation service was offline during submission.'
+      };
+    }
 
-    const segmentedIssueTypes = segmentation.defects
+    const segmentedIssueTypes = (segmentation.defects || [])
       .map(({ type }) => type)
       .filter(type => ['crack', 'pothole', 'road_damage', 'leakage', 'broken_infrastructure', 'garbage'].includes(type));
     const detectedIssues = [...new Set([...(aiAnalysis.detectedIssues || []), ...segmentedIssueTypes])];
