@@ -90,14 +90,14 @@ export const TenderUploadForm = ({ onUploadSuccess }) => {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-5">
           {error && (
-            <div className="p-4 bg-rose-50 border border-rose-200/60 rounded-xl text-rose-700 text-sm flex items-start gap-2.5">
+            <div className="p-4 bg-rose-50 border border-rose-200 rounded-md text-rose-700 text-sm flex items-start gap-2.5">
               <AlertCircle className="h-5 w-5 shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
           {success && (
-            <div className="p-4 bg-emerald-50 border border-emerald-200/60 rounded-xl text-emerald-700 text-sm flex items-start gap-2.5 animate-fadeIn">
+            <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-md text-emerald-700 text-sm flex items-start gap-2.5 animate-fadeIn">
               <CheckCircle2 className="h-5 w-5 shrink-0" />
               <span>Tender analyzed successfully and saved to ledger!</span>
             </div>
@@ -147,7 +147,7 @@ export const TenderUploadForm = ({ onUploadSuccess }) => {
             <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
               Tender Document (PDF only) <span className="text-red-500">*</span>
             </label>
-            <div className="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center hover:border-brand-500 transition-colors cursor-pointer bg-slate-50 relative">
+            <div className="border-2 border-dashed border-slate-200 rounded-md p-6 text-center hover:border-brand-500 transition-colors cursor-pointer bg-white hover:bg-slate-50/50 relative">
               <input
                 type="file"
                 id="tender-file"
@@ -169,11 +169,11 @@ export const TenderUploadForm = ({ onUploadSuccess }) => {
 
           <Button
             type="submit"
-            className="w-full flex items-center justify-center gap-2 py-3"
+            className="w-full flex items-center justify-center gap-2 py-2.5"
             loading={loading}
             disabled={loading}
           >
-            {loading ? 'AI Extracting & Auditing...' : 'Upload & Analyze Tender'}
+            {loading ? 'Extracting & Auditing...' : 'Upload & Analyze Tender'}
           </Button>
         </form>
       </CardContent>

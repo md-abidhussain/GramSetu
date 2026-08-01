@@ -45,17 +45,17 @@ export const ProjectHealthCard = ({ health = 'Healthy', notes = '' }) => {
 
       <CardContent className="space-y-4">
         {/* Health status banner */}
-        <div className={`p-4 rounded-xl border flex items-center gap-3 font-semibold text-sm ${current.bg}`}>
+        <div className={`p-4 rounded-md border flex items-center gap-3 font-medium text-sm ${current.bg}`}>
           {current.icon}
           <span>{current.title}</span>
         </div>
 
-        {/* AI Notes */}
+        {/* Audit Notes */}
         <div>
-          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-            <FileText className="h-3.5 w-3.5 text-slate-400" /> AI Auditor Log
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <FileText className="h-3.5 w-3.5 text-slate-400" /> Audit Assessment Log
           </span>
-          <div className="bg-slate-50/50 p-4 rounded-xl border border-slate-100 text-xs text-dark-800 leading-relaxed max-h-40 overflow-y-auto">
+          <div className="bg-white p-4 rounded-md border border-slate-200 text-xs text-dark-800 leading-relaxed max-h-40 overflow-y-auto">
             {notes || 'No audit assessment recorded. Please upload a completion photo to execute verification comparison.'}
           </div>
         </div>

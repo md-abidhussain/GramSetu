@@ -23,11 +23,29 @@ const createMarkerIcon = (status) => {
 };
 
 export const MapView = ({ mapData = [] }) => {
-  // Center map on India or first coordinate
-  const defaultCenter = [20.5937, 78.9629];
-  const activeCenter = mapData.length > 0 && mapData[0].location?.lat && mapData[0].location?.lng
-    ? [mapData[0].location.lat, mapData[0].location.lng]
-    : defaultCenter;
+  const defaultCenter = [20.5937, 78.9629]; // Default to India center
+  const [center, setCenter] = React.useState(defaultCenter);
+
+  React.useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setCenter([position.coords.latitude, position.coords.longitude]);
+        },
+        (error) => {
+          console.warn('Geolocation access declined or unavailable, centering on projects/default.');
+          if (mapData.length > 0 && mapData[0].location?.lat && mapData[0].location?.lng) {
+            setCenter([mapData[0].location.lat, mapData[0].location.lng]);
+          }
+        },
+        { enableHighAccuracy: true, timeout: 5000 }
+      );
+    } else {
+      if (mapData.length > 0 && mapData[0].location?.lat && mapData[0].location?.lng) {
+        setCenter([mapData[0].location.lat, mapData[0].location.lng]);
+      }
+    }
+  }, [mapData]);
 
   const validPoints = mapData.filter(item => 
     item.location && 
@@ -36,6 +54,7 @@ export const MapView = ({ mapData = [] }) => {
     !isNaN(item.location.lat) && 
     !isNaN(item.location.lng)
   );
+
 
   return (
     <Card className="h-[340px] col-span-full md:col-span-1 lg:col-span-2">
@@ -48,7 +67,13 @@ export const MapView = ({ mapData = [] }) => {
 
       <CardContent className="h-64 p-0 overflow-hidden relative">
         <div className="h-full w-full">
-          <MapContainer center={activeCenter} zoom={5} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
+          <MapContainer 
+            key={`${center[0]}-${center[1]}`}
+            center={center} 
+            zoom={center === defaultCenter ? 5 : 12} 
+            scrollWheelZoom={true} 
+            style={{ height: '100%', width: '100%' }}
+          >
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

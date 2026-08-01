@@ -24,7 +24,7 @@ export const CompletionScoreCard = ({ score = 0, status = 'Pending' }) => {
     <Card className="h-full flex flex-col justify-between">
       <CardHeader>
         <div>
-          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">AI Audit Metric</span>
+          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Audit Metric</span>
           <CardTitle className="text-base mt-0.5">Physical Completion</CardTitle>
         </div>
       </CardHeader>

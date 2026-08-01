@@ -25,7 +25,7 @@ export const TenderSummaryCard = ({ tender }) => {
       <CardHeader>
         <div className="flex flex-col gap-1 md:flex-row md:items-center justify-between w-full">
           <div>
-            <span className="text-[10px] text-brand-600 font-bold uppercase tracking-wider">AI Procurement Review</span>
+            <span className="text-[10px] text-brand-600 font-bold uppercase tracking-wider">Procurement Review</span>
             <CardTitle className="text-xl mt-0.5">{title}</CardTitle>
           </div>
           <div className="mt-2 md:mt-0 flex gap-2 shrink-0">
@@ -35,7 +35,7 @@ export const TenderSummaryCard = ({ tender }) => {
                 href={fileUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-medium rounded-full text-slate-600 transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-medium rounded-md text-slate-650 transition-colors"
               >
                 <FileText className="h-3 w-3" /> PDF Source
               </a>
@@ -45,10 +45,10 @@ export const TenderSummaryCard = ({ tender }) => {
       </CardHeader>
       
       <CardContent className="space-y-6">
-        {/* AI Summary */}
+        {/* Executive Summary */}
         <div>
-          <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Executive Summary</h4>
-          <p className="text-sm text-dark-800 leading-relaxed bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
+          <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Executive Summary</h4>
+          <p className="text-sm text-dark-800 leading-relaxed bg-slate-50 p-4 rounded-md border border-slate-200">
             {aiSummary}
           </p>
         </div>
@@ -56,50 +56,50 @@ export const TenderSummaryCard = ({ tender }) => {
         {/* Budget & Timeline Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {/* Budget Info */}
-          <div className={`p-5 rounded-2xl border transition-all ${
+          <div className={`p-5 rounded-md border ${
             budgetAnalysis?.flagged
-              ? 'bg-rose-50/40 border-rose-100 hover:shadow-sm'
-              : 'bg-emerald-50/30 border-emerald-100 hover:shadow-sm'
+              ? 'bg-rose-50/40 border-rose-100 shadow-sm'
+              : 'bg-emerald-50/30 border-emerald-100 shadow-sm'
           }`}>
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
                 <DollarSign className="h-4 w-4 text-slate-400" /> Budget Analysis
               </span>
               {budgetAnalysis?.flagged ? (
-                <span className="text-[10px] bg-rose-100 text-rose-800 font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
+                <span className="text-[10px] bg-rose-100 text-rose-800 font-semibold px-2 py-0.5 rounded flex items-center gap-1">
                   <AlertTriangle className="h-3 w-3" /> Flagged
                 </span>
               ) : (
-                <span className="text-[10px] bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
+                <span className="text-[10px] bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded flex items-center gap-1">
                   <CheckCircle className="h-3 w-3" /> Normal
                 </span>
               )}
             </div>
             
             <p className="text-sm font-bold text-dark-800 mb-1">
-              Allocated: <span className="text-brand-700">{budgetAllocated || 'Not specified'}</span>
+              Allocated: <span className="text-brand-750 font-bold">{budgetAllocated || 'Not specified'}</span>
             </p>
-            <p className="text-xs text-slate-500 leading-relaxed">
+            <p className="text-xs text-slate-550 leading-relaxed">
               {budgetAnalysis?.reason}
             </p>
           </div>
 
           {/* Timeline Info */}
-          <div className={`p-5 rounded-2xl border transition-all ${
+          <div className={`p-5 rounded-md border ${
             timelineAnalysis?.flagged
-              ? 'bg-rose-50/40 border-rose-100 hover:shadow-sm'
-              : 'bg-emerald-50/30 border-emerald-100 hover:shadow-sm'
+              ? 'bg-rose-50/40 border-rose-100 shadow-sm'
+              : 'bg-emerald-50/30 border-emerald-100 shadow-sm'
           }`}>
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
                 <Calendar className="h-4 w-4 text-slate-400" /> Timeline Analysis
               </span>
               {timelineAnalysis?.flagged ? (
-                <span className="text-[10px] bg-rose-100 text-rose-800 font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
+                <span className="text-[10px] bg-rose-100 text-rose-800 font-semibold px-2 py-0.5 rounded flex items-center gap-1">
                   <AlertTriangle className="h-3 w-3" /> Flagged
                 </span>
               ) : (
-                <span className="text-[10px] bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
+                <span className="text-[10px] bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded flex items-center gap-1">
                   <CheckCircle className="h-3 w-3" /> Normal
                 </span>
               )}
@@ -110,18 +110,18 @@ export const TenderSummaryCard = ({ tender }) => {
                 {timelineStart ? new Date(timelineStart).toLocaleDateString() : 'TBD'} - {timelineEnd ? new Date(timelineEnd).toLocaleDateString() : 'TBD'}
               </span>
             </p>
-            <p className="text-xs text-slate-500 leading-relaxed">
+            <p className="text-xs text-slate-550 leading-relaxed">
               {timelineAnalysis?.reason}
             </p>
           </div>
         </div>
 
-        {/* AI Recommendations */}
-        <div className="border-t border-slate-100 pt-5">
-          <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-            <ListTodo className="h-4 w-4 text-slate-400" /> AI Recommendations
+        {/* Procurement Recommendations */}
+        <div className="border-t border-slate-200 pt-5">
+          <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <ListTodo className="h-4 w-4 text-slate-400" /> Recommendations
           </h4>
-          <p className="text-sm text-dark-800 leading-relaxed bg-brand-50/20 p-4 rounded-2xl border border-brand-100/30">
+          <p className="text-sm text-dark-800 leading-relaxed bg-brand-50/10 p-4 rounded-md border border-brand-100/30">
             {recommendation}
           </p>
         </div>

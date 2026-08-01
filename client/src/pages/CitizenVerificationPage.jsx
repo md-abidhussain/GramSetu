@@ -12,16 +12,16 @@ export const CitizenVerificationPage = () => {
   };
 
   return (
-    <PageLayout title="Citizen Verification Ledger">
+    <PageLayout title="Citizen Portal">
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Public Header */}
         <div className="text-center space-y-2 py-4">
-          <span className="text-[10px] text-brand-600 font-bold uppercase tracking-wider bg-brand-50 border border-brand-100/50 px-3 py-1 rounded-full">
+          <span className="text-[10px] text-brand-600 font-bold uppercase tracking-wider bg-brand-50 border border-brand-100 px-3 py-1 rounded">
             Transparent Governance
           </span>
           <h2 className="text-2xl font-bold tracking-tight text-dark-800">Verify Infrastructure Integrity</h2>
           <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
-            Every citizen has the power to audit public construction works. Upload a photo, pinpoint coordinates, and let our AI cross-verify compliance reports in real time.
+            Every citizen has the power to audit public construction works. Upload a photo, pinpoint coordinates, and submit details directly for automated compliance verification.
           </p>
         </div>
 

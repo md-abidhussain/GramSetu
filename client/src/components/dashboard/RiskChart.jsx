@@ -38,7 +38,7 @@ export const RiskChart = ({ analytics }) => {
     <Card className="h-[340px]">
       <CardHeader>
         <div>
-          <CardTitle>AI Risk Assessments</CardTitle>
+          <CardTitle>Risk Assessments</CardTitle>
           <p className="text-xs text-slate-400 mt-0.5">Distribution of calculated risks between tenders and projects</p>
         </div>
       </CardHeader>
@@ -66,10 +66,10 @@ export const RiskChart = ({ analytics }) => {
             <Tooltip
               contentStyle={{
                 backgroundColor: '#ffffff',
-                border: '1px solid #f1f5f9',
-                borderRadius: '0.75rem',
+                border: '1px solid #e2e8f0',
+                borderRadius: '0.375rem',
                 fontSize: '11px',
-                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.05)'
+                boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
               }}
             />
             <Legend
@@ -79,8 +79,8 @@ export const RiskChart = ({ analytics }) => {
               iconSize={8}
               wrapperStyle={{ fontSize: '11px', color: '#64748b' }}
             />
-            <Bar dataKey="Tenders" fill="#8b5cf6" radius={[4, 4, 0, 0]} maxBarSize={32} />
-            <Bar dataKey="Projects" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={32} />
+            <Bar dataKey="Tenders" fill="#005ea5" radius={[2, 2, 0, 0]} maxBarSize={32} />
+            <Bar dataKey="Projects" fill="#059669" radius={[2, 2, 0, 0]} maxBarSize={32} />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>

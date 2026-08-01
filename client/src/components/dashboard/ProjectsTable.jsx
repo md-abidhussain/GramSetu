@@ -14,19 +14,19 @@ export const ProjectsTable = ({ projects = [], onSelectProject }) => {
     switch (status) {
       case 'Verified':
         return (
-          <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+          <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
             <CheckCircle className="h-3 w-3" /> Verified
           </span>
         );
       case 'Flagged':
         return (
-          <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-bold bg-rose-50 text-rose-700 border border-rose-100">
+          <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded font-medium bg-rose-50 text-rose-700 border border-rose-100">
             <AlertCircle className="h-3 w-3" /> Flagged
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-50 text-amber-700 border border-amber-100">
+          <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded font-medium bg-amber-50 text-amber-700 border border-amber-100">
             <AlertTriangle className="h-3 w-3" /> Pending
           </span>
         );
@@ -60,7 +60,7 @@ export const ProjectsTable = ({ projects = [], onSelectProject }) => {
                 placeholder="Search projects..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-4 py-2 text-xs transition-all focus:outline-none focus:bg-white focus:border-brand-500 text-dark-800 placeholder-slate-450"
+                className="w-full bg-white border border-slate-200 rounded-md pl-9 pr-4 py-2 text-xs transition-colors focus:outline-none focus:border-brand-500 text-dark-800 placeholder-slate-400"
               />
             </div>
 
@@ -74,7 +74,7 @@ export const ProjectsTable = ({ projects = [], onSelectProject }) => {
               ]}
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="!py-2 !px-3 !text-xs !bg-slate-50 border-slate-200 w-36"
+              className="!py-1.5 !px-3 !text-xs !bg-white border-slate-200 w-36"
             />
 
             <Select
@@ -87,7 +87,7 @@ export const ProjectsTable = ({ projects = [], onSelectProject }) => {
               ]}
               value={riskFilter}
               onChange={(e) => setRiskFilter(e.target.value)}
-              className="!py-2 !px-3 !text-xs !bg-slate-50 border-slate-200 w-32"
+              className="!py-1.5 !px-3 !text-xs !bg-white border-slate-200 w-32"
             />
           </div>
         </div>
@@ -97,16 +97,16 @@ export const ProjectsTable = ({ projects = [], onSelectProject }) => {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-slate-50/70 border-y border-slate-100 text-slate-400 font-bold uppercase tracking-wider">
-                <th className="px-6 py-3.5">Project Details</th>
-                <th className="px-6 py-3.5">Contractor</th>
-                <th className="px-6 py-3.5 text-center">Completion Score</th>
-                <th className="px-6 py-3.5">Risk Rating</th>
-                <th className="px-6 py-3.5">Audit Status</th>
-                <th className="px-6 py-3.5">Audit Date</th>
+              <tr className="bg-slate-50 border-y border-slate-200 text-slate-500 font-semibold text-[11px] tracking-normal">
+                <th className="px-6 py-3">Project Details</th>
+                <th className="px-6 py-3">Contractor</th>
+                <th className="px-6 py-3 text-center">Completion</th>
+                <th className="px-6 py-3">Risk Rating</th>
+                <th className="px-6 py-3">Audit Status</th>
+                <th className="px-6 py-3">Audit Date</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50">
+            <tbody className="divide-y divide-slate-200/60 bg-white">
               {filteredProjects.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="text-center py-12 text-slate-400 font-medium bg-slate-50/20">

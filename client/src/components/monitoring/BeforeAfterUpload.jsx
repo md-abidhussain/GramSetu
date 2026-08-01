@@ -127,23 +127,23 @@ export const BeforeAfterUpload = ({ projects, onProjectCreated, onProjectComplet
   return (
     <Card>
       <CardHeader className="pb-0 border-b-0">
-        <div className="flex border-b border-slate-100 w-full">
+        <div className="flex border-b border-slate-200 w-full">
           <button
             onClick={() => { setActiveTab('create'); setError(null); }}
-            className={`flex-1 py-3 text-sm font-semibold border-b-2 text-center transition-all ${
+            className={`flex-1 py-3 text-sm font-semibold border-b-2 text-center transition-colors ${
               activeTab === 'create'
                 ? 'border-brand-600 text-brand-600'
-                : 'border-transparent text-slate-400 hover:text-slate-600'
+                : 'border-transparent text-slate-500 hover:text-slate-700'
             }`}
           >
             1. Initialize Project
           </button>
           <button
             onClick={() => { setActiveTab('complete'); setError(null); }}
-            className={`flex-1 py-3 text-sm font-semibold border-b-2 text-center transition-all ${
+            className={`flex-1 py-3 text-sm font-semibold border-b-2 text-center transition-colors ${
               activeTab === 'complete'
                 ? 'border-brand-600 text-brand-600'
-                : 'border-transparent text-slate-400 hover:text-slate-600'
+                : 'border-transparent text-slate-500 hover:text-slate-700'
             }`}
           >
             2. Upload Completion
@@ -153,7 +153,7 @@ export const BeforeAfterUpload = ({ projects, onProjectCreated, onProjectComplet
 
       <CardContent className="pt-6">
         {error && (
-          <div className="mb-5 p-4 bg-rose-50 border border-rose-100 rounded-xl text-rose-700 text-sm flex items-start gap-2.5">
+          <div className="mb-5 p-4 bg-rose-50 border border-rose-200 rounded-md text-rose-700 text-sm flex items-start gap-2.5">
             <AlertTriangle className="h-5 w-5 shrink-0 text-rose-500" />
             <span>{error}</span>
           </div>
@@ -222,7 +222,7 @@ export const BeforeAfterUpload = ({ projects, onProjectCreated, onProjectComplet
               </label>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-                <div className="border-2 border-dashed border-slate-200 hover:border-brand-500 transition-colors rounded-xl p-5 text-center cursor-pointer bg-slate-50 relative h-32 flex flex-col justify-center items-center">
+                <div className="border-2 border-dashed border-slate-200 hover:border-brand-500 transition-colors rounded-md p-5 text-center cursor-pointer bg-white hover:bg-slate-50/50 relative h-32 flex flex-col justify-center items-center">
                   <input
                     type="file"
                     accept="image/*"
@@ -236,18 +236,18 @@ export const BeforeAfterUpload = ({ projects, onProjectCreated, onProjectComplet
                 </div>
                 
                 {beforePreview ? (
-                  <div className="relative rounded-xl overflow-hidden h-32 border border-slate-200">
+                  <div className="relative rounded-md overflow-hidden h-32 border border-slate-200">
                     <img src={beforePreview} alt="Before preview" className="w-full h-full object-cover" />
                   </div>
                 ) : (
-                  <div className="h-32 rounded-xl bg-slate-100 flex items-center justify-center border border-slate-200 text-slate-400 text-xs">
+                  <div className="h-32 rounded-md bg-slate-100 flex items-center justify-center border border-slate-200 text-slate-400 text-xs">
                     No image selected
                   </div>
                 )}
               </div>
             </div>
 
-            <Button type="submit" className="w-full py-3" loading={loading} disabled={loading}>
+            <Button type="submit" className="w-full py-2.5" loading={loading} disabled={loading}>
               Initialize Project Ledger
             </Button>
           </form>
@@ -270,7 +270,7 @@ export const BeforeAfterUpload = ({ projects, onProjectCreated, onProjectComplet
               </label>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-                <div className="border-2 border-dashed border-slate-200 hover:border-brand-500 transition-colors rounded-xl p-5 text-center cursor-pointer bg-slate-50 relative h-32 flex flex-col justify-center items-center">
+                <div className="border-2 border-dashed border-slate-200 hover:border-brand-500 transition-colors rounded-md p-5 text-center cursor-pointer bg-white hover:bg-slate-50/50 relative h-32 flex flex-col justify-center items-center">
                   <input
                     type="file"
                     accept="image/*"
@@ -284,18 +284,18 @@ export const BeforeAfterUpload = ({ projects, onProjectCreated, onProjectComplet
                 </div>
 
                 {afterPreview ? (
-                  <div className="relative rounded-xl overflow-hidden h-32 border border-slate-200">
+                  <div className="relative rounded-md overflow-hidden h-32 border border-slate-200">
                     <img src={afterPreview} alt="After preview" className="w-full h-full object-cover" />
                   </div>
                 ) : (
-                  <div className="h-32 rounded-xl bg-slate-100 flex items-center justify-center border border-slate-200 text-slate-400 text-xs">
+                  <div className="h-32 rounded-md bg-slate-100 flex items-center justify-center border border-slate-200 text-slate-400 text-xs">
                     No image selected
                   </div>
                 )}
               </div>
             </div>
 
-            <Button type="submit" className="w-full py-3" loading={loading} disabled={loading}>
+            <Button type="submit" className="w-full py-2.5" loading={loading} disabled={loading}>
               {loading ? 'AI Verifying Infrastructure...' : 'Submit & Analyze Completion'}
             </Button>
           </form>

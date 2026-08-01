@@ -6,7 +6,7 @@ import { Button } from '../ui/Button.jsx';
 import GpsPicker from './GpsPicker.jsx';
 import { getProjects } from '../../services/monitoringService.js';
 import { submitCitizenReport } from '../../services/citizenService.js';
-import { Camera, ShieldAlert, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Camera, ShieldAlert, CheckCircle2 } from 'lucide-react';
 
 export const CitizenReportForm = ({ onSubmitSuccess }) => {
   const [projects, setProjects] = useState([]);
@@ -182,12 +182,12 @@ export const CitizenReportForm = ({ onSubmitSuccess }) => {
 
           <Button
             type="submit"
-            className="w-full py-3 flex items-center justify-center gap-1.5"
+            className="w-full py-2.5 flex items-center justify-center gap-1.5"
             loading={loading}
             disabled={loading}
           >
-            <Sparkles className="h-4.5 w-4.5" />
-            {loading ? 'AI Verifying Evidence...' : 'Submit Evidence for Review'}
+            <ShieldAlert className="h-4 w-4" />
+            {loading ? 'Submitting Evidence...' : 'Submit Evidence for Review'}
           </Button>
         </form>
       </CardContent>

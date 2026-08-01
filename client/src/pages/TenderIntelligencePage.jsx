@@ -36,7 +36,7 @@ export const TenderIntelligencePage = () => {
   };
 
   return (
-    <PageLayout title="AI Tender Intelligence">
+    <PageLayout title="Tender Intelligence">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left Column: Upload Form & Past Audits */}
         <div className="lg:col-span-4 space-y-6">

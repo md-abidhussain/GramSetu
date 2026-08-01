@@ -20,7 +20,7 @@ export const Input = ({
         type={type}
         id={id}
         required={required}
-        className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm transition-all focus:outline-none focus:bg-white focus:border-brand-500 focus:ring-1 focus:ring-brand-500 text-dark-800 placeholder-slate-400 ${
+        className={`w-full bg-white border border-slate-200 rounded-md px-3.5 py-2 text-sm transition-colors focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 text-dark-800 placeholder-slate-400 ${
           error ? 'border-red-400 focus:border-red-500 focus:ring-red-500' : ''
         }`}
         {...props}
@@ -50,7 +50,7 @@ export const Textarea = ({
         id={id}
         rows={rows}
         required={required}
-        className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm transition-all focus:outline-none focus:bg-white focus:border-brand-500 focus:ring-1 focus:ring-brand-500 text-dark-800 placeholder-slate-400 ${
+        className={`w-full bg-white border border-slate-200 rounded-md px-3.5 py-2 text-sm transition-colors focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 text-dark-800 placeholder-slate-400 ${
           error ? 'border-red-400 focus:border-red-500 focus:ring-red-500' : ''
         }`}
         {...props}
