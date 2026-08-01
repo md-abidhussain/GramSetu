@@ -15,10 +15,10 @@ export const cleanJsonString = (str) => {
  * Common function to invoke Gemini model and return structured JSON
  * @param {string} prompt - Prompt instruction
  * @param {Array<{mimeType: string, data: string}>} files - Optional inline base64 files
- * @param {string} modelName - Model name, defaults to 'gemini-1.5-flash'
+ * @param {string} modelName - Model name, defaults to 'gemini-3.1-flash-lite'
  * @returns {Promise<object>} Parsed JSON response
  */
-export const callGeminiJson = async (prompt, files = [], modelName = 'gemini-1.5-flash') => {
+export const callGeminiJson = async (prompt, files = [], modelName = 'gemini-3.1-flash-lite') => {
   try {
     const model = genAI.getGenerativeModel({
       model: modelName,
