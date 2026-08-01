@@ -20,8 +20,15 @@ demo_mode = False
 def get_model():
     global model, demo_mode
     if model is None:
-        weights = os.getenv("YOLO_SEG_WEIGHTS", "models/road-defects-yolov8-seg.pt")
-        if not os.path.isfile(weights):
+        weights = os.getenv("YOLO_SEG_WEIGHTS")
+        if not weights:
+            # Check default weights: prefer ONNX, then fall back to PyTorch weights
+            for path in ["models/model.onnx", "models/road-defects-yolov8-seg.pt"]:
+                if os.path.isfile(path):
+                    weights = path
+                    break
+        
+        if not weights or not os.path.isfile(weights):
             print("WARNING: YOLO weights not found. Falling back to Demo/Simulation mode.")
             demo_mode = True
             return None
@@ -30,9 +37,11 @@ def get_model():
             class_names = {str(name).lower().replace(" ", "_") for name in model.names.values()}
             required_classes = {"pothole"}
             if not required_classes.issubset(class_names):
-                print("WARNING: YOLO weights missing pothole class. Falling back to Demo/Simulation mode.")
+                print(f"WARNING: YOLO weights missing pothole class. Available classes: {class_names}. Falling back to Demo/Simulation mode.")
                 demo_mode = True
                 model = None
+            else:
+                demo_mode = False
         except Exception as e:
             print(f"WARNING: Error loading YOLO weights ({e}). Falling back to Demo/Simulation mode.")
             demo_mode = True
