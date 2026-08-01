@@ -75,6 +75,84 @@ segmentation-service/   FastAPI + Ultralytics YOLOv8-Seg inference service
 
 > Generic COCO YOLO weights are not sufficient: they do not contain pothole/crack defect classes. Use a custom-trained or road-defect-specific **segmentation** model, not a detection-only model.
 
+## Fine-tune YOLOv8-Seg for potholes and cracks
+
+The repository includes a reproducible two-class fine-tuning workflow in `segmentation-service/`. It starts from `yolov8n-seg.pt` and fine-tunes semantic masks for exactly these class IDs:
+
+| Class ID | Class name |
+| --- | --- |
+| `0` | `pothole` |
+| `1` | `crack` |
+
+### 1. Prepare labelled segmentation data
+
+Create this local directory structure. The data and model weights are ignored by Git because they can be large and may have licensing restrictions.
+
+```text
+segmentation-service/
+  datasets/road-defects/
+    images/
+      train/
+      val/
+      test/        # optional
+    labels/
+      train/
+      val/
+      test/        # optional
+```
+
+Each image has a same-named `.txt` label in the matching `labels` folder. Labels use the Ultralytics YOLO **segmentation** format:
+
+```text
+<class-id> <x1> <y1> <x2> <y2> <x3> <y3> ...
+```
+
+Coordinates are normalized from `0` to `1`; each annotation must contain at least three polygon points. For example:
+
+```text
+0 0.12 0.43 0.18 0.40 0.25 0.45 0.21 0.52 0.14 0.51
+1 0.63 0.20 0.66 0.22 0.72 0.39 0.69 0.42
+```
+
+Do not train on box-only labels for this workflow: the production service needs masks to calculate area. Split images by physical location or road segment, not by random adjacent frames, so nearly identical photos do not leak into validation.
+
+### 2. Train the model
+
+Install the segmentation dependencies, add the labelled data above, then run:
+
+```powershell
+cd segmentation-service
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+python train.py --epochs 150 --imgsz 640 --device 0
+```
+
+Use `--device cpu` if there is no CUDA GPU; it will be much slower. `--batch -1` is the default and lets Ultralytics select a batch size for available GPU memory. The initial `yolov8n-seg.pt` checkpoint may download on the first run. Training output is written to:
+
+```text
+segmentation-service/runs/pothole-crack-seg/weights/best.pt
+```
+
+The training script rejects incomplete datasets, invalid classes, box-like labels, and polygon coordinates outside `0..1` before GPU training begins.
+
+### 3. Evaluate and promote the model
+
+Evaluate on the held-out validation split:
+
+```powershell
+python evaluate.py --weights runs\pothole-crack-seg\weights\best.pt --device 0
+```
+
+Review the segmentation mAP50-95 result, per-class precision/recall, and visual predictions before deployment. Do not promote a model based only on training accuracy. When it is acceptable, copy `best.pt` to a stable local location, for example:
+
+```powershell
+New-Item -ItemType Directory -Force models
+Copy-Item runs\pothole-crack-seg\weights\best.pt models\road-defects-yolov8-seg.pt
+```
+
+Set `YOLO_SEG_WEIGHTS` to that file when starting the API service. You can continue a stopped run with the saved `last.pt` checkpoint through Ultralytics resume mode. The scripts use the documented Ultralytics training and validation interfaces. [Ultralytics training documentation](https://docs.ultralytics.com/modes/train/), [Ultralytics segmentation dataset format](https://docs.ultralytics.com/datasets/segment/).
+
 ## Setup and run locally
 
 Run these commands from the repository root (`GramSetu-main`).
