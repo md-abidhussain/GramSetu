@@ -14,13 +14,16 @@ const projectSchema = new mongoose.Schema({
   location: {
     lat: { type: Number, required: true },
     lng: { type: Number, required: true },
-    address: { type: String }
+    address: { type: String, default: '' }
   },
   beforeImageUrl: { type: String }, // Cloudinary URL
   afterImageUrl: { type: String },  // Cloudinary URL
   completionScore: { type: Number, min: 0, max: 100 },
-  riskLevel: { type: String, enum: ['Low', 'Medium', 'High'] },
-  projectHealth: { type: String, enum: ['Healthy', 'At Risk', 'Failed'] },
+  riskLevel: { type: String, enum: ['Low', 'Medium', 'High'], default: 'Low' },
+  projectHealth: { type: String, enum: ['Healthy', 'At Risk', 'Failed'], default: 'Healthy' },
+  healthPercentage: { type: Number, default: 100, min: 0, max: 100 },
+  complaintCount: { type: Number, default: 0 },
+  suggestedMaintenance: { type: Boolean, default: false },
   aiComparisonNotes: { type: String },
   status: { 
     type: String, 
@@ -44,6 +47,8 @@ const projectSchema = new mongoose.Schema({
     default: 'Tender Published'
   },
   statusHistory: [statusHistoryEntrySchema],
+  budgetVariance: { type: Number, default: 0 }, // Positive values represent overruns in currency
+  timelineEndDate: { type: Date },
   createdAt: { type: Date, default: Date.now }
 });
 

@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { request } from '../services/api.js';
+import { request, setInMemoryToken } from '../services/api.js';
 
 export const AuthContext = createContext();
 
@@ -7,19 +7,18 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Check if token exists on mount and fetch user profile
+  // Check if session is alive on mount
   useEffect(() => {
     const initializeAuth = async () => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        try {
-          const profile = await request('/auth/me');
+      try {
+        const profile = await request('/auth/me');
+        if (profile && profile._id) {
           setUser(profile);
-        } catch (error) {
-          console.error('Failed to load user session', error);
-          localStorage.removeItem('token');
+        } else {
           setUser(null);
         }
+      } catch (error) {
+        setUser(null);
       }
       setLoading(false);
     };
@@ -27,34 +26,90 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, []);
 
-  const loginUser = async (email, password) => {
+  const loginCitizen = async (identifier, password) => {
     try {
-      const data = await request('/auth/login', {
+      const data = await request('/auth/citizen/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ identifier, password }),
       });
       
-      localStorage.setItem('token', data.token);
-      setUser({
-        _id: data._id,
-        name: data.name,
-        email: data.email,
-        role: data.role,
-      });
+      setInMemoryToken(data.token);
+      setUser(data);
       return data;
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('Citizen Login error:', error);
       throw error;
     }
   };
 
-  const logoutUser = () => {
-    localStorage.removeItem('token');
+  const registerCitizen = async (name, email, phone, password) => {
+    try {
+      const data = await request('/auth/citizen/register', {
+        method: 'POST',
+        body: JSON.stringify({ name, email, phone, password }),
+      });
+      
+      setInMemoryToken(data.token);
+      setUser(data);
+      return data;
+    } catch (error) {
+      console.error('Citizen Register error:', error);
+      throw error;
+    }
+  };
+
+  const loginAuthority = async (identifier, password) => {
+    try {
+      const data = await request('/auth/authority/login', {
+        method: 'POST',
+        body: JSON.stringify({ identifier, password }),
+      });
+      
+      setInMemoryToken(data.token);
+      setUser(data);
+      return data;
+    } catch (error) {
+      console.error('Official Login error:', error);
+      throw error;
+    }
+  };
+
+  const registerAuthority = async (name, email, password, role) => {
+    try {
+      const data = await request('/auth/authority/register', {
+        method: 'POST',
+        body: JSON.stringify({ name, email, password, role }),
+      });
+      
+      setInMemoryToken(data.token);
+      setUser(data);
+      return data;
+    } catch (error) {
+      console.error('Official Register error:', error);
+      throw error;
+    }
+  };
+
+  const logoutUser = async () => {
+    try {
+      await request('/auth/logout', { method: 'POST' });
+    } catch (err) {
+      console.warn('Logout endpoint error:', err.message);
+    }
+    setInMemoryToken(null);
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, loginUser, logoutUser }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      loading, 
+      loginCitizen, 
+      registerCitizen, 
+      loginAuthority, 
+      registerAuthority, 
+      logoutUser 
+    }}>
       {children}
     </AuthContext.Provider>
   );

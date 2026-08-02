@@ -1,78 +1,214 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card.jsx';
 import { Button } from '../ui/Button.jsx';
-import { updateReportStatus } from '../../services/citizenService.js';
-import { MessageSquare, MapPin, Eye, CheckCircle2, ShieldAlert, Image as ImageIcon } from 'lucide-react';
+import { useAuth } from '../../hooks/useAuth.js';
+import { 
+  assignInspector, 
+  scheduleInspection, 
+  uploadInspectionVerification, 
+  resolveComplaint,
+  getInspectors
+} from '../../services/citizenService.js';
+import { 
+  MessageSquare, 
+  MapPin, 
+  Eye, 
+  ShieldAlert, 
+  Image as ImageIcon, 
+  UserCheck, 
+  Calendar, 
+  FileText,
+  AlertCircle
+} from 'lucide-react';
 
 export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
-  const [updatingId, setUpdatingId] = useState(null);
+  const { user } = useAuth(); // Logged-in authority official
   const [selectedReport, setSelectedReport] = useState(null);
+  
+  // Dynamic inspectors list for assignments
+  const [inspectors, setInspectors] = useState([]);
+  const [selectedInspectorId, setSelectedInspectorId] = useState('');
+  
+  // Inspection scheduling
+  const [scheduleDate, setScheduleDate] = useState('');
+  
+  // Verification uploads
+  const [inspectorFile, setInspectorFile] = useState(null);
+  const [inspectorNotes, setInspectorNotes] = useState('');
+  
+  // Resolutions
+  const [resolutionSummary, setResolutionSummary] = useState('');
 
-  const handleStatusChange = async (id, newStatus) => {
-    setUpdatingId(id);
+  const [loadingAction, setLoadingAction] = useState(false);
+  const [actionError, setActionError] = useState(null);
+
+  // Load registered Inspectors on mount
+  useEffect(() => {
+    const fetchInspectors = async () => {
+      try {
+        const list = await getInspectors();
+        setInspectors(list);
+        if (list.length > 0) {
+          setSelectedInspectorId(list[0]._id);
+        }
+      } catch (err) {
+        console.error('Failed to load inspectors list', err);
+      }
+    };
+    fetchInspectors();
+  }, []);
+
+  // Update selected report details when complaints feed updates
+  useEffect(() => {
+    if (selectedReport) {
+      const updated = complaints.find(c => c._id === selectedReport._id);
+      if (updated) {
+        setSelectedReport(updated);
+      }
+    }
+  }, [complaints]);
+
+  // Handler: Assign Inspector
+  const handleAssignInspector = async () => {
+    if (!selectedReport || !selectedInspectorId) return;
+    setLoadingAction(true);
+    setActionError(null);
     try {
-      await updateReportStatus(id, newStatus);
-      if (onStatusUpdated) {
-        onStatusUpdated();
-      }
-      if (selectedReport && selectedReport._id === id) {
-        setSelectedReport(prev => ({ ...prev, status: newStatus }));
-      }
+      await assignInspector(selectedReport._id, selectedInspectorId);
+      if (onStatusUpdated) onStatusUpdated();
     } catch (err) {
-      console.error('Failed to update status', err);
+      setActionError(err.message || 'Inspector assignment failed.');
     } finally {
-      setUpdatingId(null);
+      setLoadingAction(false);
     }
   };
 
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'Resolved':
-        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">Resolved</span>;
-      case 'Reviewed':
-        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-100">Reviewed</span>;
-      default:
-        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-100">New Complaint</span>;
+  // Handler: Schedule Date
+  const handleScheduleInspection = async () => {
+    if (!selectedReport || !scheduleDate) return;
+    setLoadingAction(true);
+    setActionError(null);
+    try {
+      await scheduleInspection(selectedReport._id, scheduleDate);
+      if (onStatusUpdated) onStatusUpdated();
+    } catch (err) {
+      setActionError(err.message || 'Failed to schedule inspection.');
+    } finally {
+      setLoadingAction(false);
     }
+  };
+
+  // Handler: Upload Verification Evidence
+  const handleUploadVerification = async (e) => {
+    e.preventDefault();
+    if (!selectedReport || !inspectorFile) {
+      setActionError('Verification photo is required');
+      return;
+    }
+    setLoadingAction(true);
+    setActionError(null);
+    try {
+      const formData = new FormData();
+      formData.append('reportId', selectedReport._id);
+      formData.append('image', inspectorFile);
+      formData.append('inspectorNotes', inspectorNotes);
+
+      await uploadInspectionVerification(formData);
+      setInspectorFile(null);
+      setInspectorNotes('');
+      if (onStatusUpdated) onStatusUpdated();
+    } catch (err) {
+      setActionError(err.message || 'Failed to upload verification evidence.');
+    } finally {
+      setLoadingAction(false);
+    }
+  };
+
+  // Handler: Resolve Complaint
+  const handleResolveComplaint = async (decision) => {
+    if (!selectedReport || !resolutionSummary) {
+      setActionError('Resolution summary remarks are required before finalizing decision.');
+      return;
+    }
+    setLoadingAction(true);
+    setActionError(null);
+    try {
+      await resolveComplaint(selectedReport._id, decision, resolutionSummary);
+      setResolutionSummary('');
+      if (onStatusUpdated) onStatusUpdated();
+    } catch (err) {
+      setActionError(err.message || 'Failed to record decision.');
+    } finally {
+      setLoadingAction(false);
+    }
+  };
+
+  const getStatusBadgeColor = (status) => {
+    switch (status) {
+      case 'Resolution Published':
+      case 'Accepted':
+        return 'bg-emerald-50 text-emerald-700 border-emerald-100';
+      case 'Rejected':
+        return 'bg-rose-50 text-rose-700 border-rose-100';
+      case 'Inspector Assigned':
+      case 'Inspection Scheduled':
+      case 'Inspector Uploads Verification':
+        return 'bg-blue-50 text-blue-700 border-blue-100';
+      default:
+        return 'bg-amber-50 text-amber-700 border-amber-100';
+    }
+  };
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '';
+    return new Date(dateStr).toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
   };
 
   return (
     <Card className="col-span-full">
       <CardHeader>
         <div>
-          <CardTitle className="flex items-center gap-1.5">
-            <MessageSquare className="h-5 w-5 text-brand-600" /> Citizen Complaints Feed
+          <CardTitle className="flex items-center gap-1.5 text-base">
+            <MessageSquare className="h-5 w-5 text-brand-600" /> Government Complaints Review Feed
           </CardTitle>
-          <p className="text-xs text-slate-400 mt-0.5">Real-time citizen infrastructure audits & damage reports</p>
+          <p className="text-xs text-slate-400 mt-0.5">Audit municipal defect notifications and direct local inspection tasks</p>
         </div>
       </CardHeader>
 
       <CardContent>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* List of complaints */}
-          <div className="lg:col-span-1 space-y-4 max-h-[500px] overflow-y-auto pr-2">
+          
+          {/* Complaints Feed List */}
+          <div className="lg:col-span-1 space-y-3 max-h-[520px] overflow-y-auto pr-2">
             {complaints.length === 0 ? (
               <p className="text-xs text-slate-400 text-center py-12 bg-slate-50/50 rounded-md">No citizen complaints registered</p>
             ) : (
               complaints.map((item) => (
                 <div
                   key={item._id}
-                  onClick={() => setSelectedReport(item)}
-                  className={`p-3.5 rounded-md border transition-colors cursor-pointer text-xs ${
+                  onClick={() => {
+                    setSelectedReport(item);
+                    setActionError(null);
+                  }}
+                  className={`p-3.5 rounded border transition-colors cursor-pointer text-xs ${
                     selectedReport?._id === item._id
-                      ? 'border-brand-600 bg-brand-50/10'
-                      : 'border-slate-200 hover:border-slate-300 bg-white'
+                      ? 'border-brand-650 bg-brand-50/10'
+                      : 'border-slate-200 hover:border-slate-350 bg-white'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className={`font-bold ${item.flaggedAsDiscrepancy ? 'text-rose-600' : 'text-slate-650'}`}>
-                      Match: {item.matchScore}%
+                    <span className="font-bold text-rose-600">Match Index: {item.matchScore}%</span>
+                    <span className={`px-2 py-0.5 rounded text-[9px] font-bold border ${getStatusBadgeColor(item.status)}`}>
+                      {item.status}
                     </span>
-                    {getStatusBadge(item.status)}
                   </div>
-                  <h4 className="font-semibold text-dark-800 truncate mb-1">{item.project?.title || item.customProjectTitle || 'Unknown Project'}</h4>
+                  <h4 className="font-bold text-dark-800 truncate mb-0.5">{item.project?.title || item.customProjectTitle || 'Custom Report'}</h4>
                   <p className="text-slate-400 truncate flex items-center gap-1">
-                    <MapPin className="h-3 w-3 shrink-0" /> {item.project?.location?.address || 'N/A'}
+                    <MapPin className="h-3 w-3 shrink-0" /> {item.project?.location?.address || 'Custom Coordinates'}
                   </p>
                   <p className="text-slate-500 mt-2 line-clamp-2">{item.description}</p>
                 </div>
@@ -80,122 +216,265 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
             )}
           </div>
 
-          {/* Detailed view */}
-          <div className="lg:col-span-2 bg-slate-50/20 border border-slate-200 rounded-lg p-6 flex flex-col justify-between min-h-[400px]">
+          {/* Detailed Workflow Actions Panel */}
+          <div className="lg:col-span-2 bg-slate-50/30 border border-slate-200 rounded-lg p-5 flex flex-col justify-between min-h-[480px]">
             {selectedReport ? (
-              <div className="space-y-5 animate-fadeIn">
+              <div className="space-y-4 animate-fadeIn text-xs">
+                
                 {/* Header */}
-                <div className="flex justify-between items-start gap-4">
+                <div className="flex justify-between items-start gap-4 border-b border-slate-100 pb-3">
                   <div>
-                    <h3 className="text-sm font-bold text-dark-800">{selectedReport.project?.title || selectedReport.customProjectTitle || 'Custom Project'}</h3>
-                    <p className="text-slate-400 text-xs flex items-center gap-1 mt-0.5">
-                      <MapPin className="h-3.5 w-3.5" /> GPS: {selectedReport.gps.lat}, {selectedReport.gps.lng}
+                    <h3 className="text-sm font-bold text-dark-800">
+                      {selectedReport.project?.title || selectedReport.customProjectTitle || 'Custom Project Site'}
+                    </h3>
+                    <p className="text-slate-400 text-[10px] mt-0.5">
+                      Reporter: {selectedReport.citizen?.name || 'Anonymous Citizen'} • Severity: <span className="font-semibold text-rose-600">{selectedReport.severity}</span>
                     </p>
                   </div>
-                  <div className="flex gap-2">
-                    {getStatusBadge(selectedReport.status)}
-                  </div>
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${getStatusBadgeColor(selectedReport.status)}`}>
+                    {selectedReport.status}
+                  </span>
                 </div>
 
-                {/* Visual Evidence (Citizen Image vs Official Image) */}
+                {actionError && (
+                  <div className="p-3 bg-rose-50 border border-rose-200 rounded text-rose-700 text-xs flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4 shrink-0" />
+                    <span>{actionError}</span>
+                  </div>
+                )}
+
+                {/* Evidence Photo Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <span className="block text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1">
-                      <ImageIcon className="h-3.5 w-3.5" /> Citizen Submitted Photo
+                      <ImageIcon className="h-3.5 w-3.5 text-slate-400" /> Citizen Evidence
                     </span>
-                    <a href={selectedReport.citizenImageUrl} target="_blank" rel="noreferrer" className="block relative h-36 rounded-md overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity">
-                      <img src={selectedReport.citizenImageUrl} alt="Citizen Proof" className="w-full h-full object-cover" />
-                      <span className="absolute bottom-2 right-2 bg-dark-900/60 text-white font-bold text-[9px] px-2 py-0.5 rounded flex items-center gap-1">
-                        <Eye className="h-3 w-3" /> Zoom
-                      </span>
+                    <a href={selectedReport.citizenImageUrl} target="_blank" rel="noreferrer" className="block relative h-32 rounded border border-slate-200 overflow-hidden bg-white hover:opacity-90 transition-opacity">
+                      <img src={selectedReport.citizenImageUrl} alt="Citizen Upload" className="w-full h-full object-cover" />
                     </a>
                   </div>
-                  
+
                   <div>
                     <span className="block text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1">
-                      <ImageIcon className="h-3.5 w-3.5" /> Official Completion Photo
+                      <ImageIcon className="h-3.5 w-3.5 text-slate-400" /> Official Site Verification
                     </span>
-                    {selectedReport.project?.afterImageUrl ? (
-                      <a href={selectedReport.project.afterImageUrl} target="_blank" rel="noreferrer" className="block relative h-36 rounded-md overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity">
-                        <img src={selectedReport.project.afterImageUrl} alt="Official Completion" className="w-full h-full object-cover" />
-                        <span className="absolute bottom-2 right-2 bg-dark-900/60 text-white font-bold text-[9px] px-2 py-0.5 rounded flex items-center gap-1">
-                          <Eye className="h-3 w-3" /> Zoom
-                        </span>
+                    {selectedReport.inspectorAfterImageUrl ? (
+                      <a href={selectedReport.inspectorAfterImageUrl} target="_blank" rel="noreferrer" className="block relative h-32 rounded border border-slate-200 overflow-hidden bg-white hover:opacity-90 transition-opacity">
+                        <img src={selectedReport.inspectorAfterImageUrl} alt="Inspector Upload" className="w-full h-full object-cover" />
                       </a>
                     ) : (
-                      <div className="h-36 rounded-md bg-slate-100 flex items-center justify-center text-slate-400 italic text-[11px] border border-dashed border-slate-200">
-                        Awaiting completed photo
+                      <div className="h-32 rounded border border-dashed border-slate-200 flex items-center justify-center text-slate-400 italic">
+                        Inspection evidence not uploaded yet
                       </div>
                     )}
                   </div>
                 </div>
 
-                {/* Details & AI Report */}
-                <div className="space-y-3">
-                  <div>
-                    <span className="block text-[10px] text-slate-400 font-bold uppercase tracking-wider">Citizen Narrative</span>
-                    <p className="text-xs text-dark-800 mt-1 bg-white p-3 rounded-md border border-slate-200">{selectedReport.description}</p>
+                {/* Info summary */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-3.5 rounded border border-slate-200">
+                  <div className="space-y-1">
+                    <p><span className="text-slate-400 font-medium">Assigned Officer:</span> <span className="font-semibold">{selectedReport.assignedOfficer?.name || 'Not Assigned'}</span></p>
+                    <p><span className="text-slate-400 font-medium">Inspection Date:</span> <span className="font-semibold">{formatDate(selectedReport.inspectionDate) || 'Not Scheduled'}</span></p>
+                    <p><span className="text-slate-400 font-medium">Resolution ETA:</span> <span className="font-semibold">{formatDate(selectedReport.resolutionEta) || 'TBD'}</span></p>
                   </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <span className="block text-[10px] text-slate-400 font-bold uppercase tracking-wider">Anomalies Spotted</span>
-                      <div className="flex flex-wrap gap-1 mt-1.5">
-                        {selectedReport.detectedIssues.map(issue => (
-                          <span key={issue} className="px-2 py-0.5 bg-rose-50 text-rose-700 border border-rose-100 rounded text-[10px] font-semibold uppercase">
-                            {issue}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <span className="block text-[10px] text-slate-400 font-bold uppercase tracking-wider">Compliance Index</span>
-                      <span className={`inline-block mt-1.5 font-bold text-sm ${selectedReport.matchScore >= 80 ? 'text-emerald-600' : 'text-rose-600'}`}>
-                        {selectedReport.matchScore}%
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="border-t border-slate-200 pt-3">
-                    <span className="block text-[10px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
-                      <ShieldAlert className="h-3.5 w-3.5 text-brand-600" /> Discrepancy Assessment
-                    </span>
-                    <p className="text-xs text-dark-800 leading-relaxed mt-1 bg-brand-50/10 p-3.5 rounded-md border border-brand-100/20">
-                      {selectedReport.aiReport}
-                    </p>
+                  <div className="space-y-1">
+                    <p><span className="text-slate-400 font-medium">Duplicate Check:</span> <span className="font-semibold text-amber-600">{selectedReport.duplicateFound ? 'Duplicate Found' : 'Clean'}</span></p>
+                    <p><span className="text-slate-400 font-medium">Detected Anomalies:</span> <span className="font-semibold text-rose-600 capitalize">{selectedReport.detectedIssues?.join(', ') || 'None'}</span></p>
                   </div>
                 </div>
 
-                {/* Actions */}
-                <div className="flex gap-3 justify-end border-t border-slate-100 pt-4">
-                  {selectedReport.status !== 'Reviewed' && (
-                    <Button
-                      variant="outline"
-                      onClick={() => handleStatusChange(selectedReport._id, 'Reviewed')}
-                      disabled={updatingId === selectedReport._id}
-                      className="px-5"
-                    >
-                      Mark Reviewed
-                    </Button>
+                <div className="border-t border-slate-100 pt-3">
+                  <span className="block text-[10px] text-slate-450 font-bold uppercase tracking-wider">Citizen Narrative</span>
+                  <p className="text-slate-650 mt-1 leading-relaxed">{selectedReport.description}</p>
+                </div>
+
+                {/* Gemini comparative report analysis if discrepancies exist */}
+                {selectedReport.aiReport && (
+                  <div className="border-t border-slate-100 pt-3">
+                    <span className="block text-[10px] text-slate-450 font-bold uppercase tracking-wider flex items-center gap-1">
+                      <ShieldAlert className="h-3.5 w-3.5 text-brand-600" /> AI Discrepancy Assessment
+                    </span>
+                    <p className="text-slate-700 bg-brand-50/15 border border-brand-100 p-2.5 rounded mt-1.5 leading-relaxed">
+                      {selectedReport.aiReport}
+                    </p>
+                  </div>
+                )}
+
+                {/* Inspector Site Notes */}
+                {selectedReport.inspectorNotes && (
+                  <div className="border-t border-slate-100 pt-3">
+                    <span className="block text-[10px] text-slate-450 font-bold uppercase tracking-wider">Inspector Notes</span>
+                    <p className="text-slate-700 bg-slate-100/50 border border-slate-200 p-2.5 rounded mt-1.5 leading-relaxed italic">
+                      {selectedReport.inspectorNotes}
+                    </p>
+                  </div>
+                )}
+
+                {/* RESOLUTION FLOW OPTIONS */}
+                <div className="border-t border-slate-200 pt-4 mt-6">
+                  
+                  {/* Step 1: Assign Inspector (District Authority / Admin only) */}
+                  {(selectedReport.status === 'Authority Notification' || selectedReport.status === 'Complaint Submitted' || selectedReport.status === 'Duplicate Detected') && 
+                   (user.role === 'District Authority' || user.role === 'Admin' || user.role === 'Government Officer') && (
+                    <div className="space-y-2.5">
+                      <h4 className="font-bold text-slate-500 flex items-center gap-1">
+                        <UserCheck className="h-4 w-4" /> 1. Assign Site Inspector
+                      </h4>
+                      <div className="flex gap-2">
+                        <select
+                          value={selectedInspectorId}
+                          onChange={(e) => setSelectedInspectorId(e.target.value)}
+                          className="flex-1 bg-white border border-slate-200 rounded px-2.5 py-1.5 focus:outline-none focus:border-brand-500"
+                        >
+                          {inspectors.map(ins => (
+                            <option key={ins._id} value={ins._id}>
+                              {ins.name} ({ins.uniqueUserId})
+                            </option>
+                          ))}
+                        </select>
+                        <Button
+                          onClick={handleAssignInspector}
+                          loading={loadingAction}
+                          disabled={loadingAction || !selectedInspectorId}
+                          className="px-4 py-1.5"
+                        >
+                          Assign Official
+                        </Button>
+                      </div>
+                    </div>
                   )}
-                  {selectedReport.status !== 'Resolved' && (
-                    <Button
-                      variant="primary"
-                      onClick={() => handleStatusChange(selectedReport._id, 'Resolved')}
-                      disabled={updatingId === selectedReport._id}
-                      className="px-5 bg-emerald-600 hover:bg-emerald-700"
-                    >
-                      Resolve Issue
-                    </Button>
+
+                  {/* Step 2: Schedule Site Visit (Assigned Inspector only) */}
+                  {selectedReport.status === 'Inspector Assigned' && 
+                   (selectedReport.assignedOfficer?._id === user._id || user.role === 'Admin') && (
+                    <div className="space-y-2.5">
+                      <h4 className="font-bold text-slate-500 flex items-center gap-1">
+                        <Calendar className="h-4 w-4" /> 2. Schedule Inspection Visit
+                      </h4>
+                      <div className="flex gap-2">
+                        <input
+                          type="date"
+                          value={scheduleDate}
+                          onChange={(e) => setScheduleDate(e.target.value)}
+                          className="flex-1 bg-white border border-slate-200 rounded px-2.5 py-1.5 focus:outline-none"
+                        />
+                        <Button
+                          onClick={handleScheduleInspection}
+                          loading={loadingAction}
+                          disabled={loadingAction || !scheduleDate}
+                          className="px-4 py-1.5 animate-fadeIn"
+                        >
+                          Schedule Visit
+                        </Button>
+                      </div>
+                    </div>
                   )}
+
+                  {/* Step 3: Upload Inspector Evidence Photos (Assigned Inspector only) */}
+                  {selectedReport.status === 'Inspection Scheduled' && 
+                   (selectedReport.assignedOfficer?._id === user._id || user.role === 'Admin') && (
+                    <form onSubmit={handleUploadVerification} className="space-y-3">
+                      <h4 className="font-bold text-slate-500 flex items-center gap-1">
+                        <ImageIcon className="h-4 w-4" /> 3. Submit Inspection Verification Details
+                      </h4>
+                      
+                      <div className="space-y-2">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => setInspectorFile(e.target.files[0])}
+                          required
+                          className="w-full bg-white border border-slate-200 rounded px-2.5 py-1.5"
+                        />
+                        <textarea
+                          placeholder="Provide Inspector comments / defect remarks..."
+                          value={inspectorNotes}
+                          onChange={(e) => setInspectorNotes(e.target.value)}
+                          rows={2}
+                          className="w-full bg-white border border-slate-200 rounded px-2.5 py-1.5 focus:outline-none"
+                        />
+                        <Button
+                          type="submit"
+                          loading={loadingAction}
+                          disabled={loadingAction || !inspectorFile}
+                          className="w-full py-2 bg-blue-600 hover:bg-blue-700"
+                        >
+                          Submit Verification Proof
+                        </Button>
+                      </div>
+                    </form>
+                  )}
+
+                  {/* Step 4: Authority Review Decision (District Authority / Officer only) */}
+                  {(selectedReport.status === 'Inspector Uploads Verification' || 
+                    selectedReport.status === 'Gemini Analysis' || 
+                    selectedReport.status === 'AI Agent Validation') && 
+                   (user.role === 'District Authority' || user.role === 'Admin' || user.role === 'Government Officer') && (
+                    <div className="space-y-3">
+                      <h4 className="font-bold text-slate-500 flex items-center gap-1">
+                        <FileText className="h-4 w-4" /> 4. Final Official Resolution Decision
+                      </h4>
+                      
+                      <textarea
+                        placeholder="Provide details on resolution work completed, repairs initialized, or justifications..."
+                        value={resolutionSummary}
+                        onChange={(e) => setResolutionSummary(e.target.value)}
+                        required
+                        rows={2}
+                        className="w-full bg-white border border-slate-200 rounded px-2.5 py-1.5 focus:outline-none"
+                      />
+                      
+                      <div className="flex gap-2 justify-end pt-1">
+                        <button
+                          onClick={() => handleResolveComplaint('Need More Evidence')}
+                          disabled={loadingAction}
+                          className="px-4 py-2 border border-slate-200 rounded hover:bg-slate-50 font-bold"
+                        >
+                          Need More Evidence
+                        </button>
+                        <button
+                          onClick={() => handleResolveComplaint('Rejected')}
+                          disabled={loadingAction}
+                          className="px-4 py-2 bg-rose-50 border border-rose-100 text-rose-700 hover:bg-rose-100 rounded font-bold"
+                        >
+                          Reject Complaint
+                        </button>
+                        <button
+                          onClick={() => handleResolveComplaint('Accepted')}
+                          disabled={loadingAction}
+                          className="px-5 py-2 bg-emerald-600 text-white hover:bg-emerald-700 rounded font-bold shadow"
+                        >
+                          Accept & Publish Resolution
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedReport.status === 'Resolution Published' && (
+                    <div className="bg-emerald-50/20 border border-emerald-100 p-3 rounded text-emerald-800 text-center font-bold">
+                      ✔️ Issue Resolution Published & Citizen Rewarded.
+                    </div>
+                  )}
+
+                  {selectedReport.status === 'Rejected' && (
+                    <div className="bg-rose-50/20 border border-rose-100 p-3 rounded text-rose-800 text-center font-bold">
+                      ❌ Complaint was Rejected by Authority.
+                    </div>
+                  )}
+
+                  {selectedReport.status === 'Need More Evidence' && (
+                    <div className="bg-amber-50/20 border border-amber-100 p-3 rounded text-amber-800 text-center font-bold">
+                      ⚠️ Authority requires additional evidence. Awaiting Citizen Update.
+                    </div>
+                  )}
+
                 </div>
               </div>
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center text-slate-400 p-12 text-center">
                 <MessageSquare className="h-10 w-10 text-slate-300 mb-2" />
                 <p className="text-xs font-semibold">Select a citizen complaint</p>
-                <p className="text-[11px] mt-0.5">Click any report in the left sidebar to audit the damage details and trigger resolutions.</p>
+                <p className="text-[11px] mt-0.5">Click any report in the left sidebar to audit the damage details and trigger workflow actions.</p>
               </div>
             )}
           </div>

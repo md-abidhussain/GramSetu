@@ -63,7 +63,7 @@ export const getRiskAnalytics = async (req, res, next) => {
 
 export const getContractorScores = async (req, res, next) => {
   try {
-    const contractors = await Contractor.find().sort({ performanceScore: -1 });
+    const contractors = await Contractor.find().sort({ trustScore: -1 });
     res.json(contractors);
   } catch (error) {
     next(error);
@@ -74,6 +74,8 @@ export const getComplaints = async (req, res, next) => {
   try {
     const complaints = await CitizenReport.find()
       .populate('project')
+      .populate('citizen', 'name email phone')
+      .populate('assignedOfficer', 'name role')
       .sort({ createdAt: -1 });
     res.json(complaints);
   } catch (error) {
@@ -83,7 +85,9 @@ export const getComplaints = async (req, res, next) => {
 
 export const getMapData = async (req, res, next) => {
   try {
-    const projects = await Project.find({}, 'title location status projectHealth completionScore').sort({ createdAt: -1 });
+    const projects = await Project.find()
+      .populate('contractor', 'name trustScore')
+      .sort({ createdAt: -1 });
     res.json(projects);
   } catch (error) {
     next(error);

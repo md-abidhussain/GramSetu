@@ -23,12 +23,15 @@ export const Sidebar = () => {
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, role: 'authority' },
     { name: 'Tender Intelligence', path: '/tenders', icon: FileText, role: 'authority' },
     { name: 'Project Monitoring', path: '/projects', icon: Activity, role: 'authority' },
-    { name: 'Citizen Portal (Public)', path: '/verify', icon: ShieldAlert, role: 'any' },
+    { name: 'Citizen Portal', path: '/verify', icon: ShieldAlert, role: 'any' },
   ];
 
   const filteredItems = navItems.filter(item => {
-    if (item.role === 'any') return true;
-    return user && (user.role === 'authority' || user.role === 'admin');
+    if (item.role === 'any') {
+      // Citizens only see Citizen Portal; Officials can see everything
+      return true;
+    }
+    return user && user.role !== 'citizen' && !user.isCitizen;
   });
 
   return (

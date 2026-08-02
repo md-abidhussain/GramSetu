@@ -6,12 +6,12 @@ import {
   getComplaints, 
   getMapData 
 } from '../controllers/dashboardController.js';
-import { protect, restrictTo } from '../middleware/authMiddleware.js';
+import { protectAuthority, restrictTo } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.use(protect);
-router.use(restrictTo('authority', 'admin'));
+router.use(protectAuthority);
+router.use(restrictTo('District Authority', 'PWD Engineer', 'Admin', 'Government Officer', 'Inspector'));
 
 router.get('/summary', getSummary);
 router.get('/risk-analytics', getRiskAnalytics);

@@ -1,9 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card.jsx';
+import { 
+  Award, 
+  X, 
+  TrendingUp, 
+  ShieldCheck, 
+  AlertTriangle, 
+  Activity, 
+  Calendar,
+  CheckCircle,
+  FileSpreadsheet
+} from 'lucide-react';
 
 export const ContractorLeaderboard = ({ contractors = [] }) => {
-  // Sort by performanceScore descending
-  const sortedContractors = [...contractors].sort((a, b) => b.performanceScore - a.performanceScore);
+  // Sort by trustScore descending
+  const sortedContractors = [...contractors].sort((a, b) => b.trustScore - a.trustScore);
+  const [selectedContractor, setSelectedContractor] = useState(null);
 
   const getRankBadge = (index) => {
     const badgeColors = [
@@ -25,39 +37,195 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
     <Card className="h-full">
       <CardHeader>
         <div>
-          <CardTitle>
-            Contractor Performance Ledger
+          <CardTitle className="text-base font-bold">
+            Contractor Intelligence Registry
           </CardTitle>
-          <p className="text-xs text-slate-400 mt-0.5">National leaderboard ranked by integrity and completion standing</p>
+          <p className="text-xs text-slate-400 mt-0.5">National contractor performance & AI Trust standing directory</p>
         </div>
       </CardHeader>
 
       <CardContent className="p-0 overflow-y-auto max-h-[380px]">
         <div className="divide-y divide-slate-100">
           {sortedContractors.length === 0 ? (
-            <p className="text-xs text-slate-400 text-center py-12">No contractors seeded in the ledger.</p>
+            <p className="text-xs text-slate-400 text-center py-12">No contractors seeded in the registry.</p>
           ) : (
             sortedContractors.map((item, idx) => (
-              <div key={item._id} className="p-4 flex items-center gap-3.5 hover:bg-slate-50/50 transition-colors">
+              <div 
+                key={item._id} 
+                onClick={() => setSelectedContractor(item)}
+                className="p-4 flex items-center gap-3.5 hover:bg-slate-50/50 transition-colors cursor-pointer"
+              >
                 {getRankBadge(idx)}
 
                 <div className="flex-1 min-w-0">
                   <h4 className="font-semibold text-xs text-dark-800 truncate">{item.name}</h4>
                   <div className="flex items-center gap-3 mt-1 text-[10px] text-slate-400">
-                    <span>ID: {item.registrationId}</span>
-                    <span className="flex items-center gap-0.5">On-Time: {item.completedOnTime}</span>
-                    <span className="flex items-center gap-0.5">Delayed: {item.delayedCount}</span>
+                    <span>Reg: {item.registrationId}</span>
+                    <span>Completed: {item.completedCount}</span>
+                    <span className="text-rose-600">Complaints: {item.citizenComplaintsCount || 0}</span>
                   </div>
                 </div>
 
-                <div className={`px-2 py-0.5 rounded text-[11px] font-bold shrink-0 ${getScoreColor(item.performanceScore)}`}>
-                  {item.performanceScore} Pts
+                <div className="text-right">
+                  <div className={`px-2 py-0.5 rounded text-[10px] font-bold inline-block ${getScoreColor(item.trustScore)}`}>
+                    {item.trustScore}% Trust
+                  </div>
+                  <span className="block text-[8px] text-slate-400 mt-0.5">Performance: {item.performanceScore}</span>
                 </div>
               </div>
             ))
           )}
         </div>
       </CardContent>
+
+      {/* Contractor Details Modal (Phase 6) */}
+      {selectedContractor && (
+        <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-50 p-4 animate-fadeIn">
+          <div className="bg-white rounded-lg border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden">
+            
+            {/* Modal Header */}
+            <div className="bg-slate-800 text-white p-5 flex items-center justify-between">
+              <div>
+                <span className="text-[9px] text-slate-350 font-bold uppercase tracking-wider">Contractor Profile & Auditing metrics</span>
+                <h3 className="text-base font-bold flex items-center gap-2 mt-0.5">
+                  <Award className="h-5 w-5 text-brand-400" /> {selectedContractor.name}
+                </h3>
+              </div>
+              <button 
+                onClick={() => setSelectedContractor(null)}
+                className="text-slate-400 hover:text-white transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 space-y-6 overflow-y-auto max-h-[500px] text-xs">
+              
+              {/* Profile details */}
+              <div className="bg-slate-50 border border-slate-200 rounded p-4">
+                <span className="text-[10px] text-slate-450 font-bold uppercase tracking-wider">AI Executive Summary</span>
+                <p className="text-slate-650 mt-1 leading-relaxed italic">{selectedContractor.aiSummary}</p>
+                <div className="grid grid-cols-2 gap-4 mt-3 pt-3 border-t border-slate-200 text-slate-500">
+                  <p><span className="font-semibold text-slate-400">Registration ID:</span> {selectedContractor.registrationId}</p>
+                  <p><span className="font-semibold text-slate-400">Registered Since:</span> {new Date(selectedContractor.createdAt).toLocaleDateString()}</p>
+                </div>
+              </div>
+
+              {/* Metrics Grid */}
+              <div>
+                <h4 className="text-[10px] text-slate-450 font-bold uppercase tracking-wider mb-2.5">Key Performance Indicators</h4>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3.5">
+                  
+                  <div className="bg-emerald-50/20 border border-emerald-100 rounded p-3 text-center">
+                    <span className="block text-[9px] font-semibold text-slate-500 uppercase">AI Trust Score</span>
+                    <span className="text-lg font-black text-emerald-600 block mt-1">{selectedContractor.trustScore}%</span>
+                  </div>
+
+                  <div className="bg-slate-50 border border-slate-100 rounded p-3 text-center">
+                    <span className="block text-[9px] font-semibold text-slate-500 uppercase">Completed Works</span>
+                    <span className="text-lg font-black text-slate-800 block mt-1">{selectedContractor.completedCount}</span>
+                  </div>
+
+                  <div className="bg-amber-50/20 border border-amber-100 rounded p-3 text-center">
+                    <span className="block text-[9px] font-semibold text-slate-500 uppercase">Delayed Projects</span>
+                    <span className="text-lg font-black text-amber-600 block mt-1">{selectedContractor.delayedCount}</span>
+                  </div>
+
+                  <div className="bg-rose-50/20 border border-rose-100 rounded p-3 text-center">
+                    <span className="block text-[9px] font-semibold text-slate-500 uppercase">Budget Overruns</span>
+                    <span className="text-lg font-black text-rose-600 block mt-1">{selectedContractor.budgetOverrunsCount}</span>
+                  </div>
+
+                  <div className="bg-rose-50/10 border border-rose-100/50 rounded p-3 text-center">
+                    <span className="block text-[9px] font-semibold text-slate-500 uppercase">Citizen Complaints</span>
+                    <span className="text-lg font-black text-rose-700 block mt-1">{selectedContractor.citizenComplaintsCount || 0}</span>
+                  </div>
+
+                  <div className="bg-amber-50/10 border border-amber-100/50 rounded p-3 text-center">
+                    <span className="block text-[9px] font-semibold text-slate-500 uppercase">Quality Issues Flagged</span>
+                    <span className="text-lg font-black text-amber-700 block mt-1">{selectedContractor.qualityIssuesCount || 0}</span>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* Historical Trends */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="border border-slate-200 rounded p-4 bg-white shadow-sm">
+                  <h4 className="text-[10px] font-bold text-slate-450 uppercase tracking-wider mb-3 flex items-center gap-1">
+                    <TrendingUp className="h-3.5 w-3.5 text-brand-600" /> Performance Trend History
+                  </h4>
+                  <div className="flex items-end gap-2.5 h-16 pt-3 px-2">
+                    {(selectedContractor.performanceTrend || [80, 82, 85, 94]).map((val, idx) => (
+                      <div key={idx} className="flex-1 flex flex-col items-center">
+                        <div className="w-full bg-brand-500 rounded-t" style={{ height: `${val / 1.5}px` }} />
+                        <span className="text-[8px] text-slate-400 mt-1">{val}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="border border-slate-200 rounded p-4 bg-white shadow-sm">
+                  <h4 className="text-[10px] font-bold text-slate-450 uppercase tracking-wider mb-3 flex items-center gap-1">
+                    <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" /> Risk Trend Index
+                  </h4>
+                  <div className="flex items-end gap-2.5 h-16 pt-3 px-2">
+                    {(selectedContractor.riskTrend || [20, 18, 15, 8]).map((val, idx) => (
+                      <div key={idx} className="flex-1 flex flex-col items-center">
+                        <div className="w-full bg-emerald-500 rounded-t" style={{ height: `${val * 1.5}px` }} />
+                        <span className="text-[8px] text-slate-400 mt-1">{val}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Recent Inspection Logs */}
+              <div className="border border-slate-200 rounded-lg overflow-hidden">
+                <div className="bg-slate-50 border-b border-slate-200 px-4 py-2.5 flex items-center justify-between">
+                  <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                    <FileSpreadsheet className="h-4 w-4" /> Recent Audit & Inspection Reports
+                  </h4>
+                </div>
+                <div className="divide-y divide-slate-100 bg-white">
+                  {selectedContractor.recentInspections && selectedContractor.recentInspections.length > 0 ? (
+                    selectedContractor.recentInspections.map((ins, index) => (
+                      <div key={index} className="p-3 flex items-start justify-between gap-4">
+                        <div>
+                          <p className="font-semibold text-dark-800 text-[11px]">{ins.projectTitle}</p>
+                          <span className="text-[9px] text-slate-400 flex items-center gap-1 mt-0.5">
+                            <Calendar className="h-3 w-3" /> {new Date().toLocaleDateString()}
+                          </span>
+                        </div>
+                        <span className="text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100 rounded px-2 py-0.5">
+                          {ins.result}
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="p-4 text-center text-slate-400 italic text-[11px]">
+                      No inspections recorded recently.
+                    </div>
+                  )}
+                </div>
+              </div>
+
+            </div>
+
+            {/* Modal Footer */}
+            <div className="bg-slate-50 p-4 border-t border-slate-200 flex justify-end">
+              <button
+                onClick={() => setSelectedContractor(null)}
+                className="px-4 py-1.5 bg-slate-800 text-white rounded text-xs font-bold shadow hover:bg-slate-900 transition-colors"
+              >
+                Close Profile
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
     </Card>
   );
 };

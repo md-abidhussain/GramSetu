@@ -3,22 +3,35 @@ import {
   createCitizenReport, 
   getCitizenReports, 
   getCitizenReportById, 
-  updateCitizenReportStatus 
+  assignInspector,
+  scheduleInspection,
+  uploadInspectionVerification,
+  resolveComplaint
 } from '../controllers/citizenController.js';
-import { protect, restrictTo } from '../middleware/authMiddleware.js';
+import { protectAuthority, protectCitizen, protectAny, restrictTo } from '../middleware/authMiddleware.js';
 import { uploadImage } from '../middleware/uploadMiddleware.js';
 
 const router = express.Router();
 
-// Publicly accessible for citizen report submissions
-router.post('/', uploadImage, createCitizenReport);
+// Citizen-only: File a complaint
+router.post('/', protectCitizen, uploadImage, createCitizenReport);
 
-// Protected routes (authorities/admins only)
-router.use(protect);
-router.use(restrictTo('authority', 'admin'));
+// Any authenticated user: Get details of a single report
+router.get('/:id', protectAny, getCitizenReportById);
 
-router.get('/', getCitizenReports);
-router.get('/:id', getCitizenReportById);
-router.patch('/:id/status', updateCitizenReportStatus);
+// Authorities: Get list of reports
+router.get('/', protectAuthority, getCitizenReports);
+
+// Authorities: Assign inspector to complaint
+router.post('/assign-inspector', protectAuthority, restrictTo('District Authority', 'Admin', 'Government Officer'), assignInspector);
+
+// Inspector: Schedule inspection
+router.post('/schedule-inspection', protectAuthority, restrictTo('Inspector', 'Admin'), scheduleInspection);
+
+// Inspector: Upload inspection evidence
+router.post('/upload-verification', protectAuthority, restrictTo('Inspector', 'Admin'), uploadImage, uploadInspectionVerification);
+
+// Authority: Accept / Reject / Need More Evidence
+router.post('/resolve', protectAuthority, restrictTo('District Authority', 'Admin', 'Government Officer'), resolveComplaint);
 
 export default router;

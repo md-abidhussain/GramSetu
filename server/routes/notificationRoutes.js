@@ -1,11 +1,10 @@
 import express from 'express';
 import { getNotifications, markNotificationRead } from '../controllers/dashboardController.js';
-import { protect, restrictTo } from '../middleware/authMiddleware.js';
+import { protectAny } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.use(protect);
-router.use(restrictTo('authority', 'admin'));
+router.use(protectAny);
 
 router.get('/', getNotifications);
 router.patch('/:id/read', markNotificationRead);

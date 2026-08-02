@@ -1,6 +1,6 @@
 import Project from '../models/Project.js';
 import Tender from '../models/Tender.js';
-import User from '../models/User.js';
+import Authority from '../models/Authority.js';
 import Notification from '../models/Notification.js';
 import { uploadBuffer } from '../services/cloudinaryService.js';
 import { compareBeforeAfter } from '../services/geminiImageCompareService.js';
@@ -10,7 +10,7 @@ import { runMockLifecycleAI } from '../services/mockLifecycleAIService.js';
 // Helper to create notifications for all authority users
 const notifyAuthorities = async (message, type = 'info') => {
   try {
-    const authorities = await User.find({ role: { $in: ['authority', 'admin'] } });
+    const authorities = await Authority.find({ role: { $in: ['Government Officer', 'Inspector', 'District Authority', 'PWD Engineer', 'Admin'] } });
     const notifications = authorities.map(auth => ({
       user: auth._id,
       message,

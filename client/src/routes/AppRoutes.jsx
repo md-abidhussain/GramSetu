@@ -25,8 +25,33 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (user.role !== 'authority' && user.role !== 'admin') {
+  // Ensure user is an official (role is not 'citizen')
+  if (user.role === 'citizen' || user.isCitizen) {
     return <Navigate to="/verify" replace />;
+  }
+
+  return children;
+};
+
+// Component to protect citizen-only routes
+const CitizenRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-brand-600"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Ensure user is a citizen
+  if (user.role !== 'citizen' && !user.isCitizen) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;
@@ -39,10 +64,10 @@ const HomeRedirect = () => {
   if (loading) return null;
   
   if (user) {
-    if (user.role !== 'citizen') {
-      return <Navigate to="/dashboard" replace />;
-    } else {
+    if (user.role === 'citizen' || user.isCitizen) {
       return <Navigate to="/verify" replace />;
+    } else {
+      return <Navigate to="/dashboard" replace />;
     }
   }
   return <Navigate to="/login" replace />;
@@ -53,7 +78,16 @@ export const AppRoutes = () => {
     <Routes>
       <Route path="/" element={<HomeRedirect />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/verify" element={<CitizenVerificationPage />} />
+      
+      {/* Citizen Route */}
+      <Route 
+        path="/verify" 
+        element={
+          <CitizenRoute>
+            <CitizenVerificationPage />
+          </CitizenRoute>
+        } 
+      />
       
       {/* Protected Authority Routes */}
       <Route 
