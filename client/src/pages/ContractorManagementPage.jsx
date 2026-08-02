@@ -3,7 +3,7 @@ import PageLayout from '../components/layout/PageLayout.jsx';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card.jsx';
 import { Button } from '../components/ui/Button.jsx';
 import { createContractor, getContractors } from '../services/contractorService.js';
-import { Search, PlusCircle, Building2, Mail, Phone, MapPin, ShieldCheck } from 'lucide-react';
+import { Search, PlusCircle, Building2, Mail, Phone, MapPin, ShieldCheck, Briefcase, FileText, BadgeCheck } from 'lucide-react';
 
 const initialForm = {
   name: '',
@@ -131,22 +131,81 @@ export const ContractorManagementPage = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-3">
+            <form onSubmit={handleSubmit} className="space-y-4">
               {message && <p className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600">{message}</p>}
-              <div className="grid gap-3 md:grid-cols-2">
-                <input required placeholder="Contractor name" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} className="rounded-xl border border-slate-200 px-3 py-2 text-sm" />
-                <input required placeholder="Registration ID" value={form.registrationId} onChange={(event) => setForm({ ...form, registrationId: event.target.value })} className="rounded-xl border border-slate-200 px-3 py-2 text-sm" />
-                <input placeholder="Contact person" value={form.contactPerson} onChange={(event) => setForm({ ...form, contactPerson: event.target.value })} className="rounded-xl border border-slate-200 px-3 py-2 text-sm" />
-                <input placeholder="Contact email" value={form.contactEmail} onChange={(event) => setForm({ ...form, contactEmail: event.target.value })} className="rounded-xl border border-slate-200 px-3 py-2 text-sm" />
-                <input placeholder="Phone" value={form.phone} onChange={(event) => setForm({ ...form, phone: event.target.value })} className="rounded-xl border border-slate-200 px-3 py-2 text-sm" />
-                <input placeholder="Address" value={form.address} onChange={(event) => setForm({ ...form, address: event.target.value })} className="rounded-xl border border-slate-200 px-3 py-2 text-sm" />
-                <input placeholder="Expertise" value={form.expertise} onChange={(event) => setForm({ ...form, expertise: event.target.value })} className="rounded-xl border border-slate-200 px-3 py-2 text-sm" />
-                <input type="number" placeholder="Performance score" value={form.performanceScore} onChange={(event) => setForm({ ...form, performanceScore: Number(event.target.value) })} className="rounded-xl border border-slate-200 px-3 py-2 text-sm" />
-                <input type="number" placeholder="Completed on time" value={form.completedOnTime} onChange={(event) => setForm({ ...form, completedOnTime: Number(event.target.value) })} className="rounded-xl border border-slate-200 px-3 py-2 text-sm" />
-                <input type="number" placeholder="Delayed count" value={form.delayedCount} onChange={(event) => setForm({ ...form, delayedCount: Number(event.target.value) })} className="rounded-xl border border-slate-200 px-3 py-2 text-sm" />
-                <input type="number" placeholder="Budget variance" value={form.averageBudgetVariance} onChange={(event) => setForm({ ...form, averageBudgetVariance: Number(event.target.value) })} className="rounded-xl border border-slate-200 px-3 py-2 text-sm" />
+
+              <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 space-y-3">
+                <div className="flex items-center gap-2 text-sm font-semibold text-dark-800">
+                  <BadgeCheck className="h-4 w-4 text-brand-600" /> Basic contractor details
+                </div>
+                <div className="grid gap-3 md:grid-cols-2">
+                  <label className="space-y-1 text-sm">
+                    <span className="font-medium text-slate-700">Contractor name</span>
+                    <input required placeholder="Enter company or contractor name" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm" />
+                  </label>
+                  <label className="space-y-1 text-sm">
+                    <span className="font-medium text-slate-700">Registration ID</span>
+                    <input required placeholder="Official registration number" value={form.registrationId} onChange={(event) => setForm({ ...form, registrationId: event.target.value })} className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm" />
+                  </label>
+                </div>
               </div>
-              <textarea placeholder="Authority remarks" rows={4} value={form.remarks} onChange={(event) => setForm({ ...form, remarks: event.target.value })} className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" />
+
+              <div className="rounded-2xl border border-slate-200 bg-white p-4 space-y-3">
+                <div className="flex items-center gap-2 text-sm font-semibold text-dark-800">
+                  <Briefcase className="h-4 w-4 text-brand-600" /> Contact & location
+                </div>
+                <div className="grid gap-3 md:grid-cols-2">
+                  <label className="space-y-1 text-sm">
+                    <span className="font-medium text-slate-700">Contact person</span>
+                    <input placeholder="Primary person in charge" value={form.contactPerson} onChange={(event) => setForm({ ...form, contactPerson: event.target.value })} className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm" />
+                  </label>
+                  <label className="space-y-1 text-sm">
+                    <span className="font-medium text-slate-700">Email address</span>
+                    <input type="email" placeholder="official@email.com" value={form.contactEmail} onChange={(event) => setForm({ ...form, contactEmail: event.target.value })} className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm" />
+                  </label>
+                  <label className="space-y-1 text-sm">
+                    <span className="font-medium text-slate-700">Phone number</span>
+                    <input placeholder="Phone or mobile" value={form.phone} onChange={(event) => setForm({ ...form, phone: event.target.value })} className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm" />
+                  </label>
+                  <label className="space-y-1 text-sm">
+                    <span className="font-medium text-slate-700">Office address</span>
+                    <input placeholder="Registered office / site address" value={form.address} onChange={(event) => setForm({ ...form, address: event.target.value })} className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm" />
+                  </label>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 space-y-3">
+                <div className="flex items-center gap-2 text-sm font-semibold text-dark-800">
+                  <FileText className="h-4 w-4 text-brand-600" /> Work profile & performance
+                </div>
+                <div className="grid gap-3 md:grid-cols-2">
+                  <label className="space-y-1 text-sm md:col-span-2">
+                    <span className="font-medium text-slate-700">Specialization / expertise</span>
+                    <input placeholder="e.g. Road construction, bridge works, drainage" value={form.expertise} onChange={(event) => setForm({ ...form, expertise: event.target.value })} className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm" />
+                  </label>
+                  <label className="space-y-1 text-sm">
+                    <span className="font-medium text-slate-700">Performance score</span>
+                    <input type="number" placeholder="100" value={form.performanceScore} onChange={(event) => setForm({ ...form, performanceScore: Number(event.target.value) })} className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm" />
+                  </label>
+                  <label className="space-y-1 text-sm">
+                    <span className="font-medium text-slate-700">Completed on time</span>
+                    <input type="number" placeholder="0" value={form.completedOnTime} onChange={(event) => setForm({ ...form, completedOnTime: Number(event.target.value) })} className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm" />
+                  </label>
+                  <label className="space-y-1 text-sm">
+                    <span className="font-medium text-slate-700">Delayed count</span>
+                    <input type="number" placeholder="0" value={form.delayedCount} onChange={(event) => setForm({ ...form, delayedCount: Number(event.target.value) })} className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm" />
+                  </label>
+                  <label className="space-y-1 text-sm">
+                    <span className="font-medium text-slate-700">Budget variance (%)</span>
+                    <input type="number" placeholder="0" value={form.averageBudgetVariance} onChange={(event) => setForm({ ...form, averageBudgetVariance: Number(event.target.value) })} className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm" />
+                  </label>
+                </div>
+              </div>
+
+              <label className="block space-y-1 text-sm">
+                <span className="font-medium text-slate-700">Authority remarks</span>
+                <textarea placeholder="Add notes about contractor reliability, eligibility, or monitoring status" rows={4} value={form.remarks} onChange={(event) => setForm({ ...form, remarks: event.target.value })} className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" />
+              </label>
               <Button type="submit" loading={saving} className="w-full">Save contractor profile</Button>
             </form>
           </CardContent>
