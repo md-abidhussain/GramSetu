@@ -19,8 +19,8 @@ router.post('/', protectCitizen, uploadImage, createCitizenReport);
 // Any authenticated user: Get details of a single report
 router.get('/:id', protectAny, getCitizenReportById);
 
-// Authorities: Get list of reports
-router.get('/', protectAuthority, getCitizenReports);
+// Any authenticated user: Get list of reports (filtered automatically by role)
+router.get('/', protectAny, getCitizenReports);
 
 // Authorities: Assign inspector to complaint
 router.post('/assign-inspector', protectAuthority, restrictTo('District Authority', 'Admin', 'Government Officer'), assignInspector);

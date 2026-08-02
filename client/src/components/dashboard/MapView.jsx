@@ -20,13 +20,12 @@ const createMarkerIcon = (project) => {
   return L.divIcon({
     html: `
       <div class="relative flex items-center justify-center">
-        <span class="animate-ping absolute inline-flex h-4 w-4 rounded-full opacity-60" style="background-color: ${color}"></span>
-        <span class="relative inline-flex rounded-full h-3.5 w-3.5 border-2 border-white shadow-md" style="background-color: ${color}"></span>
+        <span class="inline-flex rounded-full h-4.5 w-4.5 border-2 border-white shadow-md" style="background-color: ${color}"></span>
       </div>
     `,
     className: 'custom-map-marker',
-    iconSize: [16, 16],
-    iconAnchor: [8, 8]
+    iconSize: [18, 18],
+    iconAnchor: [9, 9]
   });
 };
 

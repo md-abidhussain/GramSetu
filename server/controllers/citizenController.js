@@ -189,10 +189,16 @@ export const createCitizenReport = async (req, res, next) => {
   }
 };
 
-// Get all reports
+// Get all reports (with citizen isolation)
 export const getCitizenReports = async (req, res, next) => {
   try {
-    const reports = await CitizenReport.find()
+    let filter = {};
+    // If the logged-in user is a citizen, isolate retrieval to their own submissions only
+    if (req.isCitizen) {
+      filter = { citizen: req.user._id };
+    }
+    
+    const reports = await CitizenReport.find(filter)
       .populate('citizen', 'name email phone')
       .populate('assignedOfficer', 'name role uniqueUserId')
       .populate({
