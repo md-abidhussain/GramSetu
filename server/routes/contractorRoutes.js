@@ -1,11 +1,10 @@
 import express from 'express';
 import { createContractor, getContractorAnalysis, getContractors } from '../controllers/contractorController.js';
-import { protect, restrictTo } from '../middleware/authMiddleware.js';
+import { protectAuthority } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.use(protect);
-router.use(restrictTo('authority', 'admin'));
+router.use(protectAuthority);
 
 router.get('/', getContractors);
 router.post('/', createContractor);

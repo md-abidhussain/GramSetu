@@ -9,10 +9,10 @@ export const getSummary = async (req, res, next) => {
     const totalProjects = await Project.countDocuments();
     const completedProjects = await Project.countDocuments({ afterImageUrl: { $exists: true, $ne: null } });
     
-    // Average completion score
-    const projectsWithScore = await Project.find({ completionScore: { $exists: true } });
+    // Average completion score (exclude projects where score is null/undefined)
+    const projectsWithScore = await Project.find({ completionScore: { $ne: null, $exists: true } });
     const avgScore = projectsWithScore.length > 0
-      ? Math.round(projectsWithScore.reduce((sum, p) => sum + p.completionScore, 0) / projectsWithScore.length)
+      ? Math.round(projectsWithScore.reduce((sum, p) => sum + (p.completionScore || 0), 0) / projectsWithScore.length)
       : 100;
 
     const flaggedProjects = await Project.countDocuments({ status: 'Flagged' });
