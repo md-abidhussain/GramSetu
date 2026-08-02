@@ -50,6 +50,23 @@ const statusBadgeClasses = {
   maintenance: 'bg-amber-50 text-amber-700 border-amber-100'
 };
 
+const getAllowedNextStatuses = (currentStatus) => {
+  const transitions = {
+    'Tender Published': ['Project Created'],
+    'Project Created': ['Construction Started'],
+    'Construction Started': ['Waiting for AI Verification'],
+    'Waiting for AI Verification': ['AI Verified'],
+    'AI Verified': ['Citizen Verification'],
+    'Citizen Verification': ['Under Authority Review'],
+    'Under Authority Review': ['Approved', 'Rejected', 'Maintenance Required'],
+    'Approved': [],
+    'Rejected': [],
+    'Maintenance Required': []
+  };
+
+  return transitions[currentStatus] || [];
+};
+
 export const ProjectLifecycleSection = ({ projectId, project }) => {
   const [history, setHistory] = useState([]);
   const [currentStatus, setCurrentStatus] = useState(project?.lifecycleStatus || 'Tender Published');
@@ -58,6 +75,7 @@ export const ProjectLifecycleSection = ({ projectId, project }) => {
   const [remarks, setRemarks] = useState('');
   const [message, setMessage] = useState('');
   const { user } = useAuth();
+  const nextStatuses = getAllowedNextStatuses(currentStatus);
 
   useEffect(() => {
     const loadLifecycle = async () => {
@@ -146,29 +164,30 @@ export const ProjectLifecycleSection = ({ projectId, project }) => {
         {user?.role !== 'citizen' && (
           <form onSubmit={handleSubmit} className="rounded-2xl border border-slate-100 bg-slate-50/70 p-4 space-y-3">
             {message && <p className="text-xs text-slate-500">{message}</p>}
-            <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
-            >
-              <option value="">Select next status</option>
-              <option value="Construction Started">Construction Started</option>
-              <option value="Waiting for AI Verification">Waiting for AI Verification</option>
-              <option value="AI Verified">AI Verified</option>
-              <option value="Citizen Verification">Citizen Verification</option>
-              <option value="Under Authority Review">Under Authority Review</option>
-              <option value="Approved">Approved</option>
-              <option value="Rejected">Rejected</option>
-              <option value="Maintenance Required">Maintenance Required</option>
-            </select>
-            <textarea
-              value={remarks}
-              onChange={(e) => setRemarks(e.target.value)}
-              rows={3}
-              placeholder="Remarks"
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
-            />
-            <Button type="submit" loading={loading} className="w-full">Submit</Button>
+            {nextStatuses.length === 0 ? (
+              <p className="text-xs text-slate-500">This project has reached the end of the lifecycle workflow.</p>
+            ) : (
+              <>
+                <select
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
+                >
+                  <option value="">Select next status</option>
+                  {nextStatuses.map((value) => (
+                    <option key={value} value={value}>{value}</option>
+                  ))}
+                </select>
+                <textarea
+                  value={remarks}
+                  onChange={(e) => setRemarks(e.target.value)}
+                  rows={3}
+                  placeholder="Remarks"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
+                />
+                <Button type="submit" loading={loading} className="w-full" disabled={!status}>Submit</Button>
+              </>
+            )}
           </form>
         )}
 

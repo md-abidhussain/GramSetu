@@ -6,7 +6,9 @@ import {
   Activity, 
   ShieldAlert, 
   LogOut,
-  Shield
+  Shield,
+  Users,
+  BarChart3
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth.js';
 
@@ -23,6 +25,8 @@ export const Sidebar = () => {
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, role: 'authority' },
     { name: 'Tender Intelligence', path: '/tenders', icon: FileText, role: 'authority' },
     { name: 'Project Monitoring', path: '/projects', icon: Activity, role: 'authority' },
+    { name: 'Contractor Registry', path: '/contractors', icon: Users, role: 'authority' },
+    { name: 'Contractor Analytics', path: '/contractors-analysis', icon: BarChart3, role: 'authority' },
     { name: 'Citizen Portal (Public)', path: '/verify', icon: ShieldAlert, role: 'any' },
   ];
 

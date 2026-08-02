@@ -8,6 +8,8 @@ import TenderIntelligencePage from '../pages/TenderIntelligencePage.jsx';
 import ProjectMonitoringPage from '../pages/ProjectMonitoringPage.jsx';
 import CitizenVerificationPage from '../pages/CitizenVerificationPage.jsx';
 import LoginPage from '../pages/LoginPage.jsx';
+import ContractorManagementPage from '../pages/ContractorManagementPage.jsx';
+import ContractorAnalysisPage from '../pages/ContractorAnalysisPage.jsx';
 
 // Component to protect authority-only routes
 const ProtectedRoute = ({ children }) => {
@@ -77,6 +79,22 @@ export const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <ProjectMonitoringPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/contractors" 
+        element={
+          <ProtectedRoute>
+            <ContractorManagementPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/contractors-analysis" 
+        element={
+          <ProtectedRoute>
+            <ContractorAnalysisPage />
           </ProtectedRoute>
         } 
       />

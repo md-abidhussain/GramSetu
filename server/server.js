@@ -11,6 +11,7 @@ import projectRoutes from './routes/projectRoutes.js';
 import citizenRoutes from './routes/citizenRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
+import contractorRoutes from './routes/contractorRoutes.js';
 
 // Model imports for seeding
 import User from './models/User.js';
@@ -101,6 +102,7 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/citizen-reports', citizenRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/contractors', contractorRoutes);
 
 // Base route
 app.get('/', (req, res) => {
