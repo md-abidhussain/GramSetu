@@ -6,8 +6,8 @@ import { useAuth } from '../../hooks/useAuth.js';
 export const PageLayout = ({ children, title = 'Infrastructure Audit' }) => {
   const { user } = useAuth();
   
-  // Decide if we show sidebar (authorities/admins only)
-  const showSidebar = user && (user.role === 'authority' || user.role === 'admin');
+  // Show sidebar for any logged-in user (Phase 3 navigation & logout visibility)
+  const showSidebar = !!user;
 
   return (
     <div className="h-screen w-screen overflow-hidden flex bg-dark-50">

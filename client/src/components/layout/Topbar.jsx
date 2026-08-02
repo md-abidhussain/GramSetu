@@ -6,7 +6,7 @@ import { Shield } from 'lucide-react';
 
 export const Topbar = ({ title }) => {
   const { user } = useAuth();
-  const isAuthority = user && (user.role === 'authority' || user.role === 'admin');
+  const isAuthority = user && user.role !== 'citizen' && !user.isCitizen;
 
   return (
     <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 z-30 shrink-0">
@@ -17,7 +17,7 @@ export const Topbar = ({ title }) => {
       <div className="flex items-center gap-4">
         {isAuthority && <NotificationBell />}
         
-        {!isAuthority && (
+        {!user && (
           <Link
             to="/login"
             className="flex items-center gap-1.5 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs rounded-md shadow-sm transition-colors"
