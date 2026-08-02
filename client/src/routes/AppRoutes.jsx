@@ -33,7 +33,7 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-// Component to protect citizen-only routes
+// Component to protect citizen routes (accessible by citizens and authorities for verification/testing)
 const CitizenRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
@@ -47,11 +47,6 @@ const CitizenRoute = ({ children }) => {
 
   if (!user) {
     return <Navigate to="/login" replace />;
-  }
-
-  // Ensure user is a citizen
-  if (user.role !== 'citizen' && !user.isCitizen) {
-    return <Navigate to="/dashboard" replace />;
   }
 
   return children;
