@@ -2,7 +2,7 @@
     "rewrites": [
         {
             "source": "/api/:path*",
-            "destination": "https://YOUR-NODE-API-URL-ON-RENDER.onrender.com/api/:path*"
+            "destination": "https://gramsetu-31ax.onrender.com/api/:path*"
         }
     ]
 }
