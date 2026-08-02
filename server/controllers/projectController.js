@@ -5,6 +5,7 @@ import Notification from '../models/Notification.js';
 import { uploadBuffer } from '../services/cloudinaryService.js';
 import { compareBeforeAfter } from '../services/geminiImageCompareService.js';
 import { updateContractorScore } from '../services/contractorScoreService.js';
+import { runMockLifecycleAI } from '../services/mockLifecycleAIService.js';
 
 // Helper to create notifications for all authority users
 const notifyAuthorities = async (message, type = 'info') => {
@@ -22,6 +23,34 @@ const notifyAuthorities = async (message, type = 'info') => {
   } catch (error) {
     console.error('Error creating notifications:', error);
   }
+};
+
+const transitionLifecycle = async (project, nextStatus, updatedBy = 'system', remarks = '') => {
+  const allowedTransitions = {
+    'Tender Published': ['Project Created'],
+    'Project Created': ['Construction Started'],
+    'Construction Started': ['Waiting for AI Verification'],
+    'Waiting for AI Verification': ['AI Verified'],
+    'AI Verified': ['Citizen Verification'],
+    'Citizen Verification': ['Under Authority Review'],
+    'Under Authority Review': ['Approved', 'Rejected', 'Maintenance Required'],
+    'Approved': [],
+    'Rejected': [],
+    'Maintenance Required': []
+  };
+
+  if (!allowedTransitions[project.lifecycleStatus] || !allowedTransitions[project.lifecycleStatus].includes(nextStatus)) {
+    throw new Error(`Invalid lifecycle transition from ${project.lifecycleStatus} to ${nextStatus}`);
+  }
+
+  project.lifecycleStatus = nextStatus;
+  project.statusHistory.push({
+    status: nextStatus,
+    updatedBy,
+    remarks
+  });
+
+  return project;
 };
 
 export const createProject = async (req, res, next) => {
@@ -58,7 +87,13 @@ export const createProject = async (req, res, next) => {
         address: address || ''
       },
       beforeImageUrl: uploadResult.secure_url,
-      status: 'Pending'
+      status: 'Pending',
+      lifecycleStatus: 'Project Created',
+      statusHistory: [{
+        status: 'Project Created',
+        updatedBy: 'system',
+        remarks: 'Project created from tender intake.'
+      }]
     });
 
     const populatedProject = await project.populate(['tender', 'contractor']);
@@ -98,21 +133,16 @@ export const completeProject = async (req, res, next) => {
     project.projectHealth = comparison.projectHealth;
     project.aiComparisonNotes = comparison.notes;
 
-    // Set project status based on score
-    if (comparison.completionScore >= 80) {
-      project.status = 'Verified';
-    } else {
-      project.status = 'Flagged';
-    }
-
-    await project.save();
+    const lifecycleUpdated = await transitionLifecycle(project, 'Waiting for AI Verification', 'system', 'Completion image uploaded and ready for AI assessment.');
+    lifecycleUpdated.status = comparison.completionScore >= 80 ? 'Verified' : 'Flagged';
+    await lifecycleUpdated.save();
 
     // Trigger contractor score recalculation
     await updateContractorScore(project.contractor);
 
     // Notify authorities
     await notifyAuthorities(
-      `Project "${project.title}" completed with a completion score of ${project.completionScore}% (${project.status}).`,
+      `Project "${project.title}" entered AI verification with a completion score of ${project.completionScore}% (${project.status}).`,
       project.status === 'Verified' ? 'success' : 'warning'
     );
 
@@ -139,6 +169,78 @@ export const getProjectById = async (req, res, next) => {
       return res.status(404).json({ message: 'Project not found' });
     }
     res.json(project);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getProjectLifecycle = async (req, res, next) => {
+  try {
+    const project = await Project.findById(req.params.id);
+    if (!project) {
+      return res.status(404).json({ message: 'Project not found' });
+    }
+
+    res.json({
+      currentStatus: project.lifecycleStatus,
+      history: project.statusHistory.slice().sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateProjectLifecycle = async (req, res, next) => {
+  try {
+    const { status, remarks } = req.body;
+    const project = await Project.findById(req.params.id);
+
+    if (!project) {
+      return res.status(404).json({ message: 'Project not found' });
+    }
+
+    if (!status) {
+      return res.status(400).json({ message: 'Status is required' });
+    }
+
+    if (project.lifecycleStatus === 'Approved' || project.lifecycleStatus === 'Rejected' || project.lifecycleStatus === 'Maintenance Required') {
+      return res.status(400).json({ message: 'Project lifecycle is already complete' });
+    }
+
+    const updatedProject = await transitionLifecycle(project, status, req.user?.name || 'authority', remarks || '');
+
+    if (status === 'Waiting for AI Verification' && (!project.completionScore || !project.afterImageUrl)) {
+      return res.status(400).json({ message: 'Project requires completion data before AI verification' });
+    }
+
+    if (status === 'Waiting for AI Verification') {
+      const aiResult = await runMockLifecycleAI(project);
+      updatedProject.completionScore = aiResult.completionScore;
+      updatedProject.riskLevel = aiResult.riskLevel;
+      updatedProject.aiComparisonNotes = aiResult.recommendation;
+      updatedProject.status = aiResult.completionScore >= 80 ? 'Verified' : 'Flagged';
+      updatedProject.lifecycleStatus = 'AI Verified';
+      updatedProject.statusHistory.push({
+        status: 'AI Verified',
+        updatedBy: req.user?.name || 'system',
+        remarks: aiResult.recommendation
+      });
+    }
+
+    if (status === 'Approved') {
+      updatedProject.status = 'Verified';
+    }
+
+    if (status === 'Rejected' || status === 'Maintenance Required') {
+      updatedProject.status = 'Flagged';
+    }
+
+    await updatedProject.save();
+
+    await notifyAuthorities(`Project "${updatedProject.title}" moved to ${updatedProject.lifecycleStatus}.`, 'info');
+
+    const populatedProject = await updatedProject.populate(['tender', 'contractor']);
+    res.json(populatedProject);
   } catch (error) {
     next(error);
   }

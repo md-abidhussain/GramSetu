@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card.jsx';
 import { Input } from '../ui/Input.jsx';
 import { Select } from '../ui/Select.jsx';
-import { Search, SlidersHorizontal, CheckCircle, AlertTriangle, AlertCircle } from 'lucide-react';
+import { Search, CheckCircle, AlertTriangle, AlertCircle, Clock3 } from 'lucide-react';
 import RiskBadge from '../tender/RiskBadge.jsx';
 
 export const ProjectsTable = ({ projects = [], onSelectProject }) => {
@@ -97,13 +97,13 @@ export const ProjectsTable = ({ projects = [], onSelectProject }) => {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-slate-50 border-y border-slate-200 text-slate-500 font-semibold text-[11px] tracking-normal">
-                <th className="px-6 py-3">Project Details</th>
-                <th className="px-6 py-3">Contractor</th>
-                <th className="px-6 py-3 text-center">Completion</th>
-                <th className="px-6 py-3">Risk Rating</th>
-                <th className="px-6 py-3">Audit Status</th>
-                <th className="px-6 py-3">Audit Date</th>
+              <tr className="bg-slate-50/70 border-y border-slate-100 text-slate-400 font-bold uppercase tracking-wider">
+                <th className="px-6 py-3.5">Project Details</th>
+                <th className="px-6 py-3.5">Contractor</th>
+                <th className="px-6 py-3.5 text-center">Lifecycle</th>
+                <th className="px-6 py-3.5">Risk Rating</th>
+                <th className="px-6 py-3.5">Audit Status</th>
+                <th className="px-6 py-3.5">Audit Date</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200/60 bg-white">
@@ -129,15 +129,18 @@ export const ProjectsTable = ({ projects = [], onSelectProject }) => {
                       <p className="text-[9px] text-slate-400 mt-0.5">ID: {proj.contractor?.registrationId || 'N/A'}</p>
                     </td>
                     <td className="px-6 py-4.5 text-center">
-                      {proj.completionScore !== undefined ? (
-                        <span className={`inline-flex font-bold text-sm ${
-                          proj.completionScore >= 80 ? 'text-emerald-600' : proj.completionScore >= 50 ? 'text-amber-500' : 'text-rose-500'
-                        }`}>
-                          {proj.completionScore}%
-                        </span>
-                      ) : (
-                        <span className="text-slate-450 italic text-[11px]">Unverified</span>
-                      )}
+                      <div className="flex flex-col items-center gap-1">
+                        <span className="text-[10px] text-slate-500 font-semibold">{proj.lifecycleStatus || 'Project Created'}</span>
+                        {proj.completionScore !== undefined ? (
+                          <span className={`inline-flex font-bold text-sm ${
+                            proj.completionScore >= 80 ? 'text-emerald-600' : proj.completionScore >= 50 ? 'text-amber-500' : 'text-rose-500'
+                          }`}>
+                            {proj.completionScore}%
+                          </span>
+                        ) : (
+                          <span className="text-slate-450 italic text-[11px]">Unverified</span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4.5">
                       <RiskBadge level={proj.riskLevel || 'Low'} />

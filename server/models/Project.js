@@ -1,5 +1,12 @@
 import mongoose from 'mongoose';
 
+const statusHistoryEntrySchema = new mongoose.Schema({
+  status: { type: String, required: true },
+  updatedBy: { type: String, default: 'system' },
+  timestamp: { type: Date, default: Date.now },
+  remarks: { type: String, default: '' }
+}, { _id: false });
+
 const projectSchema = new mongoose.Schema({
   title: { type: String, required: true },
   tender: { type: mongoose.Schema.Types.ObjectId, ref: 'Tender', required: true },
@@ -20,6 +27,23 @@ const projectSchema = new mongoose.Schema({
     enum: ['Pending', 'Verified', 'Flagged'], 
     default: 'Pending' 
   },
+  lifecycleStatus: {
+    type: String,
+    enum: [
+      'Tender Published',
+      'Project Created',
+      'Construction Started',
+      'Waiting for AI Verification',
+      'AI Verified',
+      'Citizen Verification',
+      'Under Authority Review',
+      'Approved',
+      'Rejected',
+      'Maintenance Required'
+    ],
+    default: 'Tender Published'
+  },
+  statusHistory: [statusHistoryEntrySchema],
   createdAt: { type: Date, default: Date.now }
 });
 

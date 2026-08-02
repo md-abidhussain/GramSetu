@@ -4,7 +4,8 @@ import BeforeAfterUpload from '../components/monitoring/BeforeAfterUpload.jsx';
 import CompletionScoreCard from '../components/monitoring/CompletionScoreCard.jsx';
 import ProjectHealthCard from '../components/monitoring/ProjectHealthCard.jsx';
 import { useProjects } from '../hooks/useProjects.js';
-import { Eye, ChevronRight, Activity, MapPin } from 'lucide-react';
+import ProjectLifecycleSection from '../components/monitoring/ProjectLifecycleSection.jsx';
+import { Eye, Activity, MapPin } from 'lucide-react';
 
 export const ProjectMonitoringPage = () => {
   const { projects, loading, addNewProject, completeExistingProject } = useProjects();
@@ -57,11 +58,16 @@ export const ProjectMonitoringPage = () => {
                       <p className="text-dark-800 font-semibold truncate">{item.title}</p>
                       <p className="text-[10px] text-slate-400 truncate mt-0.5">{item.location.address || 'No Address'}</p>
                     </div>
-                    <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase ${
-                      item.status === 'Verified' ? 'bg-emerald-50 text-emerald-700' : item.status === 'Flagged' ? 'bg-rose-50 text-rose-700' : 'bg-amber-50 text-amber-700'
-                    }`}>
-                      {item.status}
-                    </span>
+                    <div className="text-right">
+                      <div className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase ${
+                        item.status === 'Verified' ? 'bg-emerald-50 text-emerald-700' : item.status === 'Flagged' ? 'bg-rose-50 text-rose-700' : 'bg-amber-50 text-amber-700'
+                      }`}>
+                        {item.lifecycleStatus || 'Project Created'}
+                      </div>
+                      <div className="text-[9px] text-slate-400 mt-1">
+                        {item.riskLevel || 'Low'}
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -98,6 +104,8 @@ export const ProjectMonitoringPage = () => {
                   notes={selectedProject.aiComparisonNotes}
                 />
               </div>
+
+              <ProjectLifecycleSection projectId={selectedProject._id} project={selectedProject} />
 
               {/* Image Comparison Box */}
               <div className="bg-white border border-slate-100 p-5 rounded-2xl shadow-sm">

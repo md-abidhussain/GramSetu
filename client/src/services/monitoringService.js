@@ -17,3 +17,12 @@ export const completeProject = (id, formData) => {
     body: formData, // Sending FormData with 'afterImage'
   });
 };
+
+export const getProjectLifecycle = (id) => request(`/projects/${id}/lifecycle`);
+
+export const updateProjectLifecycle = (id, payload) => {
+  return request(`/projects/${id}/lifecycle`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+};
