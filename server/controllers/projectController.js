@@ -25,21 +25,25 @@ const notifyAuthorities = async (message, type = 'info') => {
   }
 };
 
-const transitionLifecycle = async (project, nextStatus, updatedBy = 'system', remarks = '') => {
-  const allowedTransitions = {
-    'Tender Published': ['Project Created'],
-    'Project Created': ['Construction Started'],
-    'Construction Started': ['Waiting for AI Verification'],
-    'Waiting for AI Verification': ['AI Verified'],
-    'AI Verified': ['Citizen Verification'],
-    'Citizen Verification': ['Under Authority Review'],
-    'Under Authority Review': ['Approved', 'Rejected', 'Maintenance Required'],
-    'Approved': [],
-    'Rejected': [],
-    'Maintenance Required': []
-  };
+const lifecycleTransitions = {
+  'Tender Published': ['Project Created'],
+  'Project Created': ['Construction Started'],
+  'Construction Started': ['Waiting for AI Verification'],
+  'Waiting for AI Verification': ['AI Verified'],
+  'AI Verified': ['Citizen Verification'],
+  'Citizen Verification': ['Under Authority Review'],
+  'Under Authority Review': ['Approved', 'Rejected', 'Maintenance Required'],
+  'Approved': [],
+  'Rejected': [],
+  'Maintenance Required': []
+};
 
-  if (!allowedTransitions[project.lifecycleStatus] || !allowedTransitions[project.lifecycleStatus].includes(nextStatus)) {
+const getAllowedNextStatuses = (currentStatus) => lifecycleTransitions[currentStatus] || [];
+
+const transitionLifecycle = async (project, nextStatus, updatedBy = 'system', remarks = '') => {
+  const allowedNextStatuses = getAllowedNextStatuses(project.lifecycleStatus);
+
+  if (!allowedNextStatuses.includes(nextStatus)) {
     throw new Error(`Invalid lifecycle transition from ${project.lifecycleStatus} to ${nextStatus}`);
   }
 
@@ -205,6 +209,11 @@ export const updateProjectLifecycle = async (req, res, next) => {
 
     if (project.lifecycleStatus === 'Approved' || project.lifecycleStatus === 'Rejected' || project.lifecycleStatus === 'Maintenance Required') {
       return res.status(400).json({ message: 'Project lifecycle is already complete' });
+    }
+
+    const allowedNextStatuses = getAllowedNextStatuses(project.lifecycleStatus);
+    if (!allowedNextStatuses.includes(status)) {
+      return res.status(400).json({ message: `Invalid lifecycle transition from ${project.lifecycleStatus} to ${status}` });
     }
 
     const updatedProject = await transitionLifecycle(project, status, req.user?.name || 'authority', remarks || '');

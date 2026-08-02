@@ -9,9 +9,17 @@ const recentInspectionSchema = new mongoose.Schema({
 const contractorSchema = new mongoose.Schema({
   name: { type: String, required: true },
   registrationId: { type: String, required: true, unique: true },
+  contactPerson: { type: String, default: '' },
+  contactEmail: { type: String, default: '' },
+  phone: { type: String, default: '' },
+  address: { type: String, default: '' },
+  expertise: { type: String, default: '' },
+  remarks: { type: String, default: '' },
+  pastProjects: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Project' }],
   performanceScore: { type: Number, default: 85, min: 0, max: 100 }, // Default performance score
   trustScore: { type: Number, default: 90, min: 0, max: 100 }, // AI Trust Score
   completedCount: { type: Number, default: 0 },
+  completedOnTime: { type: Number, default: 0 },
   delayedCount: { type: Number, default: 0 },
   budgetOverrunsCount: { type: Number, default: 0 },
   citizenComplaintsCount: { type: Number, default: 0 },
