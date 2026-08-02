@@ -90,27 +90,53 @@ async def segment(
         })
     else:
         result = model(frame, conf=confidence, verbose=False)[0]
-        if result.masks is not None and result.boxes is not None:
+        if result.boxes is not None:
             names = result.names
-            for mask, box in zip(result.masks.data.cpu().numpy(), result.boxes):
-                binary = (mask > 0.5).astype(np.uint8)
-                binary = cv2.resize(binary, (frame.shape[1], frame.shape[0]), interpolation=cv2.INTER_NEAREST)
-                contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-                if not contours:
-                    continue
-                contour = max(contours, key=cv2.contourArea)
-                area_px = float(cv2.contourArea(contour))
-                x, y, width, height = cv2.boundingRect(contour)
+            boxes = result.boxes
+            masks = result.masks.data.cpu().numpy() if result.masks is not None else [None] * len(boxes)
+            
+            for i, box in enumerate(boxes):
                 label = names[int(box.cls.item())]
+                conf = round(float(box.conf.item()), 3)
+                
+                x1, y1, x2, y2 = box.xyxy[0].cpu().numpy()
+                width_px = float(x2 - x1)
+                height_px = float(y2 - y1)
+                x = float(x1)
+                y = float(y1)
+                
+                # If model returned masks, calculate area from the mask contour
+                if result.masks is not None:
+                    mask = masks[i]
+                    binary = (mask > 0.5).astype(np.uint8)
+                    binary = cv2.resize(binary, (frame.shape[1], frame.shape[0]), interpolation=cv2.INTER_NEAREST)
+                    contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+                    if not contours:
+                        continue
+                    contour = max(contours, key=cv2.contourArea)
+                    area_px = float(cv2.contourArea(contour))
+                    x, y, w, h = cv2.boundingRect(contour)
+                    width_px = float(w)
+                    height_px = float(h)
+                    area_cm2 = round(area_px * (scale_cm_per_pixel ** 2), 1)
+                    diameter_cm = round(2 * sqrt(area_px / np.pi) * scale_cm_per_pixel, 1)
+                else:
+                    # Fallback to Bounding Box dimensions (for standard Object Detection models)
+                    area_px = width_px * height_px
+                    area_cm2 = round(area_px * (scale_cm_per_pixel ** 2), 1)
+                    # Estimate diameter using max of width/height as in measure.py
+                    diameter_px = max(width_px, height_px)
+                    diameter_cm = round(diameter_px * scale_cm_per_pixel, 1)
+
                 defects.append({
                     "type": str(label).lower().replace(" ", "_"),
-                    "confidence": round(float(box.conf.item()), 3),
+                    "confidence": conf,
                     "maskAreaPixels": round(area_px, 1),
-                    "areaCm2": round(area_px * scale_cm_per_pixel ** 2, 1),
-                    "widthCm": round(width * scale_cm_per_pixel, 1),
-                    "heightCm": round(height * scale_cm_per_pixel, 1),
-                    "equivalentDiameterCm": round(2 * sqrt(area_px / np.pi) * scale_cm_per_pixel, 1),
-                    "boundingBoxPixels": {"x": x, "y": y, "width": width, "height": height},
+                    "areaCm2": area_cm2,
+                    "widthCm": round(width_px * scale_cm_per_pixel, 1),
+                    "heightCm": round(height_px * scale_cm_per_pixel, 1),
+                    "equivalentDiameterCm": diameter_cm,
+                    "boundingBoxPixels": {"x": x, "y": y, "width": width_px, "height": height_px},
                     "depth": None,
                     "depthNote": "Depth cannot be measured from a single RGB image; use stereo/depth sensing or a manual field measurement.",
                 })
