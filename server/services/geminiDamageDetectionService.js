@@ -49,3 +49,26 @@ the same location. Return ONLY valid JSON:
 
   return callGeminiJson(prompt, [citizenImagePart, completionImagePart]);
 };
+
+/**
+ * Detect damage in a single citizen report image when no original project image is available
+ * @param {string} citizenUrl - Cloudinary URL of the citizen report photo
+ * @returns {Promise<object>} Parsed damage detection JSON
+ */
+export const detectDamageSingleImage = async (citizenUrl) => {
+  if (!citizenUrl) {
+    throw new Error('Citizen photo URL is required');
+  }
+
+  const citizenImagePart = await fetchImageAsBase64(citizenUrl);
+
+  const prompt = `Analyze the citizen-submitted image for infrastructure damage (like cracks, potholes, road damage, leakage, broken infrastructure, or garbage). Return ONLY valid JSON:
+{
+  "detectedIssues": string[],   from this list only: ["crack","road_damage","leakage","broken_infrastructure","garbage","none"],
+  "matchScore": number (0-100),  set to 100 if no issues/damages are found, or lower depending on the severity of damage (e.g., 50-70 for moderate damage, 0-30 for severe road destruction/failure),
+  "flaggedAsDiscrepancy": boolean,  set to true if any significant damage/issue is found,
+  "aiReport": string   plain language explanation describing the state of the infrastructure and details of any detected damages
+}`;
+
+  return callGeminiJson(prompt, [citizenImagePart]);
+};

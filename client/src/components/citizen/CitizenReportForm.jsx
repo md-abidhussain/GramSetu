@@ -11,6 +11,7 @@ import { Camera, ShieldAlert, CheckCircle2, Ruler } from 'lucide-react';
 export const CitizenReportForm = ({ onSubmitSuccess }) => {
   const [projects, setProjects] = useState([]);
   const [projectId, setProjectId] = useState('');
+  const [customProjectTitle, setCustomProjectTitle] = useState('');
   const [description, setDescription] = useState('');
   const [gps, setGps] = useState({ lat: '', lng: '' });
   const [image, setImage] = useState(null);
@@ -27,7 +28,9 @@ export const CitizenReportForm = ({ onSubmitSuccess }) => {
       try {
         const list = await getProjects();
         // Allow citizens to report on any project, but particularly completed/verified ones
-        setProjects(list.map(p => ({ value: p._id, label: `${p.title} (${p.location.address || 'No Address'})` })));
+        const optionsList = list.map(p => ({ value: p._id, label: `${p.title} (${p.location.address || 'No Address'})` }));
+        optionsList.push({ value: 'custom', label: 'Other / Custom Project (Enter details manually)...' });
+        setProjects(optionsList);
       } catch (err) {
         console.error('Failed to load projects', err);
       }
@@ -63,6 +66,10 @@ export const CitizenReportForm = ({ onSubmitSuccess }) => {
       setError('All fields, GPS coordinates, an image, and a positive reference scale are required');
       return;
     }
+    if (projectId === 'custom' && !customProjectTitle) {
+      setError('Please provide a custom project title');
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -71,6 +78,9 @@ export const CitizenReportForm = ({ onSubmitSuccess }) => {
     try {
       const formData = new FormData();
       formData.append('projectId', projectId);
+      if (projectId === 'custom') {
+        formData.append('customProjectTitle', customProjectTitle);
+      }
       formData.append('description', description);
       formData.append('lat', gps.lat);
       formData.append('lng', gps.lng);
@@ -82,6 +92,7 @@ export const CitizenReportForm = ({ onSubmitSuccess }) => {
       
       // Reset form
       setProjectId('');
+      setCustomProjectTitle('');
       setDescription('');
       setGps({ lat: '', lng: '' });
       setImage(null);
@@ -134,6 +145,18 @@ export const CitizenReportForm = ({ onSubmitSuccess }) => {
             required
             disabled={loading}
           />
+
+          {projectId === 'custom' && (
+            <Input
+              label="Custom Project Title / Name"
+              id="report-custom-project"
+              placeholder="e.g. Ward 4 High Street Road Reconstruction"
+              value={customProjectTitle}
+              onChange={(e) => setCustomProjectTitle(e.target.value)}
+              required
+              disabled={loading}
+            />
+          )}
 
           <Textarea
             label="Provide Description / Issue Details"

@@ -27,7 +27,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Database connection
-connectDB();
+await connectDB();
 
 // Database Seeding function
 const seedDatabase = async () => {
@@ -92,7 +92,7 @@ const seedDatabase = async () => {
 };
 
 // Run Seeding
-seedDatabase();
+await seedDatabase();
 
 // API Routes
 app.use('/api/auth', authRoutes);

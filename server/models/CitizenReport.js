@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
 
 const citizenReportSchema = new mongoose.Schema({
-  project: { type: mongoose.Schema.Types.ObjectId, ref: 'Project', required: true },
+  project: { type: mongoose.Schema.Types.ObjectId, ref: 'Project', required: false },
+  customProjectTitle: { type: String },
   citizenImageUrl: { type: String, required: true },
   gps: {
     lat: { type: Number, required: true },

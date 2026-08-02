@@ -3,7 +3,7 @@ import Project from '../models/Project.js';
 import User from '../models/User.js';
 import Notification from '../models/Notification.js';
 import { uploadBuffer } from '../services/cloudinaryService.js';
-import { detectDamageAndDiscrepancies } from '../services/geminiDamageDetectionService.js';
+import { detectDamageAndDiscrepancies, detectDamageSingleImage } from '../services/geminiDamageDetectionService.js';
 import { quantifyDefects } from '../services/segmentationService.js';
 import { updateContractorScore } from '../services/contractorScoreService.js';
 
@@ -27,35 +27,45 @@ const notifyAuthorities = async (message, type = 'info') => {
 
 export const createCitizenReport = async (req, res, next) => {
   try {
-    const { projectId, lat, lng, description, referenceScaleCmPerPixel } = req.body;
+    const { projectId, lat, lng, description, referenceScaleCmPerPixel, customProjectTitle } = req.body;
 
     if (!projectId || !lat || !lng || !description) {
       return res.status(400).json({ message: 'projectId, lat, lng, and description are required' });
+    }
+
+    if (projectId === 'custom' && !customProjectTitle) {
+      return res.status(400).json({ message: 'customProjectTitle is required for custom projects' });
     }
 
     if (!req.file) {
       return res.status(400).json({ message: 'Verification image file is required' });
     }
 
-    const project = await Project.findById(projectId);
-    if (!project) {
-      return res.status(404).json({ message: 'Project not found' });
+    let project = null;
+    if (projectId !== 'custom') {
+      project = await Project.findById(projectId);
+      if (!project) {
+        return res.status(404).json({ message: 'Project not found' });
+      }
     }
 
     // 1. Upload citizen image to Cloudinary
     const uploadResult = await uploadBuffer(req.file.buffer, 'citizen_reports');
     const citizenImageUrl = uploadResult.secure_url;
 
-    // Determine target photo to compare against
-    // Fall back to beforeImageUrl if project hasn't uploaded afterImageUrl yet
-    const targetImageUrl = project.afterImageUrl || project.beforeImageUrl;
-
-    if (!targetImageUrl) {
-      return res.status(400).json({ message: 'Project does not have any completion or progress images to verify against' });
+    // 2. Perform AI Analysis
+    let aiAnalysis;
+    if (project) {
+      // Determine target photo to compare against
+      const targetImageUrl = project.afterImageUrl || project.beforeImageUrl;
+      if (!targetImageUrl) {
+        return res.status(400).json({ message: 'Project does not have any completion or progress images to verify against' });
+      }
+      aiAnalysis = await detectDamageAndDiscrepancies(citizenImageUrl, targetImageUrl);
+    } else {
+      // Custom project: analyze damage on the single image
+      aiAnalysis = await detectDamageSingleImage(citizenImageUrl);
     }
-
-    // 2. Compare against the official image and segment defects.
-    const aiAnalysis = await detectDamageAndDiscrepancies(citizenImageUrl, targetImageUrl);
     
     let segmentation;
     try {
@@ -78,7 +88,8 @@ export const createCitizenReport = async (req, res, next) => {
 
     // 3. Create Citizen Report
     const report = await CitizenReport.create({
-      project: projectId,
+      project: project ? project._id : undefined,
+      customProjectTitle: project ? undefined : customProjectTitle,
       citizenImageUrl,
       gps: {
         lat: Number(lat),
@@ -95,27 +106,35 @@ export const createCitizenReport = async (req, res, next) => {
     });
 
     // 4. Update project status and notify authorities if discrepancy flagged
-    if (report.flaggedAsDiscrepancy) {
-      project.status = 'Flagged';
-      await project.save();
+    if (project) {
+      if (report.flaggedAsDiscrepancy) {
+        project.status = 'Flagged';
+        await project.save();
 
-      // Recalculate contractor performance score
-      await updateContractorScore(project.contractor);
+        // Recalculate contractor performance score
+        await updateContractorScore(project.contractor);
 
-      // Create notification
-      await notifyAuthorities(
-        `ALERT: Discrepancy flagged by citizen at "${project.title}". Match Score: ${report.matchScore}%. Issues: ${report.detectedIssues.join(', ')}`,
-        'danger'
-      );
+        // Create notification
+        await notifyAuthorities(
+          `ALERT: Discrepancy flagged by citizen at "${project.title}". Match Score: ${report.matchScore}%. Issues: ${report.detectedIssues.join(', ')}`,
+          'danger'
+        );
+      } else {
+        // Create info notification
+        await notifyAuthorities(
+          `New citizen report submitted for "${project.title}". Match Score: ${report.matchScore}%.`,
+          'info'
+        );
+      }
     } else {
-      // Create info notification
+      // Custom project notification
       await notifyAuthorities(
-        `New citizen report submitted for "${project.title}". Match Score: ${report.matchScore}%.`,
+        `New citizen report submitted for custom project "${customProjectTitle}". Issues: ${report.detectedIssues.join(', ')}`,
         'info'
       );
     }
 
-    const populatedReport = await report.populate('project');
+    const populatedReport = project ? await report.populate('project') : report;
     res.status(201).json(populatedReport);
   } catch (error) {
     next(error);

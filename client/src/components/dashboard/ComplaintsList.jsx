@@ -70,7 +70,7 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                     </span>
                     {getStatusBadge(item.status)}
                   </div>
-                  <h4 className="font-semibold text-dark-800 truncate mb-1">{item.project?.title || 'Unknown Project'}</h4>
+                  <h4 className="font-semibold text-dark-800 truncate mb-1">{item.project?.title || item.customProjectTitle || 'Unknown Project'}</h4>
                   <p className="text-slate-400 truncate flex items-center gap-1">
                     <MapPin className="h-3 w-3 shrink-0" /> {item.project?.location?.address || 'N/A'}
                   </p>
@@ -87,7 +87,7 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                 {/* Header */}
                 <div className="flex justify-between items-start gap-4">
                   <div>
-                    <h3 className="text-sm font-bold text-dark-800">{selectedReport.project?.title}</h3>
+                    <h3 className="text-sm font-bold text-dark-800">{selectedReport.project?.title || selectedReport.customProjectTitle || 'Custom Project'}</h3>
                     <p className="text-slate-400 text-xs flex items-center gap-1 mt-0.5">
                       <MapPin className="h-3.5 w-3.5" /> GPS: {selectedReport.gps.lat}, {selectedReport.gps.lng}
                     </p>

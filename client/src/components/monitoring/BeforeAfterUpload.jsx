@@ -5,6 +5,7 @@ import { Select } from '../ui/Select.jsx';
 import { Button } from '../ui/Button.jsx';
 import { getTenders } from '../../services/tenderService.js';
 import { Camera, HelpCircle, CheckCircle, AlertTriangle } from 'lucide-react';
+import GpsPicker from '../citizen/GpsPicker.jsx';
 
 export const BeforeAfterUpload = ({ projects, onProjectCreated, onProjectCompleted }) => {
   const [activeTab, setActiveTab] = useState('create'); // 'create' or 'complete'
@@ -182,30 +183,14 @@ export const BeforeAfterUpload = ({ projects, onProjectCreated, onProjectComplet
               disabled={loading}
             />
 
-            <div className="grid grid-cols-2 gap-4">
-              <Input
-                label="Latitude"
-                id="project-lat"
-                placeholder="e.g. 26.8467"
-                type="number"
-                step="any"
-                value={lat}
-                onChange={(e) => setLat(e.target.value)}
-                required
-                disabled={loading}
-              />
-              <Input
-                label="Longitude"
-                id="project-lng"
-                placeholder="e.g. 80.9462"
-                type="number"
-                step="any"
-                value={lng}
-                onChange={(e) => setLng(e.target.value)}
-                required
-                disabled={loading}
-              />
-            </div>
+            <GpsPicker
+              lat={lat}
+              lng={lng}
+              onChange={({ lat, lng }) => {
+                setLat(lat);
+                setLng(lng);
+              }}
+            />
 
             <Input
               label="Location Address"
