@@ -4,6 +4,7 @@ import { protectAuthority } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
+// Only logged in authority officials can view and manage contractors
 router.use(protectAuthority);
 
 router.get('/', getContractors);
