@@ -326,6 +326,7 @@ const seedDatabase = async () => {
       }
     ];
 
+    const projects = [];
     for (const proj of projectsData) {
       // Create associated Tender
       const tender = await Tender.create({
@@ -338,7 +339,7 @@ const seedDatabase = async () => {
       });
 
       // Create Project
-      await Project.create({
+      const project = await Project.create({
         title: proj.title,
         tender: tender._id,
         contractor: proj.contractor,
@@ -356,9 +357,70 @@ const seedDatabase = async () => {
           { status: 'Project Created', remarks: 'Ledger entry initialized.' }
         ]
       });
+      projects.push(project);
     }
 
     console.log('Seeded 6 realistic Tenders and Projects.');
+
+    // 5. Seed Citizen Reports / Complaints linked to demoCitizen and projects
+    await CitizenReport.create({
+      citizen: demoCitizen._id,
+      project: projects[0]._id, // PMGSY Rural Road Upgrade
+      citizenImageUrl: 'https://res.cloudinary.com/dqixw5mir/image/upload/v1722572097/citizen_reports/s0qip0dixbvyc2b9a71f.jpg',
+      gps: { lat: 25.3176, lng: 82.9739 },
+      description: 'Major road cracking and large pothole formed near the main junction of the road completed last week.',
+      detectedIssues: ['crack', 'pothole'],
+      aiReport: 'AI visual check confirmed severe structural cracking and defect formation matching road wear indicators. Manual verification is recommended.',
+      matchScore: 82,
+      flaggedAsDiscrepancy: true,
+      referenceScaleCmPerPixel: 0.5,
+      segmentation: {
+        status: 'completed',
+        message: 'AI defect segmentation completed successfully.',
+        defects: [
+          {
+            type: 'pothole',
+            confidence: 0.89,
+            maskAreaPixels: 16752,
+            areaCm2: 4188,
+            widthCm: 125,
+            heightCm: 33,
+            equivalentDiameterCm: 125.7,
+            boundingBoxPixels: { x: 100, y: 150, width: 250, height: 66 }
+          }
+        ]
+      },
+      severity: 'High',
+      status: 'Authority Notification',
+      assignedOfficer: auth2._id, // Inspector Sanjay Singh
+      createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000) // 3 days ago
+    });
+
+    await CitizenReport.create({
+      citizen: demoCitizen._id,
+      project: projects[1]._id, // Solar Street Lighting Upgrade
+      citizenImageUrl: 'https://images.unsplash.com/photo-1515162305285-0293e4767cc2?q=80&w=600',
+      gps: { lat: 25.3185, lng: 82.9782 },
+      description: 'The third street light pole is completely non-functional and the wiring box is left exposed.',
+      detectedIssues: ['broken_infrastructure'],
+      aiReport: 'AI analysis suggests wiring safety exposure risk and public infrastructure default.',
+      matchScore: 90,
+      flaggedAsDiscrepancy: true,
+      referenceScaleCmPerPixel: 0.25,
+      segmentation: {
+        status: 'completed',
+        message: 'No visible surface cracking detected. Infrastructure issue flagged.',
+        defects: []
+      },
+      severity: 'Medium',
+      status: 'Inspector Assigned',
+      assignedOfficer: auth2._id, // Inspector Sanjay Singh
+      inspectionDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // Scheduled tomorrow
+      resolutionEta: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+      createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) // 1 day ago
+    });
+
+    console.log('Seeded 2 realistic citizen complaints linked to Abhishek Maurya.');
 
   } catch (error) {
     console.error('Error seeding database:', error.message);
