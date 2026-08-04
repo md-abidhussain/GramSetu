@@ -6,6 +6,7 @@ import { uploadBuffer } from '../services/cloudinaryService.js';
 import { compareBeforeAfter } from '../services/geminiImageCompareService.js';
 import { updateContractorScore } from '../services/contractorScoreService.js';
 import { runMockLifecycleAI } from '../services/mockLifecycleAIService.js';
+import { generateProjectAuditPDF } from '../services/pdfReportService.js';
 
 // Helper to create notifications for all authority users
 const notifyAuthorities = async (message, type = 'info') => {
@@ -250,6 +251,23 @@ export const updateProjectLifecycle = async (req, res, next) => {
 
     const populatedProject = await updatedProject.populate(['tender', 'contractor']);
     res.json(populatedProject);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const downloadProjectReport = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const project = await Project.findById(id).populate(['tender', 'contractor']);
+    if (!project) {
+      return res.status(404).json({ message: 'Project not found' });
+    }
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="audit-report-${id}.pdf"`);
+
+    await generateProjectAuditPDF(project, res);
   } catch (error) {
     next(error);
   }

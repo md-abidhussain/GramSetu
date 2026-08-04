@@ -303,7 +303,15 @@ export const CitizenVerificationPage = () => {
                           <CardTitle className="text-sm font-bold text-dark-800">
                             {selectedComplaint.project?.title || selectedComplaint.customProjectTitle || 'Custom Project Audit'}
                           </CardTitle>
-                          <p className="text-[10px] text-slate-400 mt-0.5">Complaint ID: #{selectedComplaint._id.toString().slice(-6).toUpperCase()}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-[10px] text-slate-400">Complaint ID: #{selectedComplaint._id.toString().slice(-6).toUpperCase()}</span>
+                            <button
+                              onClick={() => window.open(`/api/citizen-reports/${selectedComplaint._id}/report`, '_blank')}
+                              className="inline-flex items-center gap-1 px-2 py-0.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-[10px] font-semibold rounded text-slate-650 transition-colors"
+                            >
+                              <FileText className="h-3 w-3 text-slate-400" /> Export PDF
+                            </button>
+                          </div>
                         </div>
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
                           selectedComplaint.severity === 'High' ? 'bg-rose-50 text-rose-700 border-rose-100' : selectedComplaint.severity === 'Medium' ? 'bg-amber-50 text-amber-700 border-amber-100' : 'bg-slate-50 text-slate-600 border-slate-150'

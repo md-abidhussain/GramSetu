@@ -6,12 +6,16 @@ import {
   assignInspector,
   scheduleInspection,
   uploadInspectionVerification,
-  resolveComplaint
+  resolveComplaint,
+  downloadCitizenReport
 } from '../controllers/citizenController.js';
 import { protectAuthority, protectCitizen, protectAny, restrictTo } from '../middleware/authMiddleware.js';
 import { uploadImage } from '../middleware/uploadMiddleware.js';
 
 const router = express.Router();
+
+// Any authenticated user: Get details of a single report
+router.get('/:id/report', protectAny, downloadCitizenReport);
 
 // Citizen-only: File a complaint
 router.post('/', protectCitizen, uploadImage, createCitizenReport);

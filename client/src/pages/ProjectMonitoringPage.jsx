@@ -5,7 +5,7 @@ import CompletionScoreCard from '../components/monitoring/CompletionScoreCard.js
 import ProjectHealthCard from '../components/monitoring/ProjectHealthCard.jsx';
 import { useProjects } from '../hooks/useProjects.js';
 import ProjectLifecycleSection from '../components/monitoring/ProjectLifecycleSection.jsx';
-import { Eye, Activity, MapPin } from 'lucide-react';
+import { Eye, Activity, MapPin, FileText } from 'lucide-react';
 
 export const ProjectMonitoringPage = () => {
   const { projects, loading, addNewProject, completeExistingProject } = useProjects();
@@ -87,9 +87,17 @@ export const ProjectMonitoringPage = () => {
                     <MapPin className="h-3.5 w-3.5" /> {selectedProject.location.address || 'N/A'} (GPS: {selectedProject.location.lat}, {selectedProject.location.lng})
                   </p>
                 </div>
-                <div className="text-right">
-                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Contractor</span>
-                  <span className="text-xs font-semibold text-dark-800">{selectedProject.contractor?.name || 'N/A'}</span>
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={() => window.open(`/api/projects/${selectedProject._id}/report`, '_blank')}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-semibold rounded-lg text-slate-650 transition-colors"
+                  >
+                    <FileText className="h-3.5 w-3.5 text-slate-400" /> Export Audit PDF
+                  </button>
+                  <div className="text-right">
+                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Contractor</span>
+                    <span className="text-xs font-semibold text-dark-800">{selectedProject.contractor?.name || 'N/A'}</span>
+                  </div>
                 </div>
               </div>
 

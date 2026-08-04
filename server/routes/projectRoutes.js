@@ -5,7 +5,8 @@ import {
   getProjects, 
   getProjectById, 
   getProjectLifecycle, 
-  updateProjectLifecycle 
+  updateProjectLifecycle,
+  downloadProjectReport
 } from '../controllers/projectController.js';
 import { protectAuthority, protectAny, restrictTo } from '../middleware/authMiddleware.js';
 import { uploadImage } from '../middleware/uploadMiddleware.js';
@@ -16,6 +17,7 @@ const router = express.Router();
 router.get('/', getProjects);
 router.get('/:id', getProjectById);
 router.get('/:id/lifecycle', getProjectLifecycle);
+router.get('/:id/report', protectAny, downloadProjectReport);
 
 // Authority-only endpoints: Create and update projects
 router.post('/', protectAuthority, restrictTo('District Authority', 'PWD Engineer', 'Admin'), uploadImage, createProject);

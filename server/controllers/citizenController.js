@@ -9,6 +9,7 @@ import { uploadBuffer } from '../services/cloudinaryService.js';
 import { detectDamageAndDiscrepancies, detectDamageSingleImage } from '../services/geminiDamageDetectionService.js';
 import { quantifyDefects } from '../services/segmentationService.js';
 import { updateContractorScore } from '../services/contractorScoreService.js';
+import { generateCitizenComplaintPDF } from '../services/pdfReportService.js';
 
 // Helper to notify authority users
 const notifyAuthorities = async (message, type = 'info') => {
@@ -378,6 +379,30 @@ export const resolveComplaint = async (req, res, next) => {
 
     await report.save();
     res.json(report);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const downloadCitizenReport = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const complaint = await CitizenReport.findById(id)
+      .populate('citizen', 'name email phone')
+      .populate('assignedOfficer', 'name role uniqueUserId')
+      .populate({
+        path: 'project',
+        populate: { path: 'contractor' }
+      });
+
+    if (!complaint) {
+      return res.status(404).json({ message: 'Complaint report not found' });
+    }
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="complaint-report-${id}.pdf"`);
+
+    await generateCitizenComplaintPDF(complaint, res);
   } catch (error) {
     next(error);
   }
