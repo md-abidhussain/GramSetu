@@ -219,51 +219,61 @@ export const generateCitizenComplaintPDF = async (complaint, stream) => {
   const leftColX = 50;
   const rightColX = 300;
 
+  // Title selection
+  const complaintTitle = complaint.project?.title || complaint.customProjectTitle || 'Custom Grievance';
+
   // Left Column
   doc.font('Helvetica-Bold').fontSize(9).fillColor('#475569').text('Complaint Title:', leftColX, currentY);
-  doc.font('Helvetica').fillColor('#0f172a').text(complaint.title || 'N/A', leftColX + 90, currentY);
+  doc.font('Helvetica').fillColor('#0f172a').text(complaintTitle, leftColX + 90, currentY, { width: 160 });
 
-  doc.font('Helvetica-Bold').fillColor('#475569').text('Reported Project:', leftColX, currentY + 20);
-  doc.font('Helvetica').fillColor('#0f172a').text(complaint.project?.title || 'Custom/Isolated Location', leftColX + 90, currentY + 20, { width: 160 });
+  doc.font('Helvetica-Bold').fillColor('#475569').text('Reported Project:', leftColX, currentY + 30);
+  doc.font('Helvetica').fillColor('#0f172a').text(complaint.project?.title || 'Custom/Isolated Location', leftColX + 90, currentY + 30, { width: 160 });
 
-  doc.font('Helvetica-Bold').fillColor('#475569').text('Reported Date:', leftColX, currentY + 50);
-  doc.font('Helvetica').fillColor('#0f172a').text(new Date(complaint.createdAt).toLocaleDateString(), leftColX + 90, currentY + 50);
+  doc.font('Helvetica-Bold').fillColor('#475569').text('Reported Date:', leftColX, currentY + 60);
+  doc.font('Helvetica').fillColor('#0f172a').text(new Date(complaint.createdAt).toLocaleDateString(), leftColX + 90, currentY + 60);
 
   // Right Column
   doc.font('Helvetica-Bold').fillColor('#475569').text('GPS Coordinates:', rightColX, currentY);
-  doc.font('Helvetica').fillColor('#0f172a').text(`Lat: ${complaint.location?.lat || '0'}, Lng: ${complaint.location?.lng || '0'}`, rightColX + 90, currentY);
+  doc.font('Helvetica').fillColor('#0f172a').text(`Lat: ${complaint.gps?.lat || '0'}, Lng: ${complaint.gps?.lng || '0'}`, rightColX + 90, currentY);
 
   doc.font('Helvetica-Bold').fillColor('#475569').text('Site Address:', rightColX, currentY + 20);
-  doc.font('Helvetica').fillColor('#0f172a').text(complaint.location?.address || 'N/A', rightColX + 90, currentY + 20, { width: 160 });
+  doc.font('Helvetica').fillColor('#0f172a').text(complaint.project?.location?.address || 'Isolated/Custom Location', rightColX + 90, currentY + 20, { width: 160 });
 
   // 3. AI Quantification block
   drawSectionHeader(doc, 'AI defect analysis metrics', 270);
   currentY = 300;
 
   doc.font('Helvetica-Bold').fontSize(9).fillColor('#475569').text('AI Severity Check:', leftColX, currentY);
-  doc.font('Helvetica-Bold').fillColor(complaint.aiAnalysis?.risk === 'High' ? '#b91c1c' : '#b45309').text(`${complaint.aiAnalysis?.risk || 'Medium'} Severity`, leftColX + 110, currentY);
+  doc.font('Helvetica-Bold').fillColor(complaint.severity === 'High' ? '#b91c1c' : '#b45309').text(`${complaint.severity || 'Low'} Severity`, leftColX + 110, currentY);
 
   doc.font('Helvetica-Bold').fillColor('#475569').text('AI Confidence:', leftColX, currentY + 20);
-  doc.font('Helvetica').fillColor('#0f172a').text(`${complaint.aiAnalysis?.confidence || '90'}%`, leftColX + 110, currentY + 20);
+  doc.font('Helvetica').fillColor('#0f172a').text(`${complaint.matchScore || '90'}%`, leftColX + 110, currentY + 20);
 
   doc.font('Helvetica-Bold').fillColor('#475569').text('AI Defect Specs:', leftColX, currentY + 40);
   
-  const measurements = complaint.defectMeasurements || {};
+  // Aggregate YOLO segmentation defects
+  const defects = complaint.segmentation?.defects || [];
+  const hasDefects = defects.length > 0;
+  const totalArea = defects.reduce((sum, d) => sum + (d.areaCm2 || 0), 0);
+  const maxWidth = defects.reduce((max, d) => Math.max(max, d.widthCm || 0), 0);
+  const maxHeight = defects.reduce((max, d) => Math.max(max, d.heightCm || 0), 0);
+  const maxDiameter = defects.reduce((max, d) => Math.max(max, d.equivalentDiameterCm || 0), 0);
+
   doc.font('Helvetica').fillColor('#0f172a').text(
-    `Equivalent Diameter: ${measurements.equivalent_diameter_cm ? measurements.equivalent_diameter_cm.toFixed(1) : 'N/A'} cm\n` +
-    `Defect Area: ${measurements.area_cm2 ? measurements.area_cm2.toFixed(1) : 'N/A'} cm²\n` +
-    `Defect Dimensions: ${measurements.width_cm ? measurements.width_cm.toFixed(1) : 'N/A'} x ${measurements.height_cm ? measurements.height_cm.toFixed(1) : 'N/A'} cm`,
+    `Equivalent Diameter: ${hasDefects ? maxDiameter.toFixed(1) : 'N/A'} cm\n` +
+    `Defect Area: ${hasDefects ? totalArea.toFixed(1) : 'N/A'} cm²\n` +
+    `Defect Dimensions: ${hasDefects ? `${maxWidth.toFixed(1)} x ${maxHeight.toFixed(1)}` : 'N/A'} cm`,
     leftColX + 110, currentY + 40
   );
 
   doc.font('Helvetica-Bold').fillColor('#475569').text('Auditor Reasoning:', leftColX, currentY + 95);
-  doc.font('Helvetica').fillColor('#334155').text(complaint.aiAnalysis?.reasoning || 'No details recorded.', leftColX, currentY + 110, { width: 505 });
+  doc.font('Helvetica').fillColor('#334155').text(complaint.aiReport || 'No details recorded.', leftColX, currentY + 110, { width: 505 });
 
   // 4. Evidence Images (Citizen Grievance & Inspector Verification)
   drawSectionHeader(doc, 'Visual Audit Trial Evidence', 450);
 
-  const grievanceBuffer = await downloadImageBuffer(complaint.imageUrl);
-  const verificationBuffer = await downloadImageBuffer(complaint.verificationImageUrl);
+  const grievanceBuffer = await downloadImageBuffer(complaint.citizenImageUrl);
+  const verificationBuffer = await downloadImageBuffer(complaint.inspectorAfterImageUrl);
 
   const imgWidth = 240;
   const imgHeight = 150;
@@ -310,7 +320,7 @@ export const generateCitizenComplaintPDF = async (complaint, stream) => {
   doc.font('Helvetica-Oblique').fontSize(8).fillColor('#94a3b8').text('This document is electronically audited and certified using the GramSetu AI Ledger protocol.', 40, 720);
   doc.font('Helvetica-Bold').fontSize(9).fillColor('#475569').text('Assigned Inspector Signature', 400, 740);
   doc.strokeColor('#cbd5e1').lineWidth(1).moveTo(380, 780).lineTo(540, 780).stroke();
-  doc.font('Helvetica').fontSize(8).fillColor('#94a3b8').text(complaint.assignedInspector?.name || 'Authorized Inspector Signature', 405, 785);
+  doc.font('Helvetica').fontSize(8).fillColor('#94a3b8').text(complaint.assignedOfficer?.name || 'Authorized Inspector Signature', 405, 785);
 
   doc.end();
 };
