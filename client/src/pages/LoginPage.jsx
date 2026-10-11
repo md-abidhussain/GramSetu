@@ -5,6 +5,13 @@ import { Card, CardHeader, CardContent } from '../components/ui/Card.jsx';
 import { Button } from '../components/ui/Button.jsx';
 import { Shield, AlertCircle, Lock, User, Phone, Mail } from 'lucide-react';
 
+// Public sample accounts so anyone reviewing the project can look around
+// without signing up. They only ever see seeded demonstration data.
+const DEMO_ACCOUNTS = {
+  citizen: { identifier: 'citizen@gmail.com', password: 'citizen123', landingPage: '/verify' },
+  authority: { identifier: 'authority@gramsetu.gov', password: 'authority123', landingPage: '/dashboard' }
+};
+
 export const LoginPage = () => {
   const { 
     loginCitizen, 
@@ -92,20 +99,17 @@ export const LoginPage = () => {
     }
   };
 
-  const handleQuickBypass = async (targetRole) => {
+  const signInToDemo = async (accountType) => {
+    const account = DEMO_ACCOUNTS[accountType];
     setError(null);
     setSuccessMessage(null);
     setLoading(true);
     try {
-      if (targetRole === 'citizen') {
-        await loginCitizen('citizen@gmail.com', 'citizen123');
-        navigate('/verify');
-      } else {
-        await loginAuthority('authority@gramsetu.gov', 'authority123');
-        navigate('/dashboard');
-      }
+      const signIn = accountType === 'citizen' ? loginCitizen : loginAuthority;
+      await signIn(account.identifier, account.password);
+      navigate(account.landingPage);
     } catch (err) {
-      setError(`Quick-access bypass failed: ${err.message}. Is backend database running?`);
+      setError(`Could not open the demo account: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -114,7 +118,18 @@ export const LoginPage = () => {
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center bg-slate-50 px-4 py-12">
       <div className="w-full max-w-md space-y-6">
-        
+
+        <div className="text-center">
+          <div className="inline-flex items-center gap-2">
+            <Shield className="h-6 w-6 text-brand-600" />
+            <span className="text-xl font-semibold tracking-tight text-slate-900">GramSetu</span>
+          </div>
+          <p className="mt-2 text-sm text-slate-600">
+            Track public infrastructure projects, report problems, and verify
+            completed work.
+          </p>
+        </div>
+
         <Card className="border border-slate-200 shadow bg-white rounded-md overflow-hidden">
           <div className="flex border-b border-slate-250 bg-slate-50">
             <button
@@ -301,25 +316,24 @@ export const LoginPage = () => {
             </form>
           </CardContent>
 
-          {/* Integrated Evaluator Bypass Footer */}
           <div className="bg-slate-50 border-t border-slate-200 p-4">
-            <p className="text-[10px] font-bold text-slate-450 uppercase tracking-wider mb-2 text-center">
-              👨‍⚖️ Evaluator Bypass Links
+            <p className="mb-2 text-center text-xs font-medium text-slate-600">
+              Or look around with a demo account
             </p>
             <div className="flex gap-2">
               <button
-                onClick={() => handleQuickBypass('citizen')}
+                onClick={() => signInToDemo('citizen')}
                 disabled={loading}
-                className="flex-1 bg-white border border-slate-250 hover:bg-slate-100 text-slate-700 text-[10px] font-bold py-1.5 px-3 rounded shadow-sm focus:outline-none transition-colors"
+                className="flex-1 rounded border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-100 disabled:opacity-60"
               >
-                Skip as Citizen
+                Citizen
               </button>
               <button
-                onClick={() => handleQuickBypass('authority')}
+                onClick={() => signInToDemo('authority')}
                 disabled={loading}
-                className="flex-1 bg-white border border-slate-250 hover:bg-slate-100 text-slate-700 text-[10px] font-bold py-1.5 px-3 rounded shadow-sm focus:outline-none transition-colors"
+                className="flex-1 rounded border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-100 disabled:opacity-60"
               >
-                Skip as Authority
+                Government official
               </button>
             </div>
           </div>
