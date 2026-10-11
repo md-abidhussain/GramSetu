@@ -2,6 +2,8 @@ const API_URL = import.meta.env.VITE_API_BASE_URL
   ? `${import.meta.env.VITE_API_BASE_URL}/api`
   : '/api';
 
+const REQUEST_TIMEOUT_MS = 90000;
+
 let inMemoryToken = null;
 
 export const setInMemoryToken = (token) => {
@@ -32,10 +34,17 @@ export const request = async (endpoint, options = {}) => {
     headers['Content-Type'] = 'application/json';
   }
 
+  // The hosted backend sleeps when idle and can take close to a minute to
+  // answer the first request. Without a ceiling a stalled request would hang
+  // the screen indefinitely.
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
   try {
     const response = await fetch(`${API_URL}${endpoint}`, {
       ...options,
-      headers
+      headers,
+      signal: controller.signal
     });
 
     const data = await response.json().catch(() => ({}));
@@ -46,7 +55,11 @@ export const request = async (endpoint, options = {}) => {
 
     return data;
   } catch (error) {
-    console.error(`Request failed at ${endpoint}:`, error);
+    if (error.name === 'AbortError') {
+      throw new Error('The server took too long to respond. Please try again.');
+    }
     throw error;
+  } finally {
+    clearTimeout(timeout);
   }
 };

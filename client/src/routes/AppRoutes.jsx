@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.js';
+import LoadingScreen from '../components/ui/LoadingScreen.jsx';
 
 // Pages
 import DashboardPage from '../pages/DashboardPage.jsx';
@@ -16,11 +17,7 @@ const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-brand-600"></div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   if (!user) {
@@ -40,11 +37,7 @@ const CitizenRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-brand-600"></div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   if (!user) {
@@ -58,7 +51,7 @@ const CitizenRoute = ({ children }) => {
 const HomeRedirect = () => {
   const { user, loading } = useAuth();
   
-  if (loading) return null;
+  if (loading) return <LoadingScreen />;
   
   if (user) {
     if (user.role === 'citizen' || user.isCitizen) {
