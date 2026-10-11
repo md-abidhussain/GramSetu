@@ -6,7 +6,7 @@ import { useAuth } from '../../hooks/useAuth.js';
 export const PageLayout = ({ children, title = 'Infrastructure Audit' }) => {
   const { user } = useAuth();
   
-  // Show sidebar for any logged-in user (Phase 3 navigation & logout visibility)
+  // Show sidebar for any logged-in user
   const showSidebar = !!user;
 
   return (

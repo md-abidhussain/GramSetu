@@ -95,7 +95,7 @@ export const callGeminiJson = async (prompt, files = [], modelName = 'gemini-3.5
       const cleaned = cleanJsonString(responseText);
       const parsed = JSON.parse(cleaned);
 
-      // Validate output fields and assign defaults if missing (Phase 9)
+      // Validate output fields and assign defaults if missing
       parsed.confidence = parsed.confidence !== undefined ? Number(parsed.confidence) : 90;
       parsed.reasoning = parsed.reasoning || parsed.notes || parsed.aiComparisonNotes || 'AI validated completed verification.';
       parsed.risk = parsed.risk || parsed.riskLevel || 'Low';

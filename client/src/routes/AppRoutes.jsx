@@ -1,16 +1,17 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.js';
 import LoadingScreen from '../components/ui/LoadingScreen.jsx';
 
-// Pages
-import DashboardPage from '../pages/DashboardPage.jsx';
-import TenderIntelligencePage from '../pages/TenderIntelligencePage.jsx';
-import ProjectMonitoringPage from '../pages/ProjectMonitoringPage.jsx';
-import CitizenVerificationPage from '../pages/CitizenVerificationPage.jsx';
-import LoginPage from '../pages/LoginPage.jsx';
-import ContractorManagementPage from '../pages/ContractorManagementPage.jsx';
-import ContractorAnalysisPage from '../pages/ContractorAnalysisPage.jsx';
+// Each page loads only when someone opens it. Keeps the first download small,
+// which matters most on the slow connections this is built for.
+const LoginPage = lazy(() => import('../pages/LoginPage.jsx'));
+const DashboardPage = lazy(() => import('../pages/DashboardPage.jsx'));
+const TenderIntelligencePage = lazy(() => import('../pages/TenderIntelligencePage.jsx'));
+const ProjectMonitoringPage = lazy(() => import('../pages/ProjectMonitoringPage.jsx'));
+const CitizenVerificationPage = lazy(() => import('../pages/CitizenVerificationPage.jsx'));
+const ContractorManagementPage = lazy(() => import('../pages/ContractorManagementPage.jsx'));
+const ContractorAnalysisPage = lazy(() => import('../pages/ContractorAnalysisPage.jsx'));
 
 // Component to protect authority-only routes
 const ProtectedRoute = ({ children }) => {
@@ -65,7 +66,8 @@ const HomeRedirect = () => {
 
 export const AppRoutes = () => {
   return (
-    <Routes>
+    <Suspense fallback={<LoadingScreen />}>
+      <Routes>
       <Route path="/" element={<HomeRedirect />} />
       <Route path="/login" element={<LoginPage />} />
       
@@ -121,9 +123,10 @@ export const AppRoutes = () => {
         } 
       />
 
-      {/* Fallback route */}
-      <Route path="*" element={<HomeRedirect />} />
-    </Routes>
+        {/* Fallback route */}
+        <Route path="*" element={<HomeRedirect />} />
+      </Routes>
+    </Suspense>
   );
 };
 
