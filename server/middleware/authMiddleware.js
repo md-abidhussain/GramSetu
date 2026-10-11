@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { JWT_SECRET } from '../config/env.js';
 import Authority from '../models/Authority.js';
 import Citizen from '../models/Citizen.js';
 
@@ -29,7 +30,7 @@ export const protectAuthority = async (req, res, next) => {
       return res.status(401).json({ message: 'Not authorized, official session expired' });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'super_secure_jwt_token_secret_phrase');
+    const decoded = jwt.verify(token, JWT_SECRET);
     
     // Find in Authority collection
     const user = await Authority.findById(decoded.id).select('-passwordHash');
@@ -55,7 +56,7 @@ export const protectCitizen = async (req, res, next) => {
       return res.status(401).json({ message: 'Not authorized, citizen session expired' });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'super_secure_jwt_token_secret_phrase');
+    const decoded = jwt.verify(token, JWT_SECRET);
 
     // Find in Citizen collection
     const user = await Citizen.findById(decoded.id).select('-passwordHash');
@@ -81,7 +82,7 @@ export const protectAny = async (req, res, next) => {
       return res.status(401).json({ message: 'Not authorized, session expired' });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'super_secure_jwt_token_secret_phrase');
+    const decoded = jwt.verify(token, JWT_SECRET);
 
     // Search Citizen first, then Authority
     let user = await Citizen.findById(decoded.id).select('-passwordHash');

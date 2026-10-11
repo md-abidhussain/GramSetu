@@ -2,15 +2,18 @@ import Authority from '../models/Authority.js';
 import Citizen from '../models/Citizen.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import { JWT_SECRET } from '../config/env.js';
+
+const TOKEN_LIFETIME_SECONDS = 7 * 24 * 60 * 60;
 
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET || 'super_secure_jwt_token_secret_phrase', {
-    expiresIn: '30d'
-  });
+  return jwt.sign({ id }, JWT_SECRET, { expiresIn: TOKEN_LIFETIME_SECONDS });
 };
 
 const sendTokenCookie = (res, token) => {
-  res.setHeader('Set-Cookie', `token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=2592000`);
+  const flags = ['Path=/', 'HttpOnly', 'SameSite=Lax', `Max-Age=${TOKEN_LIFETIME_SECONDS}`];
+  if (process.env.NODE_ENV === 'production') flags.push('Secure');
+  res.setHeader('Set-Cookie', `token=${token}; ${flags.join('; ')}`);
 };
 
 // Generate unique ID for authority: AUTH-2026-XXXX

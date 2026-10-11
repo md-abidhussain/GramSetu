@@ -1,6 +1,11 @@
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+
+// Loads .env and exits if a required secret is missing. Must stay the first
+// local import so later modules see the values.
+import './config/env.js';
 import connectDB from './config/db.js';
 import { errorHandler } from './middleware/errorMiddleware.js';
 
@@ -25,14 +30,37 @@ import Reward from './models/Reward.js';
 import Notification from './models/Notification.js';
 import bcrypt from 'bcryptjs';
 
-dotenv.config();
-
 const app = express();
 
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Only these front-ends may call the API from a browser. Anything else is
+// refused, so a random site cannot make authenticated calls on a user's behalf.
+const allowedOrigins = (process.env.CLIENT_ORIGINS || 'http://localhost:5173')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+app.use(helmet());
+app.use(cors({
+  origin: (origin, callback) => {
+    // No origin header means a same-origin or server-to-server call.
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error('Origin not allowed by CORS'));
+  },
+  credentials: true
+}));
+
+// Caps request size so a huge payload cannot exhaust server memory.
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+
+// Slows down password guessing on the login and registration routes.
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Too many attempts. Please try again in 15 minutes.' }
+});
 
 // Database connection
 await connectDB();
@@ -449,7 +477,7 @@ if (seedMode === 'force') {
 }
 
 // API Routes
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/tenders', tenderRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/citizen-reports', citizenRoutes);
