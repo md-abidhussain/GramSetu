@@ -19,8 +19,12 @@ const fetchImageAsBase64 = async (url) => {
       }
     };
   } catch (error) {
-    console.error(`Error downloading image from ${url}:`, error);
-    throw new Error(`Failed to process image from URL ${url}: ${error.message}`);
+    // The URL is logged for debugging but kept out of the thrown message, which
+    // reaches the browser. Seeded demo photos point at an external photo site
+    // that sometimes removes them, and a missing photo should read as a missing
+    // photo rather than a stack of internal detail.
+    console.error(`Could not download image from ${url}:`, error.message);
+    throw new Error('A photo for this project could not be loaded, so the AI comparison could not run.');
   }
 };
 

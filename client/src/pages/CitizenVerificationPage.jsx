@@ -192,37 +192,37 @@ export const CitizenVerificationPage = () => {
         <div className="flex border-b border-slate-200 gap-1">
           <button
             onClick={() => setActiveSubTab('submit')}
-            className={`px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors ${
+            className={`px-4 py-2.5 text-sm font-medium transition-colors ${
               activeSubTab === 'submit'
                 ? 'border-b-2 border-brand-500 text-brand-600 bg-white'
                 : 'text-slate-400 hover:text-slate-650'
             }`}
           >
-            Submit Damage Evidence
+            New complaint
           </button>
           <button
             onClick={() => setActiveSubTab('track')}
-            className={`px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors ${
+            className={`px-4 py-2.5 text-sm font-medium transition-colors ${
               activeSubTab === 'track'
                 ? 'border-b-2 border-brand-500 text-brand-600 bg-white'
                 : 'text-slate-400 hover:text-slate-650'
             }`}
           >
-            Track Complaints ({myComplaints.length})
+            My complaints ({myComplaints.length})
           </button>
           <button
             onClick={() => setActiveSubTab('rewards')}
-            className={`px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors ${
+            className={`px-4 py-2.5 text-sm font-medium transition-colors ${
               activeSubTab === 'rewards'
                 ? 'border-b-2 border-brand-500 text-brand-600 bg-white'
                 : 'text-slate-400 hover:text-slate-650'
             }`}
           >
-            Reward History
+            Rewards
           </button>
           <button
             onClick={() => setActiveSubTab('notifications')}
-            className={`px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors ${
+            className={`px-4 py-2.5 text-sm font-medium transition-colors ${
               activeSubTab === 'notifications'
                 ? 'border-b-2 border-brand-500 text-brand-600 bg-white'
                 : 'text-slate-400 hover:text-slate-650'
@@ -404,11 +404,11 @@ export const CitizenVerificationPage = () => {
 
                       {/* Before / After Evidence Images */}
                       <div className="border-t border-slate-100 pt-4">
-                        <span className="text-[10px] font-semibold text-slate-450 uppercase tracking-wider block mb-2">Verification Evidence Comparison</span>
+                        <span className="text-[10px] font-semibold text-slate-450 uppercase tracking-wider block mb-2">Before and after</span>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <p className="text-[10px] text-slate-500 font-semibold mb-1 text-center">Citizen Submitted Evidence (Before)</p>
+                            <p className="text-[10px] text-slate-500 font-semibold mb-1 text-center">Your photo</p>
                             <div className="border border-slate-200 rounded-lg overflow-hidden h-40 bg-slate-50">
                               <img src={selectedComplaint.citizenImageUrl} alt="Citizen before" className="w-full h-full object-cover" />
                             </div>
