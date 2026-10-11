@@ -427,8 +427,26 @@ const seedDatabase = async () => {
   }
 };
 
-// Run Seeding on startup
-await seedDatabase();
+// Seeding is opt-in. Without this guard the server wiped every collection on
+// each restart, which destroys real data on hosts that restart or sleep (Render).
+//   SEED_DB unset / false -> never seeds (safe default for production)
+//   SEED_DB=true          -> seeds only when the database is empty
+//   SEED_DB=force         -> wipes and reseeds (deliberate demo reset only)
+const seedMode = (process.env.SEED_DB || '').toLowerCase();
+if (seedMode === 'force') {
+  console.log('SEED_DB=force - wiping and reseeding the database.');
+  await seedDatabase();
+} else if (seedMode === 'true') {
+  const alreadySeeded = await Authority.estimatedDocumentCount();
+  if (alreadySeeded === 0) {
+    console.log('Database is empty - running first-time seed.');
+    await seedDatabase();
+  } else {
+    console.log('Database already has data - skipping seed.');
+  }
+} else {
+  console.log('Seeding disabled. Set SEED_DB=true to seed an empty database.');
+}
 
 // API Routes
 app.use('/api/auth', authRoutes);
