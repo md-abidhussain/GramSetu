@@ -191,6 +191,10 @@ export const createCitizenReport = async (req, res, next) => {
 };
 
 // Get all reports (with citizen isolation)
+// A citizen may only open their own complaint. Officials may open any.
+const canView = (req, report) =>
+  !req.isCitizen || String(report.citizen?._id ?? report.citizen) === String(req.user._id);
+
 export const getCitizenReports = async (req, res, next) => {
   try {
     let filter = {};
@@ -227,6 +231,11 @@ export const getCitizenReportById = async (req, res, next) => {
     if (!report) {
       return res.status(404).json({ message: 'Citizen report not found' });
     }
+
+    if (!canView(req, report)) {
+      return res.status(403).json({ message: 'You can only view your own complaints' });
+    }
+
     res.json(report);
   } catch (error) {
     next(error);
@@ -397,6 +406,10 @@ export const downloadCitizenReport = async (req, res, next) => {
 
     if (!complaint) {
       return res.status(404).json({ message: 'Complaint report not found' });
+    }
+
+    if (!canView(req, complaint)) {
+      return res.status(403).json({ message: 'You can only download your own complaints' });
     }
 
     res.setHeader('Content-Type', 'application/pdf');
