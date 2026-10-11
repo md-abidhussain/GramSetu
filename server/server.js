@@ -65,7 +65,7 @@ const authLimiter = rateLimit({
 // Database connection
 await connectDB();
 
-// Database Seeding function (Phase 7 & Phase 12)
+// Database Seeding function
 const seedDatabase = async () => {
   try {
     // Drop all old/fake collections for a clean setup
@@ -260,7 +260,7 @@ const seedDatabase = async () => {
     const contractors = await Contractor.create(contractorData);
     console.log(`Seeded ${contractors.length} premium contractors.`);
 
-    // 5. Seed Tenders and Projects (Phase 7)
+    // 5. Seed Tenders and Projects
     const projectsData = [
       {
         title: 'PMGSY Rural Road Upgrade',

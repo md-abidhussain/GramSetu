@@ -78,7 +78,7 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
         </div>
       </CardContent>
 
-      {/* Contractor Details Modal (Phase 6) */}
+      {/* Contractor Details Modal */}
       {selectedContractor && (
         <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-50 p-4 animate-fadeIn">
           <div className="bg-white rounded-lg border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden">

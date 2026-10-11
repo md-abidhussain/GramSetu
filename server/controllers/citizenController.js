@@ -147,7 +147,7 @@ export const createCitizenReport = async (req, res, next) => {
       status: finalStatus
     });
 
-    // 8. Auto project degradation logic (Phase 5)
+    // 8. Auto project degradation logic
     if (project && !duplicateFound) {
       project.complaintCount = (project.complaintCount || 0) + 1;
       
@@ -359,7 +359,7 @@ export const resolveComplaint = async (req, res, next) => {
     if (decision === 'Accepted') {
       report.status = 'Resolution Published';
       
-      // Award Citizen Points (Phase 11)
+      // Award Citizen Points
       if (report.citizen) {
         const citizen = await Citizen.findById(report.citizen);
         if (citizen) {

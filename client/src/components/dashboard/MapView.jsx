@@ -111,7 +111,7 @@ export const MapView = ({ mapData = [] }) => {
           </MapContainer>
         </div>
 
-        {/* Detailed Project Marker Overlay Modal (Phase 8) */}
+        {/* Detailed Project Marker Overlay Modal */}
         {selectedProject && (
           <div className="absolute inset-0 bg-slate-900/50 z-20 flex items-center justify-center p-3 animate-fadeIn">
             <div className="bg-white rounded-lg border border-slate-200 shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-[90%] text-xs">
