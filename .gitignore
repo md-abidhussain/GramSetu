@@ -38,3 +38,7 @@ Thumbs.db
 segmentation-service/datasets/
 segmentation-service/models/*.pt
 segmentation-service/runs/
+
+# Python bytecode
+__pycache__/
+*.pyc
