@@ -164,13 +164,13 @@ export const LoginPage = () => {
             </div>
             <h2 className="text-base font-bold text-dark-800 tracking-tight">
               {activeTab === 'citizen'
-                ? mode === 'login' ? 'Citizen Account Login' : 'Citizen Registration'
-                : mode === 'login' ? 'Official Portal Login' : 'Official Onboarding'}
+                ? mode === 'login' ? 'Sign in as a citizen' : 'Create a citizen account'
+                : mode === 'login' ? 'Sign in as an official' : 'Create an official account'}
             </h2>
             <p className="text-xs text-slate-400 mt-1">
               {activeTab === 'citizen'
-                ? 'Report damages, audit projects, and track municipal complaints'
-                : 'Government portal for tender analytics & project audits'}
+                ? 'Report a problem and follow what happens to it'
+                : 'Review tenders, projects and citizen reports'}
             </p>
           </CardHeader>
 
@@ -243,7 +243,7 @@ export const LoginPage = () => {
                 <div className="space-y-1.5">
                   <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                     {activeTab === 'citizen' 
-                      ? 'Email Address or Mobile Number' 
+                      ? 'Email or mobile number' 
                       : 'Government Email or Official ID (AUTH-2026-XXXX)'}
                   </label>
                   <input
@@ -279,7 +279,7 @@ export const LoginPage = () => {
 
               <div className="space-y-1.5">
                 <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                  Access Password
+                  Password
                 </label>
                 <input
                   type="password"
@@ -300,7 +300,7 @@ export const LoginPage = () => {
                   disabled={loading}
                 >
                   <Lock className="h-3.5 w-3.5" />
-                  {mode === 'login' ? 'Access Portal' : 'Register Account'}
+                  {mode === 'login' ? 'Sign in' : 'Create account'}
                 </Button>
 
                 <button
