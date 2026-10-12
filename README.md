@@ -72,7 +72,7 @@ To maintain enterprise integrity, GramSetu AI implements rigid security configur
 ## 📸 Platform Interface
 
 ### 1. Citizen Portal Login
-Offers secure login alongside immediate bypass credentials for testing portals.
+Secure sign-in for citizens, with a separate sign-in for officials.
 ![Citizen Portal Login](./docs/screenshots/citizen-login.png)
 
 ### 2. Citizen Verification Portal
@@ -166,9 +166,12 @@ District Authority Handover Approval
    CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
    CLOUDINARY_API_KEY=your_cloudinary_api_key
    CLOUDINARY_API_SECRET=your_cloudinary_api_secret
-   SEGMENTATION_SERVICE_URL=http://localhost:8000
+   SEGMENTATION_SERVICE_URL=http://localhost:8001
+   CLIENT_ORIGINS=http://localhost:3000
+   SEED_DB=true
    ```
-4. Run the seed and start script:
+   `CLIENT_ORIGINS` is a comma-separated list of front-end URLs allowed to call the API. `SEED_DB=true` seeds demo data only when the database is empty; `force` wipes and reseeds, and leaving it unset (as in production) never seeds.
+4. Start the server:
    ```bash
    npm run dev
    ```
@@ -194,7 +197,7 @@ District Authority Handover Approval
    ```
 4. Start the FastAPI microservice:
    ```bash
-   uvicorn app:app --port 8000 --reload
+   uvicorn app:app --port 8001 --reload
    ```
 
 ---
