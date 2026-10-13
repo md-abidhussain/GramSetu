@@ -10,6 +10,7 @@ import { detectDamageAndDiscrepancies, detectDamageSingleImage } from '../servic
 import { quantifyDefects } from '../services/segmentationService.js';
 import { updateContractorScore } from '../services/contractorScoreService.js';
 import { generateCitizenComplaintPDF } from '../services/pdfReportService.js';
+import { isValidId, toLatitude, toLongitude, toText } from '../utils/validators.js';
 
 // Helper to notify authority users
 const notifyAuthorities = async (message, type = 'info') => {
@@ -39,16 +40,34 @@ export const createCitizenReport = async (req, res, next) => {
       return res.status(400).json({ message: 'projectId, lat, lng, and description are required' });
     }
 
-    if (projectId === 'custom' && !customProjectTitle) {
-      return res.status(400).json({ message: 'customProjectTitle is required for custom projects' });
+    const latitude = toLatitude(lat);
+    const longitude = toLongitude(lng);
+    if (latitude === null || longitude === null) {
+      return res.status(400).json({ message: 'Please give a valid location on the map' });
+    }
+
+    const reportText = toText(description, 2000);
+    if (!reportText) {
+      return res.status(400).json({ message: 'Describe the problem in 2000 characters or fewer' });
+    }
+
+    const isCustomProject = projectId === 'custom';
+    let customTitle = null;
+    if (isCustomProject) {
+      customTitle = toText(customProjectTitle, 200);
+      if (!customTitle) {
+        return res.status(400).json({ message: 'Give the place a name of 200 characters or fewer' });
+      }
+    } else if (!isValidId(projectId)) {
+      return res.status(400).json({ message: 'That project does not exist' });
     }
 
     if (!req.file) {
-      return res.status(400).json({ message: 'Verification image file is required' });
+      return res.status(400).json({ message: 'A photo of the problem is required' });
     }
 
     let project = null;
-    if (projectId !== 'custom') {
+    if (!isCustomProject) {
       project = await Project.findById(projectId);
       if (!project) {
         return res.status(404).json({ message: 'Project not found' });
@@ -63,8 +82,8 @@ export const createCitizenReport = async (req, res, next) => {
     // Check if there is another report in a ~50m radius (0.0005 lat/lng difference) with similar status
     const duplicateReport = await CitizenReport.findOne({
       status: { $ne: 'Resolved' },
-      'gps.lat': { $gte: Number(lat) - 0.0005, $lte: Number(lat) + 0.0005 },
-      'gps.lng': { $gte: Number(lng) - 0.0005, $lte: Number(lng) + 0.0005 }
+      'gps.lat': { $gte: latitude - 0.0005, $lte: latitude + 0.0005 },
+      'gps.lng': { $gte: longitude - 0.0005, $lte: longitude + 0.0005 }
     });
 
     const duplicateFound = !!duplicateReport;
@@ -112,8 +131,8 @@ export const createCitizenReport = async (req, res, next) => {
     // 6. Geo-Verification check (within 150m of project location if project specified)
     let geoVerified = true;
     if (project) {
-      const distanceLat = Math.abs(project.location.lat - Number(lat));
-      const distanceLng = Math.abs(project.location.lng - Number(lng));
+      const distanceLat = Math.abs(project.location.lat - latitude);
+      const distanceLng = Math.abs(project.location.lng - longitude);
       if (distanceLat > 0.0015 || distanceLng > 0.0015) {
         geoVerified = false;
       }
@@ -129,13 +148,13 @@ export const createCitizenReport = async (req, res, next) => {
     const report = await CitizenReport.create({
       citizen: citizenId || null,
       project: project ? project._id : undefined,
-      customProjectTitle: project ? undefined : customProjectTitle,
+      customProjectTitle: project ? undefined : customTitle,
       citizenImageUrl,
       gps: {
-        lat: Number(lat),
-        lng: Number(lng)
+        lat: latitude,
+        lng: longitude
       },
-      description,
+      description: reportText,
       detectedIssues,
       aiReport: aiAnalysis.aiReport,
       matchScore: aiAnalysis.matchScore,

@@ -62,6 +62,19 @@ const authLimiter = rateLimit({
   message: { message: 'Too many attempts. Please try again in 15 minutes.' }
 });
 
+// Submitting a report or a tender stores a file and calls a paid AI service,
+// so each one costs real money. This caps how fast a single caller can spend it.
+const uploadLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'You have sent a lot of uploads in a short time. Please try again later.' },
+  // Reading project and tender lists is cheap and public, so only count the
+  // requests that actually store a file or call the AI.
+  skip: (req) => req.method === 'GET'
+});
+
 // Database connection
 await connectDB();
 
@@ -478,9 +491,9 @@ if (seedMode === 'force') {
 
 // API Routes
 app.use('/api/auth', authLimiter, authRoutes);
-app.use('/api/tenders', tenderRoutes);
-app.use('/api/projects', projectRoutes);
-app.use('/api/citizen-reports', citizenRoutes);
+app.use('/api/tenders', uploadLimiter, tenderRoutes);
+app.use('/api/projects', uploadLimiter, projectRoutes);
+app.use('/api/citizen-reports', uploadLimiter, citizenRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/rewards', rewardRoutes);
