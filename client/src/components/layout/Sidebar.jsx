@@ -21,22 +21,22 @@ export const Sidebar = () => {
     navigate('/login');
   };
 
+  const isCitizen = Boolean(user && (user.isCitizen || user.role === 'citizen'));
+
+  // Citizens report problems. Officials review what citizens reported, from
+  // the complaints list on their dashboard. Neither needs the other's menu.
   const navItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, role: 'authority' },
-    { name: 'Tender Intelligence', path: '/tenders', icon: FileText, role: 'authority' },
-    { name: 'Project Monitoring', path: '/projects', icon: Activity, role: 'authority' },
-    { name: 'Contractor Registry', path: '/contractors', icon: Users, role: 'authority' },
-    { name: 'Contractor Analytics', path: '/contractors-analysis', icon: BarChart3, role: 'authority' },
-    { name: 'Citizen Portal', path: '/verify', icon: ShieldAlert, role: 'any' },
+    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, audience: 'official' },
+    { name: 'Tender Intelligence', path: '/tenders', icon: FileText, audience: 'official' },
+    { name: 'Project Monitoring', path: '/projects', icon: Activity, audience: 'official' },
+    { name: 'Contractor Registry', path: '/contractors', icon: Users, audience: 'official' },
+    { name: 'Contractor Analytics', path: '/contractors-analysis', icon: BarChart3, audience: 'official' },
+    { name: 'Complaints', path: '/verify', icon: ShieldAlert, audience: 'citizen' },
   ];
 
-  const filteredItems = navItems.filter(item => {
-    if (item.role === 'any') {
-      // Citizens only see Citizen Portal; Officials can see everything
-      return true;
-    }
-    return user && user.role !== 'citizen' && !user.isCitizen;
-  });
+  const filteredItems = navItems.filter((item) =>
+    item.audience === (isCitizen ? 'citizen' : 'official')
+  );
 
   return (
     <div className="w-64 bg-dark-900 text-slate-300 h-full flex flex-col border-r border-dark-800">
