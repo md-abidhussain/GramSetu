@@ -1,4 +1,5 @@
 import express from 'express';
+import { validateIdParam } from '../middleware/validateIdParam.js';
 import { getNotifications, markNotificationRead } from '../controllers/dashboardController.js';
 import { protectAny } from '../middleware/authMiddleware.js';
 
@@ -7,6 +8,6 @@ const router = express.Router();
 router.use(protectAny);
 
 router.get('/', getNotifications);
-router.patch('/:id/read', markNotificationRead);
+router.patch('/:id/read', validateIdParam(), markNotificationRead);
 
 export default router;

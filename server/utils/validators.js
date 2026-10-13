@@ -23,3 +23,12 @@ export const toText = (value, maxLength) => {
   if (trimmed.length === 0 || trimmed.length > maxLength) return null;
   return trimmed;
 };
+
+// Keeps a number inside the range the field is meant to hold. Scores arrived
+// straight from the request body, so a contractor could be created with a
+// performance score of 9999 and sit permanently at the top of the leaderboard.
+export const toNumberInRange = (value, min, max, fallback) => {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return fallback;
+  return Math.min(Math.max(number, min), max);
+};

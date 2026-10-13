@@ -7,6 +7,7 @@ import { compareBeforeAfter } from '../services/geminiImageCompareService.js';
 import { updateContractorScore } from '../services/contractorScoreService.js';
 import { runMockLifecycleAI } from '../services/mockLifecycleAIService.js';
 import { generateProjectAuditPDF } from '../services/pdfReportService.js';
+import { isValidId, toLatitude, toLongitude, toText } from '../utils/validators.js';
 
 // Helper to create notifications for all authority users
 const notifyAuthorities = async (message, type = 'info') => {
@@ -66,6 +67,26 @@ export const createProject = async (req, res, next) => {
       return res.status(400).json({ message: 'Title, tenderId, lat, and lng are required' });
     }
 
+    const projectTitle = toText(title, 200);
+    if (!projectTitle) {
+      return res.status(400).json({ message: 'Give the project a title of 200 characters or fewer' });
+    }
+
+    if (!isValidId(tenderId)) {
+      return res.status(400).json({ message: 'That tender does not exist' });
+    }
+
+    const latitude = toLatitude(lat);
+    const longitude = toLongitude(lng);
+    if (latitude === null || longitude === null) {
+      return res.status(400).json({ message: 'Please give a valid location for the project' });
+    }
+
+    const projectAddress = address ? toText(address, 300) : null;
+    if (address && !projectAddress) {
+      return res.status(400).json({ message: 'Shorten the address to 300 characters or fewer' });
+    }
+
     if (!req.file) {
       return res.status(400).json({ message: 'Project "before" image is required' });
     }
@@ -83,13 +104,13 @@ export const createProject = async (req, res, next) => {
 
     // Create project
     const project = await Project.create({
-      title,
+      title: projectTitle,
       tender: tenderId,
       contractor: contractorId,
       location: {
-        lat: Number(lat),
-        lng: Number(lng),
-        address: address || ''
+        lat: latitude,
+        lng: longitude,
+        address: projectAddress || ''
       },
       beforeImageUrl: uploadResult.secure_url,
       status: 'Pending',
