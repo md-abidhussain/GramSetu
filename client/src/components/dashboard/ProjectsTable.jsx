@@ -138,7 +138,7 @@ export const ProjectsTable = ({ projects = [], onSelectProject }) => {
                             {proj.completionScore}%
                           </span>
                         ) : (
-                          <span className="text-slate-450 italic text-[11px]">Unverified</span>
+                          <span className="text-slate-500 italic text-[11px]">Unverified</span>
                         )}
                       </div>
                     </td>

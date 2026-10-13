@@ -39,9 +39,9 @@ export const ProjectMonitoringPage = () => {
             </h3>
             
             {loading && projects.length === 0 ? (
-              <p className="text-xs text-slate-450 italic py-4">Loading project ledger...</p>
+              <p className="text-xs text-slate-500 italic py-4">Loading project ledger...</p>
             ) : projects.length === 0 ? (
-              <p className="text-xs text-slate-450 italic py-4">No projects registered yet.</p>
+              <p className="text-xs text-slate-500 italic py-4">No projects registered yet.</p>
             ) : (
               <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
                 {projects.map((item) => (
@@ -90,7 +90,7 @@ export const ProjectMonitoringPage = () => {
                 <div className="flex items-center gap-4">
                   <button
                     onClick={() => window.open(`/api/projects/${selectedProject._id}/report`, '_blank')}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-semibold rounded-lg text-slate-650 transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-semibold rounded-lg text-slate-700 transition-colors"
                   >
                     <FileText className="h-3.5 w-3.5 text-slate-400" /> Export Audit PDF
                   </button>

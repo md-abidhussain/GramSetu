@@ -7,7 +7,7 @@ export const Card = ({ children, className = '' }) => (
 );
 
 export const CardHeader = ({ children, className = '' }) => (
-  <div className={`px-6 py-4 border-b border-slate-150 flex items-center justify-between ${className}`}>
+  <div className={`px-6 py-4 border-b border-slate-100 flex items-center justify-between ${className}`}>
     {children}
   </div>
 );
