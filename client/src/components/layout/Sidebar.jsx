@@ -39,8 +39,8 @@ export const Sidebar = () => {
   );
 
   return (
-    <div className="w-64 bg-dark-900 text-slate-300 h-full flex flex-col border-r border-dark-800">
-      <div className="h-16 flex items-center px-6 border-b border-dark-800 gap-2">
+    <div className="w-64 bg-brand-800 text-brand-100 h-full flex flex-col border-r border-brand-900">
+      <div className="h-16 flex items-center px-6 border-b border-brand-900 gap-2">
         <div className="h-9 w-9 bg-brand-600 rounded-md flex items-center justify-center text-white font-bold">
           GS
         </div>
@@ -61,7 +61,7 @@ export const Sidebar = () => {
               `flex items-center gap-3 px-4 py-2.5 rounded-md text-sm font-medium transition-colors ${
                 isActive
                   ? 'bg-brand-600 text-white'
-                  : 'text-slate-400 hover:bg-dark-800 hover:text-slate-100'
+                  : 'text-brand-100/80 hover:bg-brand-700 hover:text-white'
               }`
             }
           >
@@ -72,8 +72,8 @@ export const Sidebar = () => {
       </nav>
 
       {user && (
-        <div className="p-4 border-t border-dark-800">
-          <div className="bg-dark-950/40 rounded-md p-4 flex flex-col gap-3">
+        <div className="p-4 border-t border-brand-900">
+          <div className="bg-brand-900/50 rounded-md p-4 flex flex-col gap-3">
             <div className="flex items-center gap-3">
               <div className="h-9 w-9 bg-slate-700 text-slate-200 font-semibold rounded-full flex items-center justify-center uppercase text-sm">
                 {user.name.charAt(0)}
@@ -85,7 +85,7 @@ export const Sidebar = () => {
             </div>
             <button
               onClick={handleLogout}
-              className="flex items-center justify-center gap-2 w-full px-3 py-2 bg-dark-800 hover:bg-red-950/20 hover:text-red-400 text-slate-400 text-xs font-medium rounded-md transition-colors"
+              className="flex items-center justify-center gap-2 w-full px-3 py-2 bg-brand-900 hover:bg-red-950/40 hover:text-red-400 text-slate-400 text-xs font-medium rounded-md transition-colors"
             >
               <LogOut className="h-3.5 w-3.5" />
               <span>Log Out</span>
