@@ -1,10 +1,15 @@
 /** @type {import('tailwindcss').Config} */
 
-// Navy carries the brand, the way most Indian government service portals do.
-// Green is deliberately left out of the brand scale: this app already uses
-// green to mean verified or resolved, and a green button would blur that.
-// Saffron appears only as an accent, and only at shade 700 when it carries
-// text, because lighter saffron does not meet the contrast GIGW asks for.
+// Deep forest green for the chrome and primary actions, on a warm off-white
+// page rather than stark white.
+//
+// The app also uses green for "verified" and "resolved", so the two are kept
+// apart by weight, not hue: the brand green is dark and solid, while a status
+// is a pale pill that always carries its word. Relying on more than colour is
+// what WCAG asks for anyway.
+//
+// Saffron is the accent, and only at shade 700 when it carries text, because
+// lighter saffron does not meet the contrast GIGW asks for.
 export default {
   content: [
     "./index.html",
@@ -14,16 +19,20 @@ export default {
     extend: {
       colors: {
         brand: {
-          50: '#f2f6fb',
-          100: '#e3ecf7',
-          200: '#c2d5ec',
-          300: '#93b4db',
-          400: '#5c8bc6',
-          500: '#336aae',
-          600: '#1b4f91', // 8.16:1 on white, and white on it - AAA both ways
-          700: '#123a6b',
-          800: '#0d2d50',
-          900: '#0a2038',
+          50: '#f1f7f3',
+          100: '#dcebe2',
+          200: '#bbd8c7',
+          300: '#8dbda2',
+          400: '#589a79',
+          500: '#2f7a59',
+          600: '#1b5e40', // 7.72:1 on white, and white on it - AAA both ways
+          700: '#14532d',
+          800: '#0f3f23', // sidebar and header chrome - 11.96:1 with white text
+          900: '#0a2b18',
+        },
+        surface: {
+          DEFAULT: '#faf9f7', // warm off-white, easier on the eye than pure white
+          raised: '#ffffff',
         },
         accent: {
           50: '#fff8ed',
