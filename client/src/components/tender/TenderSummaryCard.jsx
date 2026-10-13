@@ -35,7 +35,7 @@ export const TenderSummaryCard = ({ tender }) => {
                 href={fileUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-medium rounded-md text-slate-650 transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-medium rounded-md text-slate-700 transition-colors"
               >
                 <FileText className="h-3 w-3" /> PDF Source
               </a>
@@ -77,9 +77,9 @@ export const TenderSummaryCard = ({ tender }) => {
             </div>
             
             <p className="text-sm font-bold text-dark-800 mb-1">
-              Allocated: <span className="text-brand-750 font-bold">{budgetAllocated || 'Not specified'}</span>
+              Allocated: <span className="text-brand-800 font-bold">{budgetAllocated || 'Not specified'}</span>
             </p>
-            <p className="text-xs text-slate-550 leading-relaxed">
+            <p className="text-xs text-slate-600 leading-relaxed">
               {budgetAnalysis?.reason}
             </p>
           </div>
@@ -110,7 +110,7 @@ export const TenderSummaryCard = ({ tender }) => {
                 {timelineStart ? new Date(timelineStart).toLocaleDateString() : 'TBD'} - {timelineEnd ? new Date(timelineEnd).toLocaleDateString() : 'TBD'}
               </span>
             </p>
-            <p className="text-xs text-slate-550 leading-relaxed">
+            <p className="text-xs text-slate-600 leading-relaxed">
               {timelineAnalysis?.reason}
             </p>
           </div>

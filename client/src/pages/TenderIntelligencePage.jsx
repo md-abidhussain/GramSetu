@@ -49,9 +49,9 @@ export const TenderIntelligencePage = () => {
             </h3>
             
             {loading && tenders.length === 0 ? (
-              <p className="text-xs text-slate-450 italic py-4">Loading audit logs...</p>
+              <p className="text-xs text-slate-500 italic py-4">Loading audit logs...</p>
             ) : tenders.length === 0 ? (
-              <p className="text-xs text-slate-450 italic py-4">No audits conducted yet.</p>
+              <p className="text-xs text-slate-500 italic py-4">No audits conducted yet.</p>
             ) : (
               <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
                 {tenders.map((item) => (

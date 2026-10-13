@@ -134,7 +134,7 @@ export const CitizenVerificationPage = () => {
             className={`px-4 py-2.5 text-sm font-medium transition-colors ${
               activeSubTab === 'submit'
                 ? 'border-b-2 border-brand-500 text-brand-600 bg-white'
-                : 'text-slate-400 hover:text-slate-650'
+                : 'text-slate-400 hover:text-slate-700'
             }`}
           >
             New complaint
@@ -144,7 +144,7 @@ export const CitizenVerificationPage = () => {
             className={`px-4 py-2.5 text-sm font-medium transition-colors ${
               activeSubTab === 'track'
                 ? 'border-b-2 border-brand-500 text-brand-600 bg-white'
-                : 'text-slate-400 hover:text-slate-650'
+                : 'text-slate-400 hover:text-slate-700'
             }`}
           >
             My complaints ({myComplaints.length})
@@ -154,7 +154,7 @@ export const CitizenVerificationPage = () => {
             className={`px-4 py-2.5 text-sm font-medium transition-colors ${
               activeSubTab === 'rewards'
                 ? 'border-b-2 border-brand-500 text-brand-600 bg-white'
-                : 'text-slate-400 hover:text-slate-650'
+                : 'text-slate-400 hover:text-slate-700'
             }`}
           >
             Rewards
@@ -164,7 +164,7 @@ export const CitizenVerificationPage = () => {
             className={`px-4 py-2.5 text-sm font-medium transition-colors ${
               activeSubTab === 'notifications'
                 ? 'border-b-2 border-brand-500 text-brand-600 bg-white'
-                : 'text-slate-400 hover:text-slate-650'
+                : 'text-slate-400 hover:text-slate-700'
             }`}
           >
             Notifications ({notifications.filter(n => !n.read).length})

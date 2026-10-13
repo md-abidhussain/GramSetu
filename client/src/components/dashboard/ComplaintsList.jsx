@@ -196,8 +196,8 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                   }}
                   className={`p-3.5 rounded border transition-colors cursor-pointer text-xs ${
                     selectedReport?._id === item._id
-                      ? 'border-brand-650 bg-brand-50/10'
-                      : 'border-slate-200 hover:border-slate-350 bg-white'
+                      ? 'border-brand-700 bg-brand-50/10'
+                      : 'border-slate-200 hover:border-slate-400 bg-white'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
@@ -284,14 +284,14 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                 </div>
 
                 <div className="border-t border-slate-100 pt-3">
-                  <span className="block text-[10px] text-slate-450 font-bold uppercase tracking-wider">Citizen Narrative</span>
-                  <p className="text-slate-650 mt-1 leading-relaxed">{selectedReport.description}</p>
+                  <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-wider">Citizen Narrative</span>
+                  <p className="text-slate-700 mt-1 leading-relaxed">{selectedReport.description}</p>
                 </div>
 
                 {/* Gemini comparative report analysis if discrepancies exist */}
                 {selectedReport.aiReport && (
                   <div className="border-t border-slate-100 pt-3">
-                    <span className="block text-[10px] text-slate-450 font-bold uppercase tracking-wider flex items-center gap-1">
+                    <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1">
                       <ShieldAlert className="h-3.5 w-3.5 text-brand-600" /> AI Discrepancy Assessment
                     </span>
                     <p className="text-slate-700 bg-brand-50/15 border border-brand-100 p-2.5 rounded mt-1.5 leading-relaxed">
@@ -303,7 +303,7 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                 {/* Inspector Site Notes */}
                 {selectedReport.inspectorNotes && (
                   <div className="border-t border-slate-100 pt-3">
-                    <span className="block text-[10px] text-slate-450 font-bold uppercase tracking-wider">Inspector Notes</span>
+                    <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-wider">Inspector Notes</span>
                     <p className="text-slate-700 bg-slate-100/50 border border-slate-200 p-2.5 rounded mt-1.5 leading-relaxed italic">
                       {selectedReport.inspectorNotes}
                     </p>

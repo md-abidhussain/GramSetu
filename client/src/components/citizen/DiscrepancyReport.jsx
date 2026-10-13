@@ -34,7 +34,7 @@ export const DiscrepancyReport = ({ result }) => {
   };
 
   return (
-    <Card className="border-t-4 border-t-brand-650">
+    <Card className="border-t-4 border-t-brand-700">
       <CardHeader>
         <div className="flex justify-between items-center w-full">
           <div>
@@ -65,7 +65,7 @@ export const DiscrepancyReport = ({ result }) => {
           </div>
           <div>
             <p className="text-xs font-bold text-dark-800">Verification Score</p>
-            <p className="text-[11px] text-slate-550 leading-normal mt-0.5">
+            <p className="text-[11px] text-slate-600 leading-normal mt-0.5">
               {matchScore >= 80 
                 ? 'Current photo aligns well with official completion records.' 
                 : 'Current photo shows clear structural inconsistencies compared to completion records.'}
@@ -98,7 +98,7 @@ export const DiscrepancyReport = ({ result }) => {
         {segmentation?.status === 'completed' && (
           <div>
             <span className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500">
-              <Ruler className="h-4 w-4 text-brand-650" /> Defect Measurements
+              <Ruler className="h-4 w-4 text-brand-700" /> Defect Measurements
             </span>
             {segmentation.defects?.length ? (
               <div className="space-y-2">
@@ -115,7 +115,7 @@ export const DiscrepancyReport = ({ result }) => {
         )}
 
         {segmentation?.status === 'scale_missing' && (
-          <p className="rounded-md bg-amber-50 border border-amber-250 p-3 text-xs text-amber-800">Defect size was not calculated: add a calibrated reference scale when submitting the photo.</p>
+          <p className="rounded-md bg-amber-50 border border-amber-200 p-3 text-xs text-amber-800">Defect size was not calculated: add a calibrated reference scale when submitting the photo.</p>
         )}
 
         <div className="border-t border-slate-200 pt-4">

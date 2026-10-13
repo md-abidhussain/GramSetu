@@ -131,12 +131,12 @@ export const LoginPage = () => {
         </div>
 
         <Card className="border border-slate-200 shadow bg-white rounded-md overflow-hidden">
-          <div className="flex border-b border-slate-250 bg-slate-50">
+          <div className="flex border-b border-slate-200 bg-slate-50">
             <button
               onClick={() => handleTabChange('citizen')}
               className={`flex-1 text-center py-3 text-xs font-bold tracking-wider uppercase transition-colors ${
                 activeTab === 'citizen'
-                  ? 'border-b-2 border-brand-600 text-brand-650 bg-white'
+                  ? 'border-b-2 border-brand-600 text-brand-700 bg-white'
                   : 'text-slate-500 hover:text-slate-700 bg-slate-50'
               }`}
             >
@@ -146,7 +146,7 @@ export const LoginPage = () => {
               onClick={() => handleTabChange('authority')}
               className={`flex-1 text-center py-3 text-xs font-bold tracking-wider uppercase transition-colors ${
                 activeTab === 'authority'
-                  ? 'border-b-2 border-brand-600 text-brand-650 bg-white'
+                  ? 'border-b-2 border-brand-600 text-brand-700 bg-white'
                   : 'text-slate-500 hover:text-slate-700 bg-slate-50'
               }`}
             >
@@ -157,9 +157,9 @@ export const LoginPage = () => {
           <CardHeader className="border-b-0 pb-0 text-center flex flex-col items-center pt-6">
             <div className="h-12 w-12 bg-slate-100 border border-slate-200 rounded flex items-center justify-center font-bold mb-3">
               {activeTab === 'citizen' ? (
-                <User className="h-6 w-6 text-slate-650" />
+                <User className="h-6 w-6 text-slate-700" />
               ) : (
-                <Shield className="h-6 w-6 text-brand-650" />
+                <Shield className="h-6 w-6 text-brand-700" />
               )}
             </div>
             <h2 className="text-base font-bold text-dark-800 tracking-tight">
@@ -184,7 +184,7 @@ export const LoginPage = () => {
               )}
 
               {successMessage && (
-                <div className="p-3 bg-emerald-50 border border-emerald-250 rounded text-emerald-800 text-xs flex items-center gap-2">
+                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded text-emerald-800 text-xs flex items-center gap-2">
                   <AlertCircle className="h-4 w-4 shrink-0" />
                   <span>{successMessage}</span>
                 </div>
@@ -202,7 +202,7 @@ export const LoginPage = () => {
                     onChange={(e) => setName(e.target.value)}
                     required
                     disabled={loading}
-                    className="w-full bg-white border border-slate-250 rounded px-3 py-2 text-xs text-dark-800 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 placeholder-slate-400"
+                    className="w-full bg-white border border-slate-200 rounded px-3 py-2 text-xs text-dark-800 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 placeholder-slate-400"
                   />
                 </div>
               )}
@@ -220,7 +220,7 @@ export const LoginPage = () => {
                       onChange={(e) => setEmail(e.target.value)}
                       required={activeTab === 'authority'}
                       disabled={loading}
-                      className="w-full bg-white border border-slate-250 rounded px-3 py-2 text-xs text-dark-800 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 placeholder-slate-400"
+                      className="w-full bg-white border border-slate-200 rounded px-3 py-2 text-xs text-dark-800 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 placeholder-slate-400"
                     />
                   </div>
                   {activeTab === 'citizen' && (
@@ -234,7 +234,7 @@ export const LoginPage = () => {
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         disabled={loading}
-                        className="w-full bg-white border border-slate-250 rounded px-3 py-2 text-xs text-dark-800 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 placeholder-slate-400"
+                        className="w-full bg-white border border-slate-200 rounded px-3 py-2 text-xs text-dark-800 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 placeholder-slate-400"
                       />
                     </div>
                   )}
@@ -253,7 +253,7 @@ export const LoginPage = () => {
                     onChange={(e) => setIdentifier(e.target.value)}
                     required
                     disabled={loading}
-                    className="w-full bg-white border border-slate-250 rounded px-3 py-2 text-xs text-dark-800 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 placeholder-slate-400"
+                    className="w-full bg-white border border-slate-200 rounded px-3 py-2 text-xs text-dark-800 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 placeholder-slate-400"
                   />
                 </div>
               )}
@@ -266,7 +266,7 @@ export const LoginPage = () => {
                   <select
                     value={role}
                     onChange={(e) => setRole(e.target.value)}
-                    className="w-full bg-white border border-slate-250 rounded px-3 py-2 text-xs text-dark-800 focus:outline-none focus:border-brand-500"
+                    className="w-full bg-white border border-slate-200 rounded px-3 py-2 text-xs text-dark-800 focus:outline-none focus:border-brand-500"
                   >
                     <option value="Government Officer">Government Officer</option>
                     <option value="Inspector">Inspector</option>
@@ -288,7 +288,7 @@ export const LoginPage = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   disabled={loading}
-                  className="w-full bg-white border border-slate-250 rounded px-3 py-2 text-xs text-dark-800 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 placeholder-slate-400"
+                  className="w-full bg-white border border-slate-200 rounded px-3 py-2 text-xs text-dark-800 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 placeholder-slate-400"
                 />
               </div>
 
@@ -306,7 +306,7 @@ export const LoginPage = () => {
                 <button
                   type="button"
                   onClick={() => setMode(mode === 'login' ? 'register' : 'login')}
-                  className="text-center text-[11px] text-brand-650 hover:underline font-bold mt-1.5"
+                  className="text-center text-[11px] text-brand-700 hover:underline font-bold mt-1.5"
                 >
                   {mode === 'login' 
                     ? activeTab === 'citizen' ? "New to the platform? Register here" : "Official onboarding: Register account"

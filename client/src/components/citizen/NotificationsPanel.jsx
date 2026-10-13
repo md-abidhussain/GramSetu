@@ -18,7 +18,7 @@ export const NotificationsPanel = ({ notifications, loading: loadingNotification
             <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-brand-600 mx-auto" />
           </div>
         ) : notifications.length === 0 ? (
-          <div className="text-center py-12 text-slate-450 text-xs italic">
+          <div className="text-center py-12 text-slate-500 text-xs italic">
             No notifications available.
           </div>
         ) : (

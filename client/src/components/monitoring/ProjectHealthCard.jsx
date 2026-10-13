@@ -25,7 +25,7 @@ export const ProjectHealthCard = ({ health = 'Healthy', notes = '' }) => {
         };
       default:
         return {
-          bg: 'bg-slate-50 text-slate-700 border-slate-150',
+          bg: 'bg-slate-50 text-slate-700 border-slate-100',
           icon: <HeartPulse className="h-5 w-5 text-slate-500 shrink-0" />,
           title: 'Awaiting Verification'
         };

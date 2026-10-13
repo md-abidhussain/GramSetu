@@ -86,9 +86,9 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
             {/* Modal Header */}
             <div className="bg-slate-800 text-white p-5 flex items-center justify-between">
               <div>
-                <span className="text-[9px] text-slate-350 font-bold uppercase tracking-wider">Contractor Profile & Auditing metrics</span>
+                <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Contractor Profile & Auditing metrics</span>
                 <h3 className="text-base font-bold flex items-center gap-2 mt-0.5">
-                  <Award className="h-5 w-5 text-brand-400" /> {selectedContractor.name}
+                  <Award className="h-5 w-5 text-brand-500" /> {selectedContractor.name}
                 </h3>
               </div>
               <button 
@@ -104,8 +104,8 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
               
               {/* Profile details */}
               <div className="bg-slate-50 border border-slate-200 rounded p-4">
-                <span className="text-[10px] text-slate-450 font-bold uppercase tracking-wider">AI Executive Summary</span>
-                <p className="text-slate-650 mt-1 leading-relaxed italic">{selectedContractor.aiSummary}</p>
+                <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">AI Executive Summary</span>
+                <p className="text-slate-700 mt-1 leading-relaxed italic">{selectedContractor.aiSummary}</p>
                 <div className="grid grid-cols-2 gap-4 mt-3 pt-3 border-t border-slate-200 text-slate-500">
                   <p><span className="font-semibold text-slate-400">Registration ID:</span> {selectedContractor.registrationId}</p>
                   <p><span className="font-semibold text-slate-400">Registered Since:</span> {new Date(selectedContractor.createdAt).toLocaleDateString()}</p>
@@ -114,7 +114,7 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
 
               {/* Metrics Grid */}
               <div>
-                <h4 className="text-[10px] text-slate-450 font-bold uppercase tracking-wider mb-2.5">Key Performance Indicators</h4>
+                <h4 className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-2.5">Key Performance Indicators</h4>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3.5">
                   
                   <div className="bg-emerald-50/20 border border-emerald-100 rounded p-3 text-center">
@@ -153,7 +153,7 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
               {/* Historical Trends */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="border border-slate-200 rounded p-4 bg-white shadow-sm">
-                  <h4 className="text-[10px] font-bold text-slate-450 uppercase tracking-wider mb-3 flex items-center gap-1">
+                  <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-1">
                     <TrendingUp className="h-3.5 w-3.5 text-brand-600" /> Performance Trend History
                   </h4>
                   <div className="flex items-end gap-2.5 h-16 pt-3 px-2">
@@ -167,7 +167,7 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
                 </div>
 
                 <div className="border border-slate-200 rounded p-4 bg-white shadow-sm">
-                  <h4 className="text-[10px] font-bold text-slate-450 uppercase tracking-wider mb-3 flex items-center gap-1">
+                  <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-1">
                     <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" /> Risk Trend Index
                   </h4>
                   <div className="flex items-end gap-2.5 h-16 pt-3 px-2">

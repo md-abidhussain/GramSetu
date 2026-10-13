@@ -118,7 +118,7 @@ export const MapView = ({ mapData = [] }) => {
               
               <div className="bg-slate-800 text-white p-3 flex items-center justify-between">
                 <div>
-                  <span className="text-[8px] text-slate-350 font-bold uppercase tracking-wider">Geospatial Audit Profile</span>
+                  <span className="text-[8px] text-slate-400 font-bold uppercase tracking-wider">Geospatial Audit Profile</span>
                   <h4 className="font-bold text-xs mt-0.5 flex items-center gap-1.5">
                     <MapPin className="h-4 w-4 text-rose-500" /> {selectedProject.title}
                   </h4>
@@ -165,23 +165,23 @@ export const MapView = ({ mapData = [] }) => {
 
                 <div className="space-y-1.5 border-t border-slate-100 pt-2.5">
                   <p className="flex items-center justify-between">
-                    <span className="text-slate-450 font-medium">Contractor:</span>
+                    <span className="text-slate-500 font-medium">Contractor:</span>
                     <span className="font-semibold text-dark-800">{selectedProject.contractor?.name || 'N/A'}</span>
                   </p>
                   <p className="flex items-center justify-between">
-                    <span className="text-slate-450 font-medium">Contractor AI Trust:</span>
+                    <span className="text-slate-500 font-medium">Contractor AI Trust:</span>
                     <span className="font-semibold text-emerald-600">{selectedProject.contractor?.trustScore || 85}%</span>
                   </p>
                   <p className="flex items-center justify-between">
-                    <span className="text-slate-450 font-medium">Lifecycle Status:</span>
-                    <span className="font-semibold text-brand-650">{selectedProject.lifecycleStatus}</span>
+                    <span className="text-slate-500 font-medium">Lifecycle Status:</span>
+                    <span className="font-semibold text-brand-700">{selectedProject.lifecycleStatus}</span>
                   </p>
                   <p className="flex items-center justify-between">
-                    <span className="text-slate-450 font-medium">Citizen Complaints:</span>
-                    <span className="font-semibold text-rose-650">{selectedProject.complaintCount || 0} File(s)</span>
+                    <span className="text-slate-500 font-medium">Citizen Complaints:</span>
+                    <span className="font-semibold text-rose-700">{selectedProject.complaintCount || 0} File(s)</span>
                   </p>
                   <p className="flex items-center justify-between">
-                    <span className="text-slate-450 font-medium">Location Address:</span>
+                    <span className="text-slate-500 font-medium">Location Address:</span>
                     <span className="font-medium text-slate-600 text-[10px] text-right truncate max-w-[200px]">{selectedProject.location.address}</span>
                   </p>
                 </div>
@@ -191,7 +191,7 @@ export const MapView = ({ mapData = [] }) => {
                   <span className="block text-[8px] font-bold text-brand-700 uppercase tracking-wider flex items-center gap-1 mb-1">
                     <ShieldCheck className="h-3.5 w-3.5" /> AI Audit Summary & Notes
                   </span>
-                  <p className="text-slate-650 leading-relaxed text-[10px]">
+                  <p className="text-slate-700 leading-relaxed text-[10px]">
                     {selectedProject.aiComparisonNotes || 'AI comparison audit pending completion file uploads. Roadway is currently monitored under project created lifecycle state.'}
                   </p>
                 </div>

@@ -208,7 +208,7 @@ export const CitizenReportForm = ({ onSubmitSuccess }) => {
 
           <div className="rounded-md border border-brand-100 bg-brand-50/10 p-3.5">
             <label htmlFor="reference-scale" className="flex items-center gap-1.5 text-xs font-semibold text-dark-800">
-              <Ruler className="h-3.5 w-3.5 text-brand-650" /> Reference scale (cm per pixel) <span className="text-red-500">*</span>
+              <Ruler className="h-3.5 w-3.5 text-brand-700" /> Reference scale (cm per pixel) <span className="text-red-500">*</span>
             </label>
             <input
               id="reference-scale"
