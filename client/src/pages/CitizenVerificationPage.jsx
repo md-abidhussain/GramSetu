@@ -100,7 +100,7 @@ export const CitizenVerificationPage = () => {
 
 
   return (
-    <PageLayout title="Citizen Verification Portal">
+    <PageLayout title="Complaints">
       <div className="max-w-6xl mx-auto space-y-6">
         
         {/* Profile Summary Header */}

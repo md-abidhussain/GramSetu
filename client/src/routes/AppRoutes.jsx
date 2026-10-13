@@ -33,7 +33,9 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-// Component to protect citizen routes (accessible by citizens and authorities for verification/testing)
+// The complaint portal belongs to citizens. Officials review complaints on
+// their own dashboard, so sending them here would let them file complaints as
+// though they were members of the public.
 const CitizenRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
@@ -43,6 +45,10 @@ const CitizenRoute = ({ children }) => {
 
   if (!user) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (user.role !== 'citizen' && !user.isCitizen) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;
