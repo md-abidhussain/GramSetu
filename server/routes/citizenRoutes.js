@@ -1,4 +1,5 @@
 import express from 'express';
+import { validateIdParam } from '../middleware/validateIdParam.js';
 import { 
   createCitizenReport, 
   getCitizenReports, 
@@ -15,13 +16,13 @@ import { uploadImage } from '../middleware/uploadMiddleware.js';
 const router = express.Router();
 
 // Any authenticated user: Get details of a single report
-router.get('/:id/report', protectAny, downloadCitizenReport);
+router.get('/:id/report', validateIdParam(), protectAny, downloadCitizenReport);
 
 // Citizen-only: File a complaint
 router.post('/', protectCitizen, uploadImage, createCitizenReport);
 
 // Any authenticated user: Get details of a single report
-router.get('/:id', protectAny, getCitizenReportById);
+router.get('/:id', validateIdParam(), protectAny, getCitizenReportById);
 
 // Any authenticated user: Get list of reports (filtered automatically by role)
 router.get('/', protectAny, getCitizenReports);

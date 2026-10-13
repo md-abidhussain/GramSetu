@@ -266,8 +266,8 @@ export const assignInspector = async (req, res, next) => {
   try {
     const { reportId, inspectorId } = req.body;
 
-    if (!reportId || !inspectorId) {
-      return res.status(400).json({ message: 'reportId and inspectorId are required' });
+    if (!isValidId(reportId) || !isValidId(inspectorId)) {
+      return res.status(400).json({ message: 'A complaint and an inspector must both be chosen' });
     }
 
     const report = await CitizenReport.findById(reportId);
@@ -298,8 +298,13 @@ export const scheduleInspection = async (req, res, next) => {
   try {
     const { reportId, date } = req.body;
 
-    if (!reportId || !date) {
-      return res.status(400).json({ message: 'reportId and scheduled date are required' });
+    if (!isValidId(reportId)) {
+      return res.status(400).json({ message: 'That complaint does not exist' });
+    }
+
+    const scheduledFor = new Date(date);
+    if (isNaN(scheduledFor.getTime())) {
+      return res.status(400).json({ message: 'Please choose a valid inspection date' });
     }
 
     const report = await CitizenReport.findById(reportId);
@@ -307,7 +312,7 @@ export const scheduleInspection = async (req, res, next) => {
       return res.status(404).json({ message: 'Complaint report not found' });
     }
 
-    report.inspectionDate = new Date(date);
+    report.inspectionDate = scheduledFor;
     report.status = 'Inspection Scheduled';
     await report.save();
 
@@ -322,8 +327,8 @@ export const uploadInspectionVerification = async (req, res, next) => {
   try {
     const { reportId, inspectorNotes } = req.body;
 
-    if (!reportId) {
-      return res.status(400).json({ message: 'reportId is required' });
+    if (!isValidId(reportId)) {
+      return res.status(400).json({ message: 'That complaint does not exist' });
     }
 
     if (!req.file) {
@@ -363,8 +368,16 @@ export const resolveComplaint = async (req, res, next) => {
   try {
     const { reportId, decision, resolutionSummary } = req.body;
 
-    if (!reportId || !decision) {
-      return res.status(400).json({ message: 'reportId and decision (Accepted/Rejected/Need More Evidence) are required' });
+    if (!isValidId(reportId)) {
+      return res.status(400).json({ message: 'That complaint does not exist' });
+    }
+
+    // The status field accepts every stage of the complaint lifecycle, so
+    // without this an official could post any stage here and jump a complaint
+    // straight to published, skipping inspection.
+    const ALLOWED_DECISIONS = ['Accepted', 'Rejected', 'Need More Evidence'];
+    if (!ALLOWED_DECISIONS.includes(decision)) {
+      return res.status(400).json({ message: 'Decision must be Accepted, Rejected, or Need More Evidence' });
     }
 
     const report = await CitizenReport.findById(reportId);

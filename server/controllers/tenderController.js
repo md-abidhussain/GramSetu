@@ -3,6 +3,7 @@ import Contractor from '../models/Contractor.js';
 import { extractTextFromPdf } from '../utils/pdfExtractor.js';
 import { uploadBuffer } from '../services/cloudinaryService.js';
 import { analyzeTender } from '../services/geminiTenderService.js';
+import { isValidId, toText } from '../utils/validators.js';
 
 export const createTender = async (req, res, next) => {
   try {
@@ -10,6 +11,15 @@ export const createTender = async (req, res, next) => {
 
     if (!title || !contractorId) {
       return res.status(400).json({ message: 'Title and contractor ID are required' });
+    }
+
+    const tenderTitle = toText(title, 300);
+    if (!tenderTitle) {
+      return res.status(400).json({ message: 'Give the tender a title of 300 characters or fewer' });
+    }
+
+    if (!isValidId(contractorId)) {
+      return res.status(400).json({ message: 'That contractor does not exist' });
     }
 
     if (!req.file) {
@@ -33,7 +43,7 @@ export const createTender = async (req, res, next) => {
 
     // 4. Save to Database
     const tender = await Tender.create({
-      title,
+      title: tenderTitle,
       contractor: contractorId,
       fileUrl: uploadResult.secure_url,
       extractedText: extractedText.slice(0, 10000), // Save subset or full

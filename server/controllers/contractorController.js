@@ -1,6 +1,7 @@
 import Contractor from '../models/Contractor.js';
 import Project from '../models/Project.js';
 import CitizenReport from '../models/CitizenReport.js';
+import { toText, toNumberInRange } from '../utils/validators.js';
 
 export const getContractors = async (req, res, next) => {
   try {
@@ -28,23 +29,25 @@ export const createContractor = async (req, res, next) => {
       averageBudgetVariance
     } = req.body;
 
-    if (!name || !registrationId) {
+    const contractorName = toText(name, 200);
+    const registration = toText(registrationId, 60);
+    if (!contractorName || !registration) {
       return res.status(400).json({ message: 'Contractor name and registration ID are required' });
     }
 
     const contractor = await Contractor.create({
-      name,
-      registrationId,
-      contactPerson: contactPerson || '',
-      contactEmail: contactEmail || '',
-      phone: phone || '',
-      address: address || '',
-      expertise: expertise || '',
-      remarks: remarks || '',
-      performanceScore: Number(performanceScore) || 100,
-      completedOnTime: Number(completedOnTime) || 0,
-      delayedCount: Number(delayedCount) || 0,
-      averageBudgetVariance: Number(averageBudgetVariance) || 0
+      name: contractorName,
+      registrationId: registration,
+      contactPerson: toText(contactPerson, 120) || '',
+      contactEmail: toText(contactEmail, 160) || '',
+      phone: toText(phone, 20) || '',
+      address: toText(address, 300) || '',
+      expertise: toText(expertise, 200) || '',
+      remarks: toText(remarks, 1000) || '',
+      performanceScore: toNumberInRange(performanceScore, 0, 100, 100),
+      completedOnTime: toNumberInRange(completedOnTime, 0, 100000, 0),
+      delayedCount: toNumberInRange(delayedCount, 0, 100000, 0),
+      averageBudgetVariance: toNumberInRange(averageBudgetVariance, -100, 1000, 0)
     });
 
     res.status(201).json(contractor);

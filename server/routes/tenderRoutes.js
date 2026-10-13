@@ -1,4 +1,5 @@
 import express from 'express';
+import { validateIdParam } from '../middleware/validateIdParam.js';
 import { 
   createTender, 
   getTenders, 
@@ -16,7 +17,7 @@ router.use(restrictTo('District Authority', 'PWD Engineer', 'Admin', 'Government
 
 router.post('/', uploadTender, createTender);
 router.get('/', getTenders);
-router.get('/:id', getTenderById);
-router.get('/contractor/:contractorId', getTendersByContractor);
+router.get('/:id', validateIdParam(), getTenderById);
+router.get('/contractor/:contractorId', validateIdParam('contractorId'), getTendersByContractor);
 
 export default router;
