@@ -7,7 +7,7 @@ import {
   getTendersByContractor 
 } from '../controllers/tenderController.js';
 import { protectAuthority, restrictTo } from '../middleware/authMiddleware.js';
-import { uploadTender } from '../middleware/uploadMiddleware.js';
+import { uploadTender, verifyPdfContents } from '../middleware/uploadMiddleware.js';
 
 const router = express.Router();
 
@@ -15,7 +15,7 @@ const router = express.Router();
 router.use(protectAuthority);
 router.use(restrictTo('District Authority', 'PWD Engineer', 'Admin', 'Government Officer', 'Inspector'));
 
-router.post('/', uploadTender, createTender);
+router.post('/', uploadTender, verifyPdfContents, createTender);
 router.get('/', getTenders);
 router.get('/:id', validateIdParam(), getTenderById);
 router.get('/contractor/:contractorId', validateIdParam('contractorId'), getTendersByContractor);
