@@ -42,3 +42,8 @@ segmentation-service/runs/
 # Python bytecode
 __pycache__/
 *.pyc
+
+# Python virtual environments
+.venv/
+venv/
+env/

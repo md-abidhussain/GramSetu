@@ -41,7 +41,8 @@ GramSetu AI addresses these issues by introducing an automated, decentralized in
 
 What is protected and what enforces it is written up in
 [docs/SECURITY.md](./docs/SECURITY.md), including the decisions taken knowingly
-and the gaps that remain.
+and the gaps that remain. [docs/DECISIONS.md](./docs/DECISIONS.md) explains why
+the rest of the system is shaped the way it is.
 
 ## 📐 Architecture & System Design
 

@@ -1,11 +1,11 @@
-# GramSetu — working notes
+# Engineering decisions
 
-Citizen-facing infrastructure transparency platform. Citizens report problems with
-public works; officials review, assign inspectors, and resolve. React + Vite client,
-Express + MongoDB server, Gemini for image and tender analysis.
+Why parts of GramSetu are built the way they are. Most of these replaced
+something that was wrong, and the reasoning is written down so the fix is not
+quietly undone later.
 
-Built with two teammates during a hackathon (bibhuti-parida, Ramu1029). Their
-commits stay in the history. Say so plainly if asked who built it.
+Started with two teammates during a hackathon (bibhuti-parida, Ramu1029); their
+commits are in the history.
 
 ## Run it
 
@@ -35,7 +35,7 @@ Citizen `citizen@gmail.com` / `citizen123`. Officials `authority@gramsetu.gov`,
 `admin@gramsetu.gov` — inspector uses `inspector123`, the rest `authority123`.
 These are public sample accounts on purpose; the login page links to two of them.
 
-## Decisions worth not reversing
+## Do not reverse these
 
 **Seeding is opt-in.** `seedDatabase()` once ran on every boot and deleted all
 eight collections first, so every Render restart destroyed real data. Now
@@ -112,7 +112,7 @@ is exactly why it has to be unmistakable that it is not one.
 calls Gemini. Writes to those routes allow 30 per hour; reads are skipped because
 listing projects is public and cheap.
 
-## Known gaps — real, not hidden
+## Known gaps
 
 - The YOLOv8 segmentation service is **not deployed**. Without
   `SEGMENTATION_SERVICE_URL` the app records defect measurement as unavailable and
@@ -153,7 +153,7 @@ when there is a reason to upgrade other than the audit number.
 
 ## Security
 
-docs/SECURITY.md lists what is protected, what enforces it, and the decisions
+[SECURITY.md](./SECURITY.md) lists what is protected, what enforces it, and the decisions
 taken knowingly. Keep it true when you change an auth path.
 
 ## Conventions
