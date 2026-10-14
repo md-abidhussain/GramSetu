@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import ErrorBoundary from '../ErrorBoundary.jsx';
 
 const Broken = () => {
@@ -19,6 +19,9 @@ beforeEach(() => {
 
 afterEach(() => {
   consoleError.mockRestore();
+  // Unmount between tests. Testing Library only does this by itself when
+  // vitest globals are switched on, and they are not.
+  cleanup();
 });
 
 describe('ErrorBoundary', () => {
