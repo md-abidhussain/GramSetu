@@ -118,6 +118,14 @@ export const DiscrepancyReport = ({ result }) => {
           <p className="rounded-md bg-amber-50 border border-amber-200 p-3 text-xs text-amber-800">Defect size was not calculated: add a calibrated reference scale when submitting the photo.</p>
         )}
 
+        {segmentation?.status === 'unavailable' && (
+          <p className="rounded-md border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">
+            Defect sizes are not included in this report. The measurement service
+            was not running when the photo was submitted; the issues listed above
+            come from the image analysis and are unaffected.
+          </p>
+        )}
+
         <div className="border-t border-slate-200 pt-4">
           <span className="text-xs font-semibold text-slate-500 mb-2 flex items-center gap-1.5">
             <MessageSquare className="h-4 w-4 text-slate-400" /> Executive Compliance Report
