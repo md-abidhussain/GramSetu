@@ -74,22 +74,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const registerAuthority = async (name, email, password, role) => {
-    try {
-      const data = await request('/auth/authority/register', {
-        method: 'POST',
-        body: JSON.stringify({ name, email, password, role }),
-      });
-      
-      setInMemoryToken(data.token);
-      setUser(data);
-      return data;
-    } catch (error) {
-      console.error('Official Register error:', error);
-      throw error;
-    }
-  };
-
   const logoutUser = async () => {
     try {
       await request('/auth/logout', { method: 'POST' });
@@ -107,7 +91,6 @@ export const AuthProvider = ({ children }) => {
       loginCitizen, 
       registerCitizen, 
       loginAuthority, 
-      registerAuthority, 
       logoutUser 
     }}>
       {children}

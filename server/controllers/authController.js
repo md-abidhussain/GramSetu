@@ -3,6 +3,13 @@ import Citizen from '../models/Citizen.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { JWT_SECRET } from '../config/env.js';
+import {
+  describePasswordProblem,
+  isValidEmail,
+  isValidPhone,
+  toIdentifier
+} from '../utils/credentials.js';
+import { randomInt } from 'node:crypto';
 
 const TOKEN_LIFETIME_SECONDS = 7 * 24 * 60 * 60;
 
@@ -17,26 +24,39 @@ const sendTokenCookie = (res, token) => {
 };
 
 // Generate unique ID for authority: AUTH-2026-XXXX
+// This id is one of the things an official logs in with, so it must not be
+// guessable. The old version drew a four digit number from Math.random, which
+// gave 9000 possible ids: enough to guess, and enough to run out of.
 const generateUniqueAuthorityId = async () => {
-  let uniqueId = '';
-  let exists = true;
-  while (exists) {
-    const randomNum = Math.floor(1000 + Math.random() * 9000); // 4 digit number
-    uniqueId = `AUTH-2026-${randomNum}`;
-    const found = await Authority.findOne({ uniqueUserId: uniqueId });
-    if (!found) {
-      exists = false;
+  const year = new Date().getFullYear();
+
+  for (let attempt = 0; attempt < 10; attempt += 1) {
+    const candidate = `AUTH-${year}-${String(randomInt(0, 1_000_000_000)).padStart(9, '0')}`;
+    const taken = await Authority.findOne({ uniqueUserId: candidate });
+    if (!taken) {
+      return candidate;
     }
   }
-  return uniqueId;
+
+  throw new Error('Could not allocate an official user id.');
 };
 
 export const registerAuthority = async (req, res, next) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, password, role } = req.body;
+    const email = toIdentifier(req.body.email).toLowerCase();
 
     if (!name || !email || !password || !role) {
       return res.status(400).json({ message: 'Name, email, password, and official role are required' });
+    }
+
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ message: 'That does not look like an email address.' });
+    }
+
+    const passwordProblem = describePasswordProblem(password);
+    if (passwordProblem) {
+      return res.status(400).json({ message: passwordProblem });
     }
 
     const allowedRoles = ['Government Officer', 'Inspector', 'District Authority', 'PWD Engineer', 'Admin'];
@@ -80,7 +100,10 @@ export const registerAuthority = async (req, res, next) => {
 
 export const loginAuthority = async (req, res, next) => {
   try {
-    const { identifier, password } = req.body; // identifier can be email or uniqueUserId
+    // Forced to a string first: a body of {"identifier": {"$ne": null}} would
+    // otherwise reach Mongo as an operator rather than as a value to match.
+    const identifier = toIdentifier(req.body.identifier);
+    const { password } = req.body;
 
     if (!identifier || !password) {
       return res.status(400).json({ message: 'User ID/Email and password are required' });
@@ -88,7 +111,9 @@ export const loginAuthority = async (req, res, next) => {
 
     // Search by email or uniqueUserId
     const authority = await Authority.findOne({
-      $or: [{ email: identifier }, { uniqueUserId: identifier }]
+      // Email is stored lowercase at registration, so it is matched lowercase.
+      // The official id is not: it is issued in upper case.
+      $or: [{ email: identifier.toLowerCase() }, { uniqueUserId: identifier }]
     });
 
     if (authority && (await authority.comparePassword(password))) {
@@ -114,14 +139,29 @@ export const loginAuthority = async (req, res, next) => {
 
 export const registerCitizen = async (req, res, next) => {
   try {
-    const { name, email, phone, password } = req.body;
+    const { name, password } = req.body;
+    const email = toIdentifier(req.body.email).toLowerCase();
+    const phone = toIdentifier(req.body.phone);
 
     if (!name || !password) {
       return res.status(400).json({ message: 'Name and password are required' });
     }
 
     if (!email && !phone) {
-      return res.status(400).json({ message: 'Either Gmail (email) or Mobile Number is required' });
+      return res.status(400).json({ message: 'Either an email address or a mobile number is required' });
+    }
+
+    if (email && !isValidEmail(email)) {
+      return res.status(400).json({ message: 'That does not look like an email address.' });
+    }
+
+    if (phone && !isValidPhone(phone)) {
+      return res.status(400).json({ message: 'Enter a ten digit Indian mobile number.' });
+    }
+
+    const passwordProblem = describePasswordProblem(password);
+    if (passwordProblem) {
+      return res.status(400).json({ message: passwordProblem });
     }
 
     // Check for duplicate citizen entry
@@ -168,14 +208,15 @@ export const registerCitizen = async (req, res, next) => {
 
 export const loginCitizen = async (req, res, next) => {
   try {
-    const { identifier, password } = req.body; // identifier can be email or phone
+    const identifier = toIdentifier(req.body.identifier);
+    const { password } = req.body;
 
     if (!identifier || !password) {
       return res.status(400).json({ message: 'Email/Phone and password are required' });
     }
 
     const citizen = await Citizen.findOne({
-      $or: [{ email: identifier }, { phone: identifier }]
+      $or: [{ email: identifier.toLowerCase() }, { phone: identifier }]
     });
 
     if (citizen && (await citizen.comparePassword(password))) {
