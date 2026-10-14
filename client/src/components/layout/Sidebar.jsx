@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth.js';
+import Logo from '../ui/Logo.jsx';
 import { isCitizenUser, makeIsCurrent, navItemsFor } from './navItems.js';
 
 export const Sidebar = () => {
@@ -20,9 +21,8 @@ export const Sidebar = () => {
 
   return (
     <div className="hidden w-64 shrink-0 flex-col border-r border-brand-900 bg-brand-800 text-brand-100 md:flex">
-      {/* The name is already in the header above the content. This panel just
-          says which part of the service these links belong to. */}
-      <div className="border-b border-brand-900 px-6 py-4">
+      <div className="flex items-center gap-2.5 border-b border-brand-900 px-6 py-4">
+        <Logo className="h-7 w-7 shrink-0" onDark />
         <p className="text-sm font-semibold text-white">
           {isCitizen ? 'Your reports' : 'Official tools'}
         </p>

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.js';
 import { Button } from '../components/ui/Button.jsx';
 import IdentityBand from '../components/layout/IdentityBand.jsx';
+import Logo from '../components/ui/Logo.jsx';
 import SiteFooter from '../components/layout/SiteFooter.jsx';
 import { AlertCircle, Info, Lock } from 'lucide-react';
 
@@ -101,7 +102,8 @@ export const LoginPage = () => {
       <main className="flex flex-1 items-start justify-center px-4 py-10 sm:px-6">
         <div className="w-full max-w-lg">
           <div className="text-center">
-            <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+            <Logo className="mx-auto h-12 w-12" title="GramSetu" />
+            <h1 className="mt-3 text-2xl font-semibold tracking-tight text-slate-900">
               GramSetu
             </h1>
             <p className="mx-auto mt-2 max-w-md text-base text-slate-600">

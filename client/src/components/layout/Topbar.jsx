@@ -2,16 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth.js';
 import NotificationBell from '../dashboard/NotificationBell.jsx';
+import Logo from '../ui/Logo.jsx';
 import { LogIn } from 'lucide-react';
-
-const Monogram = () => (
-  <span
-    aria-hidden="true"
-    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-brand-700 text-sm font-bold text-white"
-  >
-    GS
-  </span>
-);
 
 export const Topbar = ({ title }) => {
   const { user } = useAuth();
@@ -21,7 +13,7 @@ export const Topbar = ({ title }) => {
     <header className="z-30 border-b border-slate-200 bg-white">
       <div className="flex min-h-[4.5rem] flex-wrap items-center justify-between gap-4 px-4 py-3 sm:px-6">
         <div className="flex min-w-0 items-center gap-3">
-          <Monogram />
+          <Logo className="h-9 w-9 shrink-0" />
           <div className="min-w-0">
             <p className="text-sm font-semibold text-brand-800">GramSetu</p>
             {/* The page name is the heading for the content below it, so it is
