@@ -144,7 +144,7 @@ export const TenderUploadForm = ({ onUploadSuccess }) => {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-semibold text-slate-500 mb-1.5">
               Tender Document (PDF only) <span className="text-red-500">*</span>
             </label>
             <div className="border-2 border-dashed border-slate-200 rounded-md p-6 text-center hover:border-brand-500 transition-colors cursor-pointer bg-white hover:bg-slate-50/50 relative">

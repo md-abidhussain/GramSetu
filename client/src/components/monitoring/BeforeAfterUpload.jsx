@@ -202,7 +202,7 @@ export const BeforeAfterUpload = ({ projects, onProjectCreated, onProjectComplet
             />
 
             <div>
-              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-slate-500 mb-1.5">
                 Before Construction Photo <span className="text-red-500">*</span>
               </label>
               
@@ -217,7 +217,7 @@ export const BeforeAfterUpload = ({ projects, onProjectCreated, onProjectComplet
                   />
                   <Camera className="h-6 w-6 text-slate-400 mb-1" />
                   <span className="text-xs font-medium text-dark-800">Choose Image</span>
-                  <span className="text-[10px] text-slate-400">PNG, JPG up to 5MB</span>
+                  <span className="text-xs text-slate-400">PNG, JPG up to 5MB</span>
                 </div>
                 
                 {beforePreview ? (
@@ -250,7 +250,7 @@ export const BeforeAfterUpload = ({ projects, onProjectCreated, onProjectComplet
             />
 
             <div>
-              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-slate-500 mb-1.5">
                 Completed Project Photo <span className="text-red-500">*</span>
               </label>
 
@@ -265,7 +265,7 @@ export const BeforeAfterUpload = ({ projects, onProjectCreated, onProjectComplet
                   />
                   <Camera className="h-6 w-6 text-slate-400 mb-1" />
                   <span className="text-xs font-medium text-dark-800">Choose Image</span>
-                  <span className="text-[10px] text-slate-400">PNG, JPG up to 5MB</span>
+                  <span className="text-xs text-slate-400">PNG, JPG up to 5MB</span>
                 </div>
 
                 {afterPreview ? (

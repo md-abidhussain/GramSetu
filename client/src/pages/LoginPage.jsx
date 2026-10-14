@@ -134,7 +134,7 @@ export const LoginPage = () => {
           <div className="flex border-b border-slate-200 bg-slate-50">
             <button
               onClick={() => handleTabChange('citizen')}
-              className={`flex-1 text-center py-3 text-xs font-bold tracking-wider uppercase transition-colors ${
+              className={`flex-1 text-center py-3 text-xs font-semibold tracking-wider uppercase transition-colors ${
                 activeTab === 'citizen'
                   ? 'border-b-2 border-brand-600 text-brand-700 bg-white'
                   : 'text-slate-500 hover:text-slate-700 bg-slate-50'
@@ -144,7 +144,7 @@ export const LoginPage = () => {
             </button>
             <button
               onClick={() => handleTabChange('authority')}
-              className={`flex-1 text-center py-3 text-xs font-bold tracking-wider uppercase transition-colors ${
+              className={`flex-1 text-center py-3 text-xs font-semibold tracking-wider uppercase transition-colors ${
                 activeTab === 'authority'
                   ? 'border-b-2 border-brand-600 text-brand-700 bg-white'
                   : 'text-slate-500 hover:text-slate-700 bg-slate-50'
@@ -192,7 +192,7 @@ export const LoginPage = () => {
 
               {mode === 'register' && (
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                  <label className="block text-xs font-semibold text-slate-500">
                     Full Name
                   </label>
                   <input
@@ -210,7 +210,7 @@ export const LoginPage = () => {
               {mode === 'register' ? (
                 <>
                   <div className="space-y-1.5">
-                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                    <label className="block text-xs font-semibold text-slate-500">
                       Email Address {activeTab === 'authority' ? '(Govt Only)' : '(Optional)'}
                     </label>
                     <input
@@ -225,7 +225,7 @@ export const LoginPage = () => {
                   </div>
                   {activeTab === 'citizen' && (
                     <div className="space-y-1.5">
-                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                      <label className="block text-xs font-semibold text-slate-500">
                         Mobile Number (Optional)
                       </label>
                       <input
@@ -241,7 +241,7 @@ export const LoginPage = () => {
                 </>
               ) : (
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                  <label className="block text-xs font-semibold text-slate-500">
                     {activeTab === 'citizen' 
                       ? 'Email or mobile number' 
                       : 'Government Email or Official ID (AUTH-2026-XXXX)'}
@@ -260,7 +260,7 @@ export const LoginPage = () => {
 
               {activeTab === 'authority' && mode === 'register' && (
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                  <label className="block text-xs font-semibold text-slate-500">
                     Government Official Role
                   </label>
                   <select
@@ -278,7 +278,7 @@ export const LoginPage = () => {
               )}
 
               <div className="space-y-1.5">
-                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-slate-500">
                   Password
                 </label>
                 <input
@@ -306,7 +306,7 @@ export const LoginPage = () => {
                 <button
                   type="button"
                   onClick={() => setMode(mode === 'login' ? 'register' : 'login')}
-                  className="text-center text-[11px] text-brand-700 hover:underline font-bold mt-1.5"
+                  className="text-center text-xs text-brand-700 hover:underline font-bold mt-1.5"
                 >
                   {mode === 'login' 
                     ? activeTab === 'citizen' ? "New to the platform? Register here" : "Official onboarding: Register account"

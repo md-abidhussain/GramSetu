@@ -8,7 +8,7 @@ export const NotificationsPanel = ({ notifications, loading: loadingNotification
   return (
     <Card>
       <CardHeader className="pb-3 border-b border-slate-100">
-        <CardTitle className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+        <CardTitle className="text-xs font-semibold text-slate-500 flex items-center gap-1.5">
           <Bell className="h-4 w-4" /> Message Notifications
         </CardTitle>
       </CardHeader>
@@ -33,14 +33,14 @@ export const NotificationsPanel = ({ notifications, loading: loadingNotification
                   </div>
                   <div>
                     <p className="text-xs text-dark-800 leading-normal font-medium">{notif.message}</p>
-                    <span className="text-[10px] text-slate-400 block mt-1">{formatDate(notif.createdAt)}</span>
+                    <span className="text-xs text-slate-400 block mt-1">{formatDate(notif.createdAt)}</span>
                   </div>
                 </div>
 
                 {!notif.read && (
                   <button
                     onClick={() => handleMarkNotificationRead(notif._id)}
-                    className="text-[10px] text-brand-600 hover:text-brand-700 font-bold shrink-0"
+                    className="text-xs text-brand-600 hover:text-brand-700 font-bold shrink-0"
                   >
                     Mark Read
                   </button>

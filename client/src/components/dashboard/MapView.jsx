@@ -62,7 +62,7 @@ export const MapView = ({ mapData = [] }) => {
             <CardTitle className="text-base font-bold">Geospatial Project Tracker</CardTitle>
             <p className="text-xs text-slate-400 mt-0.5">Plotting regional infrastructure coordinates, health metrics, and audit states</p>
           </div>
-          <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+          <div className="flex items-center gap-3 text-xs font-semibold text-slate-500">
             <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-emerald-500" /> Healthy</span>
             <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-amber-500" /> Pending / Review</span>
             <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-rose-500" /> Maintenance / Flagged</span>
@@ -118,7 +118,7 @@ export const MapView = ({ mapData = [] }) => {
               
               <div className="bg-slate-800 text-white p-3 flex items-center justify-between">
                 <div>
-                  <span className="text-[8px] text-slate-400 font-bold uppercase tracking-wider">Geospatial Audit Profile</span>
+                  <span className="text-[8px] text-slate-400 font-bold">Geospatial Audit Profile</span>
                   <h4 className="font-bold text-xs mt-0.5 flex items-center gap-1.5">
                     <MapPin className="h-4 w-4 text-rose-500" /> {selectedProject.title}
                   </h4>
@@ -137,7 +137,7 @@ export const MapView = ({ mapData = [] }) => {
                 <div className="grid grid-cols-3 gap-2 text-center">
                   <div className="bg-slate-50 border border-slate-100 rounded p-2">
                     <span className="block text-[8px] font-semibold text-slate-400 uppercase">Health</span>
-                    <span className={`text-xs font-bold block mt-0.5 ${
+                    <span className={`text-xs font-semibold block mt-0.5 ${
                       selectedProject.healthPercentage >= 80 ? 'text-emerald-600' : selectedProject.healthPercentage >= 50 ? 'text-amber-500' : 'text-rose-600'
                     }`}>
                       {selectedProject.healthPercentage}%
@@ -146,7 +146,7 @@ export const MapView = ({ mapData = [] }) => {
 
                   <div className="bg-slate-50 border border-slate-100 rounded p-2">
                     <span className="block text-[8px] font-semibold text-slate-400 uppercase">Completion</span>
-                    <span className="text-xs font-bold text-slate-800 block mt-0.5">
+                    <span className="text-xs font-semibold text-slate-800 block mt-0.5">
                       {selectedProject.completionScore !== null && selectedProject.completionScore !== undefined 
                         ? `${selectedProject.completionScore}%` 
                         : 'Unverified'}
@@ -155,7 +155,7 @@ export const MapView = ({ mapData = [] }) => {
 
                   <div className="bg-slate-50 border border-slate-100 rounded p-2">
                     <span className="block text-[8px] font-semibold text-slate-400 uppercase">Risk Level</span>
-                    <span className={`text-xs font-bold block mt-0.5 ${
+                    <span className={`text-xs font-semibold block mt-0.5 ${
                       selectedProject.riskLevel === 'Low' ? 'text-emerald-600' : selectedProject.riskLevel === 'Medium' ? 'text-amber-500' : 'text-rose-600'
                     }`}>
                       {selectedProject.riskLevel}
@@ -182,16 +182,16 @@ export const MapView = ({ mapData = [] }) => {
                   </p>
                   <p className="flex items-center justify-between">
                     <span className="text-slate-500 font-medium">Location Address:</span>
-                    <span className="font-medium text-slate-600 text-[10px] text-right truncate max-w-[200px]">{selectedProject.location.address}</span>
+                    <span className="font-medium text-slate-600 text-xs text-right truncate max-w-[200px]">{selectedProject.location.address}</span>
                   </p>
                 </div>
 
                 {/* AI Summary comparison notes */}
                 <div className="border-t border-slate-100 pt-3 bg-brand-50/10 p-2.5 rounded border border-brand-100/30">
-                  <span className="block text-[8px] font-bold text-brand-700 uppercase tracking-wider flex items-center gap-1 mb-1">
+                  <span className="block text-[8px] font-bold text-brand-700 flex items-center gap-1 mb-1">
                     <ShieldCheck className="h-3.5 w-3.5" /> AI Audit Summary & Notes
                   </span>
-                  <p className="text-slate-700 leading-relaxed text-[10px]">
+                  <p className="text-slate-700 leading-relaxed text-xs">
                     {selectedProject.aiComparisonNotes || 'AI comparison audit pending completion file uploads. Roadway is currently monitored under project created lifecycle state.'}
                   </p>
                 </div>
@@ -201,7 +201,7 @@ export const MapView = ({ mapData = [] }) => {
               <div className="bg-slate-50 p-2 border-t border-slate-200 flex justify-end">
                 <button
                   onClick={() => setSelectedProject(null)}
-                  className="px-3 py-1 bg-slate-800 text-white rounded text-[10px] font-bold hover:bg-slate-900 transition-colors"
+                  className="px-3 py-1 bg-slate-800 text-white rounded text-xs font-semibold hover:bg-slate-900 transition-colors"
                 >
                   Close
                 </button>

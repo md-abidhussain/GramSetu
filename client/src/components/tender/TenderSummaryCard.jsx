@@ -25,7 +25,7 @@ export const TenderSummaryCard = ({ tender }) => {
       <CardHeader>
         <div className="flex flex-col gap-1 md:flex-row md:items-center justify-between w-full">
           <div>
-            <span className="text-[10px] text-brand-600 font-bold uppercase tracking-wider">Procurement Review</span>
+            <span className="text-xs text-brand-600 font-bold">Procurement Review</span>
             <CardTitle className="text-xl mt-0.5">{title}</CardTitle>
           </div>
           <div className="mt-2 md:mt-0 flex gap-2 shrink-0">
@@ -47,7 +47,7 @@ export const TenderSummaryCard = ({ tender }) => {
       <CardContent className="space-y-6">
         {/* Executive Summary */}
         <div>
-          <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Executive Summary</h4>
+          <h4 className="text-xs font-semibold text-slate-500 mb-2">Executive Summary</h4>
           <p className="text-sm text-dark-800 leading-relaxed bg-slate-50 p-4 rounded-md border border-slate-200">
             {aiSummary}
           </p>
@@ -62,15 +62,15 @@ export const TenderSummaryCard = ({ tender }) => {
               : 'bg-emerald-50/30 border-emerald-100 shadow-sm'
           }`}>
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+              <span className="text-xs font-semibold text-slate-500 flex items-center gap-1.5">
                 <DollarSign className="h-4 w-4 text-slate-400" /> Budget Analysis
               </span>
               {budgetAnalysis?.flagged ? (
-                <span className="text-[10px] bg-rose-100 text-rose-800 font-semibold px-2 py-0.5 rounded flex items-center gap-1">
+                <span className="text-xs bg-rose-100 text-rose-800 font-semibold px-2 py-0.5 rounded flex items-center gap-1">
                   <AlertTriangle className="h-3 w-3" /> Flagged
                 </span>
               ) : (
-                <span className="text-[10px] bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded flex items-center gap-1">
+                <span className="text-xs bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded flex items-center gap-1">
                   <CheckCircle className="h-3 w-3" /> Normal
                 </span>
               )}
@@ -91,15 +91,15 @@ export const TenderSummaryCard = ({ tender }) => {
               : 'bg-emerald-50/30 border-emerald-100 shadow-sm'
           }`}>
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+              <span className="text-xs font-semibold text-slate-500 flex items-center gap-1.5">
                 <Calendar className="h-4 w-4 text-slate-400" /> Timeline Analysis
               </span>
               {timelineAnalysis?.flagged ? (
-                <span className="text-[10px] bg-rose-100 text-rose-800 font-semibold px-2 py-0.5 rounded flex items-center gap-1">
+                <span className="text-xs bg-rose-100 text-rose-800 font-semibold px-2 py-0.5 rounded flex items-center gap-1">
                   <AlertTriangle className="h-3 w-3" /> Flagged
                 </span>
               ) : (
-                <span className="text-[10px] bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded flex items-center gap-1">
+                <span className="text-xs bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded flex items-center gap-1">
                   <CheckCircle className="h-3 w-3" /> Normal
                 </span>
               )}
@@ -118,7 +118,7 @@ export const TenderSummaryCard = ({ tender }) => {
 
         {/* Procurement Recommendations */}
         <div className="border-t border-slate-200 pt-5">
-          <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+          <h4 className="text-xs font-semibold text-slate-500 mb-2 flex items-center gap-1.5">
             <ListTodo className="h-4 w-4 text-slate-400" /> Recommendations
           </h4>
           <p className="text-sm text-dark-800 leading-relaxed bg-brand-50/10 p-4 rounded-md border border-brand-100/30">

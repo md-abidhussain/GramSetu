@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import PageLayout from '../components/layout/PageLayout.jsx';
 import CitizenReportForm from '../components/citizen/CitizenReportForm.jsx';
 import DiscrepancyReport from '../components/citizen/DiscrepancyReport.jsx';
@@ -13,7 +14,10 @@ import { User } from 'lucide-react';
 
 export const CitizenVerificationPage = () => {
   const { user } = useAuth();
-  const [activeSubTab, setActiveSubTab] = useState('submit');
+  // Which section is open comes from the address bar, so the sidebar can link
+  // straight to one and a citizen can bookmark it.
+  const [searchParams] = useSearchParams();
+  const activeSubTab = searchParams.get('tab') || 'submit';
 
   // Track complaints
   const [myComplaints, setMyComplaints] = useState([]);
@@ -111,64 +115,20 @@ export const CitizenVerificationPage = () => {
             </div>
             <div>
               <h3 className="font-bold text-dark-800 text-sm">{user?.name}</h3>
-              <p className="text-[11px] text-slate-400 mt-0.5">Citizen Auditor • Registered via {user?.email || user?.phone || 'Mobile'}</p>
+              <p className="text-xs text-slate-400 mt-0.5">Citizen Auditor • Registered via {user?.email || user?.phone || 'Mobile'}</p>
             </div>
           </div>
           
           <div className="flex items-center gap-4">
             <div className="bg-emerald-50 border border-emerald-100 rounded px-4 py-2 text-center">
-              <p className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Civic Points</p>
+              <p className="text-xs text-slate-400 font-semibold">Civic Points</p>
               <p className="text-lg font-black text-emerald-600">{user?.points || 0}</p>
             </div>
             <div className="bg-brand-50 border border-brand-100 rounded px-4 py-2 text-center">
-              <p className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Volunteer Score</p>
+              <p className="text-xs text-slate-400 font-semibold">Volunteer Score</p>
               <p className="text-lg font-black text-brand-600">{user?.volunteerScore || 0}</p>
             </div>
           </div>
-        </div>
-
-        {/* Tab Selection */}
-        <div className="flex border-b border-slate-200 gap-1">
-          <button
-            onClick={() => setActiveSubTab('submit')}
-            className={`px-4 py-2.5 text-sm font-medium transition-colors ${
-              activeSubTab === 'submit'
-                ? 'border-b-2 border-brand-500 text-brand-600 bg-white'
-                : 'text-slate-400 hover:text-slate-700'
-            }`}
-          >
-            New complaint
-          </button>
-          <button
-            onClick={() => setActiveSubTab('track')}
-            className={`px-4 py-2.5 text-sm font-medium transition-colors ${
-              activeSubTab === 'track'
-                ? 'border-b-2 border-brand-500 text-brand-600 bg-white'
-                : 'text-slate-400 hover:text-slate-700'
-            }`}
-          >
-            My complaints ({myComplaints.length})
-          </button>
-          <button
-            onClick={() => setActiveSubTab('rewards')}
-            className={`px-4 py-2.5 text-sm font-medium transition-colors ${
-              activeSubTab === 'rewards'
-                ? 'border-b-2 border-brand-500 text-brand-600 bg-white'
-                : 'text-slate-400 hover:text-slate-700'
-            }`}
-          >
-            Rewards
-          </button>
-          <button
-            onClick={() => setActiveSubTab('notifications')}
-            className={`px-4 py-2.5 text-sm font-medium transition-colors ${
-              activeSubTab === 'notifications'
-                ? 'border-b-2 border-brand-500 text-brand-600 bg-white'
-                : 'text-slate-400 hover:text-slate-700'
-            }`}
-          >
-            Notifications ({notifications.filter(n => !n.read).length})
-          </button>
         </div>
 
         {/* Sub-tab Content Area */}

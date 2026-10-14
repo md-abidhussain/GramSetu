@@ -41,7 +41,7 @@ export const NotificationBell = () => {
       >
         <Bell className="h-5 w-5" />
         {unreadCount > 0 && (
-          <span className="absolute top-1.5 right-1.5 h-4 w-4 bg-rose-500 text-[10px] font-bold text-white rounded-full flex items-center justify-center animate-pulse">
+          <span className="absolute top-1.5 right-1.5 h-4 w-4 bg-rose-500 text-xs font-semibold text-white rounded-full flex items-center justify-center animate-pulse">
             {unreadCount}
           </span>
         )}
@@ -75,7 +75,7 @@ export const NotificationBell = () => {
                     <p className={`text-xs text-dark-800 leading-normal ${!n.read ? 'font-medium' : ''}`}>
                       {n.message}
                     </p>
-                    <span className="text-[10px] text-slate-400 mt-1 block">
+                    <span className="text-xs text-slate-400 mt-1 block">
                       {new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>

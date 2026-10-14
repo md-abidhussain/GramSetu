@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   FileText, 
@@ -8,13 +8,16 @@ import {
   LogOut,
   Shield,
   Users,
-  BarChart3
+  BarChart3,
+  Award,
+  Bell
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth.js';
 
 export const Sidebar = () => {
   const { logoutUser, user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     logoutUser();
@@ -25,13 +28,20 @@ export const Sidebar = () => {
 
   // Citizens report problems. Officials review what citizens reported, from
   // the complaints list on their dashboard. Neither needs the other's menu.
+  const currentUrl = location.pathname + location.search;
+  const isCurrent = (path) =>
+    currentUrl === path || (path === '/verify?tab=submit' && currentUrl === '/verify');
+
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, audience: 'official' },
     { name: 'Tender Intelligence', path: '/tenders', icon: FileText, audience: 'official' },
     { name: 'Project Monitoring', path: '/projects', icon: Activity, audience: 'official' },
     { name: 'Contractor Registry', path: '/contractors', icon: Users, audience: 'official' },
     { name: 'Contractor Analytics', path: '/contractors-analysis', icon: BarChart3, audience: 'official' },
-    { name: 'Complaints', path: '/verify', icon: ShieldAlert, audience: 'citizen' },
+    { name: 'New complaint', path: '/verify?tab=submit', icon: ShieldAlert, audience: 'citizen' },
+    { name: 'My complaints', path: '/verify?tab=track', icon: FileText, audience: 'citizen' },
+    { name: 'Rewards', path: '/verify?tab=rewards', icon: Award, audience: 'citizen' },
+    { name: 'Updates', path: '/verify?tab=notifications', icon: Bell, audience: 'citizen' },
   ];
 
   const filteredItems = navItems.filter((item) =>
@@ -46,7 +56,7 @@ export const Sidebar = () => {
         </div>
         <div>
           <h1 className="font-bold text-white text-base tracking-tight leading-tight">GramSetu AI</h1>
-          <span className="text-[10px] text-brand-500 font-semibold tracking-wider uppercase flex items-center gap-0.5">
+          <span className="text-xs text-brand-500 font-semibold tracking-wider uppercase flex items-center gap-0.5">
             <Shield className="h-2.5 w-2.5" /> Audit Platform
           </span>
         </div>
@@ -57,9 +67,11 @@ export const Sidebar = () => {
           <NavLink
             key={item.path}
             to={item.path}
-            className={({ isActive }) =>
+            // The citizen sections are one route with a ?tab= value, so React
+            // Router would mark all of them active. Compare the whole link.
+            className={() =>
               `flex items-center gap-3 px-4 py-2.5 rounded-md text-sm font-medium transition-colors ${
-                isActive
+                isCurrent(item.path)
                   ? 'bg-brand-600 text-white'
                   : 'text-brand-100/80 hover:bg-brand-700 hover:text-white'
               }`
@@ -80,7 +92,7 @@ export const Sidebar = () => {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-semibold text-white truncate">{user.name}</p>
-                <p className="text-[10px] text-slate-400 capitalize">{user.role}</p>
+                <p className="text-xs text-slate-400 capitalize">{user.role}</p>
               </div>
             </div>
             <button

@@ -129,16 +129,16 @@ export const ProjectLifecycleSection = ({ projectId, project }) => {
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex flex-wrap gap-2">
-          <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+          <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-500">
             Current: {currentStatus}
           </span>
           {project?.completionScore !== undefined && (
-            <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+            <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-500">
               Score: {project.completionScore}%
             </span>
           )}
           {project?.riskLevel && (
-            <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+            <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-500">
               Risk: {project.riskLevel}
             </span>
           )}
@@ -192,7 +192,7 @@ export const ProjectLifecycleSection = ({ projectId, project }) => {
         )}
 
         <div className="rounded-2xl border border-slate-100 bg-white p-4">
-          <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Timeline</h4>
+          <h4 className="text-xs font-semibold text-slate-400">Timeline</h4>
           <div className="mt-3 space-y-3">
             {history.length === 0 ? (
               <p className="text-xs text-slate-400">No lifecycle activity yet.</p>
@@ -200,10 +200,10 @@ export const ProjectLifecycleSection = ({ projectId, project }) => {
               <div key={`${entry.status}-${idx}`} className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-sm font-semibold text-dark-800">{entry.status}</span>
-                  <span className="text-[10px] uppercase tracking-wider text-slate-400">{entry.updatedBy}</span>
+                  <span className="text-xs text-slate-400">{entry.updatedBy}</span>
                 </div>
-                <p className="mt-1 text-[11px] text-slate-500">{entry.remarks || 'No remarks provided.'}</p>
-                <p className="mt-1 text-[10px] text-slate-400">{new Date(entry.timestamp).toLocaleString()}</p>
+                <p className="mt-1 text-xs text-slate-500">{entry.remarks || 'No remarks provided.'}</p>
+                <p className="mt-1 text-xs text-slate-400">{new Date(entry.timestamp).toLocaleString()}</p>
               </div>
             ))}
           </div>

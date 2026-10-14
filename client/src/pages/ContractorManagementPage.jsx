@@ -102,9 +102,9 @@ export const ContractorManagementPage = () => {
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <p className="font-semibold text-dark-800">{contractor.name}</p>
-                        <p className="text-[11px] text-slate-500">{contractor.registrationId}</p>
+                        <p className="text-xs text-slate-500">{contractor.registrationId}</p>
                       </div>
-                      <span className="rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
+                      <span className="rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
                         {contractor.performanceScore}% trust
                       </span>
                     </div>

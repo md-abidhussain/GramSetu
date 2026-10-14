@@ -227,11 +227,11 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                     <h3 className="text-sm font-bold text-dark-800">
                       {selectedReport.project?.title || selectedReport.customProjectTitle || 'Custom Project Site'}
                     </h3>
-                    <p className="text-slate-400 text-[10px] mt-0.5">
+                    <p className="text-slate-400 text-xs mt-0.5">
                       Reporter: {selectedReport.citizen?.name || 'Anonymous Citizen'} • Severity: <span className="font-semibold text-rose-600">{selectedReport.severity}</span>
                     </p>
                   </div>
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${getStatusBadgeColor(selectedReport.status)}`}>
+                  <span className={`px-2 py-0.5 rounded text-xs font-semibold border ${getStatusBadgeColor(selectedReport.status)}`}>
                     {selectedReport.status}
                   </span>
                 </div>
@@ -246,7 +246,7 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                 {/* Evidence Photo Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <span className="block text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                    <span className="block text-xs text-slate-400 font-bold mb-1.5 flex items-center gap-1">
                       <ImageIcon className="h-3.5 w-3.5 text-slate-400" /> Citizen Evidence
                     </span>
                     <a href={selectedReport.citizenImageUrl} target="_blank" rel="noreferrer" className="block relative h-32 rounded border border-slate-200 overflow-hidden bg-white hover:opacity-90 transition-opacity">
@@ -255,7 +255,7 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                   </div>
 
                   <div>
-                    <span className="block text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                    <span className="block text-xs text-slate-400 font-bold mb-1.5 flex items-center gap-1">
                       <ImageIcon className="h-3.5 w-3.5 text-slate-400" /> Official Site Verification
                     </span>
                     {selectedReport.inspectorAfterImageUrl ? (
@@ -284,14 +284,14 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                 </div>
 
                 <div className="border-t border-slate-100 pt-3">
-                  <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-wider">Citizen Narrative</span>
+                  <span className="block text-xs text-slate-500 font-bold">Citizen Narrative</span>
                   <p className="text-slate-700 mt-1 leading-relaxed">{selectedReport.description}</p>
                 </div>
 
                 {/* Gemini comparative report analysis if discrepancies exist */}
                 {selectedReport.aiReport && (
                   <div className="border-t border-slate-100 pt-3">
-                    <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1">
+                    <span className="block text-xs text-slate-500 font-bold flex items-center gap-1">
                       <ShieldAlert className="h-3.5 w-3.5 text-brand-600" /> AI Discrepancy Assessment
                     </span>
                     <p className="text-slate-700 bg-brand-50/15 border border-brand-100 p-2.5 rounded mt-1.5 leading-relaxed">
@@ -303,7 +303,7 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                 {/* Inspector Site Notes */}
                 {selectedReport.inspectorNotes && (
                   <div className="border-t border-slate-100 pt-3">
-                    <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-wider">Inspector Notes</span>
+                    <span className="block text-xs text-slate-500 font-bold">Inspector Notes</span>
                     <p className="text-slate-700 bg-slate-100/50 border border-slate-200 p-2.5 rounded mt-1.5 leading-relaxed italic">
                       {selectedReport.inspectorNotes}
                     </p>
@@ -474,7 +474,7 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
               <div className="flex-1 flex flex-col items-center justify-center text-slate-400 p-12 text-center">
                 <MessageSquare className="h-10 w-10 text-slate-300 mb-2" />
                 <p className="text-xs font-semibold">Select a citizen complaint</p>
-                <p className="text-[11px] mt-0.5">Click any report in the left sidebar to audit the damage details and trigger workflow actions.</p>
+                <p className="text-xs mt-0.5">Click any report in the left sidebar to audit the damage details and trigger workflow actions.</p>
               </div>
             )}
           </div>

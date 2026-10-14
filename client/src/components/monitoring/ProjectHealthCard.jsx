@@ -38,7 +38,7 @@ export const ProjectHealthCard = ({ health = 'Healthy', notes = '' }) => {
     <Card className="h-full">
       <CardHeader>
         <div>
-          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Audit Evaluation</span>
+          <span className="text-xs text-slate-400 font-bold">Audit Evaluation</span>
           <CardTitle className="text-base mt-0.5">Integrity & Health</CardTitle>
         </div>
       </CardHeader>
@@ -52,7 +52,7 @@ export const ProjectHealthCard = ({ health = 'Healthy', notes = '' }) => {
 
         {/* Audit Notes */}
         <div>
-          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+          <span className="text-xs font-semibold text-slate-500 mb-2 flex items-center gap-1.5">
             <FileText className="h-3.5 w-3.5 text-slate-400" /> Audit Assessment Log
           </span>
           <div className="bg-white p-4 rounded-md border border-slate-200 text-xs text-dark-800 leading-relaxed max-h-40 overflow-y-auto">

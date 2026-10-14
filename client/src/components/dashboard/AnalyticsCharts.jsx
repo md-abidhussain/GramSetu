@@ -67,7 +67,7 @@ export const AnalyticsCharts = ({ summary }) => {
           <Card key={card.title} className="bg-white border border-slate-200">
             <div className="p-6 flex items-center justify-between">
               <div className="space-y-1">
-                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">{card.title}</span>
+                <span className="text-xs text-slate-400 font-bold block">{card.title}</span>
                 <span className="text-2xl font-extrabold text-dark-800 tracking-tight block">{card.value}</span>
                 <span className="text-xs text-slate-500 font-medium block">{card.desc}</span>
               </div>

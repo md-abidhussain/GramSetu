@@ -113,7 +113,7 @@ export const CitizenReportForm = ({ onSubmitSuccess }) => {
     <Card>
       <CardHeader>
         <div>
-          <span className="text-[10px] text-brand-600 font-bold uppercase tracking-wider">Citizen Verification Portal</span>
+          <span className="text-xs text-brand-600 font-bold">Citizen Verification Portal</span>
           <CardTitle className="text-lg mt-0.5 flex items-center gap-1">
             <ShieldAlert className="h-4.5 w-4.5 text-brand-600" /> Report Infrastructure Damage
           </CardTitle>
@@ -176,7 +176,7 @@ export const CitizenReportForm = ({ onSubmitSuccess }) => {
           />
 
           <div>
-            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-semibold text-slate-500 mb-1.5">
               Infrastructure Photo (Current State) <span className="text-red-500">*</span>
             </label>
 
@@ -191,7 +191,7 @@ export const CitizenReportForm = ({ onSubmitSuccess }) => {
                 />
                 <Camera className="h-6 w-6 text-slate-400 mb-1" />
                 <span className="text-xs font-medium text-dark-800">Snap or Upload photo</span>
-                <span className="text-[10px] text-slate-400">PNG, JPG up to 5MB</span>
+                <span className="text-xs text-slate-400">PNG, JPG up to 5MB</span>
               </div>
 
               {preview ? (
@@ -222,7 +222,7 @@ export const CitizenReportForm = ({ onSubmitSuccess }) => {
               required
               className="mt-2 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-brand-500"
             />
-            <p className="mt-1.5 text-[11px] leading-relaxed text-slate-500">
+            <p className="mt-1.5 text-xs leading-relaxed text-slate-500">
               Place a known-size marker beside the defect and enter its calibrated centimetres-per-pixel value. Calibrated measurements are required for each submitted report.
             </p>
           </div>
