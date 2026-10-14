@@ -42,12 +42,17 @@ export const DashboardPage = () => {
         getProjects()
       ]);
 
-      setSummary(sum);
-      setRiskAnalytics(risk);
-      setContractors(leaders);
-      setComplaints(comp);
-      setMapData(map);
-      setProjects(proj);
+      // Each panel reads its own slice. If one endpoint answers with something
+      // unexpected, that panel shows nothing rather than the whole dashboard
+      // failing on a .filter or .map of a non-array.
+      const asList = (value) => (Array.isArray(value) ? value : []);
+
+      setSummary(sum && typeof sum === 'object' ? sum : {});
+      setRiskAnalytics(asList(risk));
+      setContractors(asList(leaders));
+      setComplaints(asList(comp));
+      setMapData(asList(map));
+      setProjects(asList(proj));
     } catch (err) {
       console.error('Failed to load dashboard parameters:', err);
     } finally {
@@ -62,31 +67,31 @@ export const DashboardPage = () => {
 
   if (loading) {
     return (
-      <PageLayout title="Official Authority Dashboard">
-        <div className="flex flex-col items-center justify-center min-h-[400px] text-slate-400 gap-2.5">
+      <PageLayout title="Dashboard">
+        <div className="flex min-h-[400px] flex-col items-center justify-center gap-3 text-slate-600">
           <Activity className="h-8 w-8 text-brand-600 animate-spin" />
-          <p className="text-xs font-semibold">Loading official government audits...</p>
+          <p className="text-base">Loading your dashboard…</p>
         </div>
       </PageLayout>
     );
   }
 
   return (
-    <PageLayout title="Official Authority Dashboard">
+    <PageLayout title="Dashboard">
       <div className="space-y-8">
         {/* Title bar and refresh button */}
         <div className="flex justify-between items-center w-full">
           <div>
-            <h2 className="text-xl font-bold text-dark-800 tracking-tight">System Overview</h2>
-            <p className="text-xs text-slate-400 mt-0.5">Real-time indicators of public infrastructure integrity ledger</p>
+            <h2 className="text-lg font-semibold tracking-tight text-slate-900">Today at a glance</h2>
+            <p className="mt-1 text-sm text-slate-600">Projects being tracked, what the public has reported, and what needs attention.</p>
           </div>
           <button
             onClick={() => fetchDashboardData(true)}
             disabled={refreshing}
-            className="flex items-center gap-1.5 px-4.5 py-2.5 bg-white border border-slate-100 rounded-xl text-slate-500 hover:text-slate-700 hover:bg-slate-50 text-xs font-semibold transition-all shadow-sm hover:shadow active:scale-95 disabled:opacity-50"
+            className="flex items-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 disabled:opacity-50"
           >
-            <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} />
-            {refreshing ? 'Syncing...' : 'Sync Ledger'}
+            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} aria-hidden="true" />
+            {refreshing ? 'Refreshing…' : 'Refresh'}
           </button>
         </div>
 

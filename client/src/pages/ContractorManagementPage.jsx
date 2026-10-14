@@ -78,12 +78,12 @@ export const ContractorManagementPage = () => {
               <CardTitle className="flex items-center gap-2">
                 <Building2 className="h-4.5 w-4.5 text-brand-600" /> Registered Contractors
               </CardTitle>
-              <p className="text-xs text-slate-400 mt-1">Authority-managed contractor registry and contact details</p>
+              <p className="text-xs text-slate-600 mt-1">Authority-managed contractor registry and contact details</p>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="relative">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-600" />
               <input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
@@ -127,7 +127,7 @@ export const ContractorManagementPage = () => {
               <CardTitle className="flex items-center gap-2">
                 <PlusCircle className="h-4.5 w-4.5 text-brand-600" /> Create Contractor Profile
               </CardTitle>
-              <p className="text-xs text-slate-400 mt-1">Authority-only form for onboarding contractor records</p>
+              <p className="text-xs text-slate-600 mt-1">Authority-only form for onboarding contractor records</p>
             </div>
           </CardHeader>
           <CardContent>

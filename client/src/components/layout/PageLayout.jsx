@@ -1,27 +1,40 @@
 import React from 'react';
 import Sidebar from './Sidebar.jsx';
 import Topbar from './Topbar.jsx';
+import MobileNav from './MobileNav.jsx';
+import IdentityBand from './IdentityBand.jsx';
+import SiteFooter from './SiteFooter.jsx';
 import { useAuth } from '../../hooks/useAuth.js';
 
 export const PageLayout = ({ children, title = 'Infrastructure Audit' }) => {
   const { user } = useAuth();
-  
-  // Show sidebar for any logged-in user
-  const showSidebar = !!user;
+  const showSidebar = Boolean(user);
 
   return (
-    <div className="h-screen w-screen overflow-hidden flex bg-dark-50">
-      {showSidebar && <Sidebar />}
+    <div className="flex min-h-screen flex-col bg-surface">
+      {/* First thing a keyboard user reaches, so they can pass the navigation. */}
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
 
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <Topbar title={title} />
-        <main className="flex-1 overflow-y-auto p-8">
-          <div className="max-w-7xl mx-auto w-full">
-            {children}
-          </div>
-        </main>
+      <IdentityBand />
+
+      <div className="flex min-h-0 flex-1">
+        {showSidebar && <Sidebar />}
+
+        <div className="flex min-w-0 flex-1 flex-col">
+          <Topbar title={title} />
+          <MobileNav />
+
+          <main id="main-content" className="flex-1 px-4 py-8 sm:px-6">
+            <div className="mx-auto w-full max-w-7xl">{children}</div>
+          </main>
+
+          <SiteFooter />
+        </div>
       </div>
     </div>
   );
 };
+
 export default PageLayout;

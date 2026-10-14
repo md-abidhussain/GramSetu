@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.js';
-import { Card, CardHeader, CardContent } from '../components/ui/Card.jsx';
 import { Button } from '../components/ui/Button.jsx';
-import { Shield, AlertCircle, Lock, User, Phone, Mail } from 'lucide-react';
+import IdentityBand from '../components/layout/IdentityBand.jsx';
+import SiteFooter from '../components/layout/SiteFooter.jsx';
+import { AlertCircle, Info, Lock } from 'lucide-react';
 
 // Public sample accounts so anyone reviewing the project can look around
 // without signing up. They only ever see seeded demonstration data.
@@ -12,17 +13,16 @@ const DEMO_ACCOUNTS = {
   authority: { identifier: 'authority@gramsetu.gov', password: 'authority123', landingPage: '/dashboard' }
 };
 
+const fieldStyle =
+  'w-full rounded-md border border-slate-300 bg-white px-3 py-2.5 text-base text-slate-900 placeholder-slate-400 focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600 disabled:bg-slate-50';
+
+const labelStyle = 'block text-sm font-medium text-slate-800';
+
 export const LoginPage = () => {
-  const { 
-    loginCitizen, 
-    registerCitizen, 
-    loginAuthority, 
-    registerAuthority, 
-    user 
-  } = useAuth();
+  const { loginCitizen, registerCitizen, loginAuthority, user } = useAuth();
   const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState('citizen');
+  const [audience, setAudience] = useState('citizen');
   const [mode, setMode] = useState('login');
 
   const [name, setName] = useState('');
@@ -30,79 +30,56 @@ export const LoginPage = () => {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [identifier, setIdentifier] = useState('');
-  const [role, setRole] = useState('Government Officer');
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (user) {
-      if (user.role === 'citizen') {
-        navigate('/verify');
-      } else {
-        navigate('/dashboard');
-      }
+      navigate(user.role === 'citizen' || user.isCitizen ? '/verify' : '/dashboard');
     }
   }, [user, navigate]);
 
-  const resetForm = () => {
+  const switchAudience = (next) => {
+    setAudience(next);
+    setMode('login');
     setName('');
     setEmail('');
     setPhone('');
     setPassword('');
     setIdentifier('');
     setError(null);
-    setSuccessMessage(null);
   };
 
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-    setMode('login');
-    resetForm();
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setError(null);
-    setSuccessMessage(null);
     setLoading(true);
 
     try {
-      if (activeTab === 'citizen') {
-        if (mode === 'login') {
-          if (!identifier || !password) throw new Error('Please fill in email/phone and password');
-          await loginCitizen(identifier, password);
-          navigate('/verify');
-        } else {
-          if (!name || !password) throw new Error('Name and password are required');
-          if (!email && !phone) throw new Error('Please provide either an email or mobile number');
-          await registerCitizen(name, email, phone, password);
-          navigate('/verify');
-        }
+      if (audience === 'authority') {
+        await loginAuthority(identifier, password);
+        navigate('/dashboard');
+      } else if (mode === 'login') {
+        await loginCitizen(identifier, password);
+        navigate('/verify');
       } else {
-        if (mode === 'login') {
-          if (!identifier || !password) throw new Error('Please fill in official email/User ID and password');
-          await loginAuthority(identifier, password);
-          navigate('/dashboard');
-        } else {
-          if (!name || !email || !password || !role) throw new Error('Please fill in all registration fields');
-          const data = await registerAuthority(name, email, password, role);
-          setSuccessMessage(`Account created successfully! Your unique Official ID is: ${data.uniqueUserId}`);
-          setMode('login');
+        if (!email && !phone) {
+          throw new Error('Enter either an email address or a mobile number.');
         }
+        await registerCitizen(name, email, phone, password);
+        navigate('/verify');
       }
     } catch (err) {
-      setError(err.message || 'Authentication failed. Please verify entries.');
+      setError(err.message || 'Those details were not accepted. Please check them and try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const signInToDemo = async (accountType) => {
+  const openDemo = async (accountType) => {
     const account = DEMO_ACCOUNTS[accountType];
     setError(null);
-    setSuccessMessage(null);
     setLoading(true);
     try {
       const signIn = accountType === 'citizen' ? loginCitizen : loginAuthority;
@@ -115,230 +92,159 @@ export const LoginPage = () => {
     }
   };
 
+  const registering = audience === 'citizen' && mode === 'register';
+
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-slate-50 px-4 py-12">
-      <div className="w-full max-w-md space-y-6">
+    <div className="flex min-h-screen flex-col bg-surface">
+      <IdentityBand />
 
-        <div className="text-center">
-          <div className="inline-flex items-center gap-2">
-            <Shield className="h-6 w-6 text-brand-600" />
-            <span className="text-xl font-semibold tracking-tight text-slate-900">GramSetu</span>
-          </div>
-          <p className="mt-2 text-sm text-slate-600">
-            Track public infrastructure projects, report problems, and verify
-            completed work.
-          </p>
-        </div>
-
-        <Card className="border border-slate-200 shadow bg-white rounded-md overflow-hidden">
-          <div className="flex border-b border-slate-200 bg-slate-50">
-            <button
-              onClick={() => handleTabChange('citizen')}
-              className={`flex-1 text-center py-3 text-xs font-semibold tracking-wider uppercase transition-colors ${
-                activeTab === 'citizen'
-                  ? 'border-b-2 border-brand-600 text-brand-700 bg-white'
-                  : 'text-slate-500 hover:text-slate-700 bg-slate-50'
-              }`}
-            >
-              Citizen Portal
-            </button>
-            <button
-              onClick={() => handleTabChange('authority')}
-              className={`flex-1 text-center py-3 text-xs font-semibold tracking-wider uppercase transition-colors ${
-                activeTab === 'authority'
-                  ? 'border-b-2 border-brand-600 text-brand-700 bg-white'
-                  : 'text-slate-500 hover:text-slate-700 bg-slate-50'
-              }`}
-            >
-              Government Official
-            </button>
-          </div>
-
-          <CardHeader className="border-b-0 pb-0 text-center flex flex-col items-center pt-6">
-            <div className="h-12 w-12 bg-slate-100 border border-slate-200 rounded flex items-center justify-center font-bold mb-3">
-              {activeTab === 'citizen' ? (
-                <User className="h-6 w-6 text-slate-700" />
-              ) : (
-                <Shield className="h-6 w-6 text-brand-700" />
-              )}
-            </div>
-            <h2 className="text-base font-bold text-dark-800 tracking-tight">
-              {activeTab === 'citizen'
-                ? mode === 'login' ? 'Sign in as a citizen' : 'Create a citizen account'
-                : mode === 'login' ? 'Sign in as an official' : 'Create an official account'}
-            </h2>
-            <p className="text-xs text-slate-400 mt-1">
-              {activeTab === 'citizen'
-                ? 'Report a problem and follow what happens to it'
-                : 'Review tenders, projects and citizen reports'}
+      <main className="flex flex-1 items-start justify-center px-4 py-10 sm:px-6">
+        <div className="w-full max-w-lg">
+          <div className="text-center">
+            <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+              GramSetu
+            </h1>
+            <p className="mx-auto mt-2 max-w-md text-base text-slate-600">
+              Report problems with public infrastructure work, follow what
+              happens to each report, and check completed projects.
             </p>
-          </CardHeader>
+          </div>
 
-          <CardContent className="pt-5 pb-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded text-red-700 text-xs flex items-center gap-2">
-                  <AlertCircle className="h-4 w-4 shrink-0" />
-                  <span>{error}</span>
-                </div>
-              )}
-
-              {successMessage && (
-                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded text-emerald-800 text-xs flex items-center gap-2">
-                  <AlertCircle className="h-4 w-4 shrink-0" />
-                  <span>{successMessage}</span>
-                </div>
-              )}
-
-              {mode === 'register' && (
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-500">
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Enter full name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                    disabled={loading}
-                    className="w-full bg-white border border-slate-200 rounded px-3 py-2 text-xs text-dark-800 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 placeholder-slate-400"
-                  />
-                </div>
-              )}
-
-              {mode === 'register' ? (
-                <>
-                  <div className="space-y-1.5">
-                    <label className="block text-xs font-semibold text-slate-500">
-                      Email Address {activeTab === 'authority' ? '(Govt Only)' : '(Optional)'}
-                    </label>
-                    <input
-                      type="email"
-                      placeholder="e.g. user@domain.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required={activeTab === 'authority'}
-                      disabled={loading}
-                      className="w-full bg-white border border-slate-200 rounded px-3 py-2 text-xs text-dark-800 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 placeholder-slate-400"
-                    />
-                  </div>
-                  {activeTab === 'citizen' && (
-                    <div className="space-y-1.5">
-                      <label className="block text-xs font-semibold text-slate-500">
-                        Mobile Number (Optional)
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="e.g. 9999999999"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        disabled={loading}
-                        className="w-full bg-white border border-slate-200 rounded px-3 py-2 text-xs text-dark-800 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 placeholder-slate-400"
-                      />
-                    </div>
-                  )}
-                </>
-              ) : (
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-500">
-                    {activeTab === 'citizen' 
-                      ? 'Email or mobile number' 
-                      : 'Government Email or Official ID (AUTH-2026-XXXX)'}
-                  </label>
-                  <input
-                    type="text"
-                    placeholder={activeTab === 'citizen' ? 'e.g. citizen@gmail.com / 9999999999' : 'e.g. authority@gramsetu.gov / AUTH-2026-9021'}
-                    value={identifier}
-                    onChange={(e) => setIdentifier(e.target.value)}
-                    required
-                    disabled={loading}
-                    className="w-full bg-white border border-slate-200 rounded px-3 py-2 text-xs text-dark-800 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 placeholder-slate-400"
-                  />
-                </div>
-              )}
-
-              {activeTab === 'authority' && mode === 'register' && (
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-500">
-                    Government Official Role
-                  </label>
-                  <select
-                    value={role}
-                    onChange={(e) => setRole(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded px-3 py-2 text-xs text-dark-800 focus:outline-none focus:border-brand-500"
-                  >
-                    <option value="Government Officer">Government Officer</option>
-                    <option value="Inspector">Inspector</option>
-                    <option value="District Authority">District Authority</option>
-                    <option value="PWD Engineer">PWD Engineer</option>
-                    <option value="Admin">Admin</option>
-                  </select>
-                </div>
-              )}
-
-              <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-500">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={loading}
-                  className="w-full bg-white border border-slate-200 rounded px-3 py-2 text-xs text-dark-800 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 placeholder-slate-400"
-                />
-              </div>
-
-              <div className="flex flex-col gap-2 pt-2">
-                <Button
-                  type="submit"
-                  className="w-full py-2.5 flex items-center justify-center gap-1.5 font-bold tracking-wider text-xs uppercase"
-                  loading={loading}
-                  disabled={loading}
+          <div className="mt-8 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+            {/* Two audiences, two different jobs: the public files and follows
+                reports, officials review them. */}
+            <div role="tablist" aria-label="Who is signing in" className="flex border-b border-slate-200">
+              {[
+                { id: 'citizen', label: 'Public' },
+                { id: 'authority', label: 'Government official' }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  role="tab"
+                  type="button"
+                  aria-selected={audience === tab.id}
+                  onClick={() => switchAudience(tab.id)}
+                  className={`flex-1 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${
+                    audience === tab.id
+                      ? 'border-brand-600 bg-white text-brand-800'
+                      : 'border-transparent bg-slate-50 text-slate-600 hover:text-slate-900'
+                  }`}
                 >
-                  <Lock className="h-3.5 w-3.5" />
-                  {mode === 'login' ? 'Sign in' : 'Create account'}
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="px-5 py-6 sm:px-6">
+              <h2 className="text-lg font-semibold tracking-tight text-slate-900">
+                {audience === 'authority'
+                  ? 'Sign in with your official account'
+                  : registering
+                    ? 'Create an account'
+                    : 'Sign in'}
+              </h2>
+
+              <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+                {error && (
+                  <div role="alert" className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+                    <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                    <span>{error}</span>
+                  </div>
+                )}
+
+                {registering && (
+                  <>
+                    <div className="space-y-1.5">
+                      <label htmlFor="name" className={labelStyle}>Full name</label>
+                      <input id="name" type="text" value={name} required disabled={loading}
+                        onChange={(e) => setName(e.target.value)} className={fieldStyle} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label htmlFor="email" className={labelStyle}>Email address</label>
+                      <input id="email" type="email" autoComplete="email" value={email} disabled={loading}
+                        onChange={(e) => setEmail(e.target.value)} className={fieldStyle} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label htmlFor="phone" className={labelStyle}>Mobile number</label>
+                      <input id="phone" type="tel" inputMode="numeric" autoComplete="tel" value={phone} disabled={loading}
+                        onChange={(e) => setPhone(e.target.value)} className={fieldStyle} />
+                      <p className="text-sm text-slate-600">Give an email address or a mobile number. Either one works.</p>
+                    </div>
+                  </>
+                )}
+
+                {!registering && (
+                  <div className="space-y-1.5">
+                    <label htmlFor="identifier" className={labelStyle}>
+                      {audience === 'citizen' ? 'Email address or mobile number' : 'Official email or user ID'}
+                    </label>
+                    <input id="identifier" type="text" autoComplete="username" value={identifier} required disabled={loading}
+                      onChange={(e) => setIdentifier(e.target.value)} className={fieldStyle} />
+                  </div>
+                )}
+
+                <div className="space-y-1.5">
+                  <label htmlFor="password" className={labelStyle}>Password</label>
+                  <input id="password" type="password" value={password} required disabled={loading}
+                    autoComplete={registering ? 'new-password' : 'current-password'}
+                    onChange={(e) => setPassword(e.target.value)} className={fieldStyle} />
+                  {registering && (
+                    <p className="text-sm text-slate-600">At least 8 characters.</p>
+                  )}
+                </div>
+
+                <Button type="submit" loading={loading} disabled={loading} className="w-full py-2.5 text-base">
+                  <Lock className="mr-2 h-4 w-4" aria-hidden="true" />
+                  {registering ? 'Create account' : 'Sign in'}
                 </Button>
 
-                <button
-                  type="button"
-                  onClick={() => setMode(mode === 'login' ? 'register' : 'login')}
-                  className="text-center text-xs text-brand-700 hover:underline font-bold mt-1.5"
-                >
-                  {mode === 'login' 
-                    ? activeTab === 'citizen' ? "New to the platform? Register here" : "Official onboarding: Register account"
-                    : 'Already registered? Switch to login'}
+                {audience === 'citizen' && (
+                  <button
+                    type="button"
+                    onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError(null); }}
+                    className="w-full text-sm font-medium text-brand-700 underline underline-offset-4 hover:text-brand-800"
+                  >
+                    {mode === 'login' ? 'Create an account' : 'I already have an account'}
+                  </button>
+                )}
+              </form>
+
+              {audience === 'authority' && (
+                // Officials no longer sign themselves up. The registration
+                // endpoint used to be open and accepted any role in the body,
+                // Admin included, so anyone could make themselves an
+                // administrator. Accounts are issued by an administrator now.
+                <div className="mt-5 flex items-start gap-2 rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700">
+                  <Info className="mt-0.5 h-4 w-4 shrink-0 text-brand-700" aria-hidden="true" />
+                  <span>
+                    Official accounts are issued by your department
+                    administrator. There is no sign-up here.
+                  </span>
+                </div>
+              )}
+            </div>
+
+            <div className="border-t border-slate-200 bg-slate-50 px-5 py-5 sm:px-6">
+              <p className="text-sm font-medium text-slate-800">Look around without an account</p>
+              <p className="mt-1 text-sm text-slate-600">
+                These are public sample accounts holding demonstration data only.
+              </p>
+              <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+                <button type="button" onClick={() => openDemo('citizen')} disabled={loading}
+                  className="flex-1 rounded-md border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-800 shadow-sm transition-colors hover:bg-slate-100 disabled:opacity-60">
+                  Open as a member of the public
+                </button>
+                <button type="button" onClick={() => openDemo('authority')} disabled={loading}
+                  className="flex-1 rounded-md border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-800 shadow-sm transition-colors hover:bg-slate-100 disabled:opacity-60">
+                  Open as an official
                 </button>
               </div>
-            </form>
-          </CardContent>
-
-          <div className="bg-slate-50 border-t border-slate-200 p-4">
-            <p className="mb-2 text-center text-xs font-medium text-slate-600">
-              Or look around with a demo account
-            </p>
-            <div className="flex gap-2">
-              <button
-                onClick={() => signInToDemo('citizen')}
-                disabled={loading}
-                className="flex-1 rounded border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-100 disabled:opacity-60"
-              >
-                Citizen
-              </button>
-              <button
-                onClick={() => signInToDemo('authority')}
-                disabled={loading}
-                className="flex-1 rounded border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-100 disabled:opacity-60"
-              >
-                Government official
-              </button>
             </div>
           </div>
-        </Card>
-      </div>
+        </div>
+      </main>
+
+      <SiteFooter />
     </div>
   );
 };

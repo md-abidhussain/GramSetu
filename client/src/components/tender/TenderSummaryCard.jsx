@@ -63,7 +63,7 @@ export const TenderSummaryCard = ({ tender }) => {
           }`}>
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-semibold text-slate-500 flex items-center gap-1.5">
-                <DollarSign className="h-4 w-4 text-slate-400" /> Budget Analysis
+                <DollarSign className="h-4 w-4 text-slate-600" /> Budget Analysis
               </span>
               {budgetAnalysis?.flagged ? (
                 <span className="text-xs bg-rose-100 text-rose-800 font-semibold px-2 py-0.5 rounded flex items-center gap-1">
@@ -92,7 +92,7 @@ export const TenderSummaryCard = ({ tender }) => {
           }`}>
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-semibold text-slate-500 flex items-center gap-1.5">
-                <Calendar className="h-4 w-4 text-slate-400" /> Timeline Analysis
+                <Calendar className="h-4 w-4 text-slate-600" /> Timeline Analysis
               </span>
               {timelineAnalysis?.flagged ? (
                 <span className="text-xs bg-rose-100 text-rose-800 font-semibold px-2 py-0.5 rounded flex items-center gap-1">
@@ -119,7 +119,7 @@ export const TenderSummaryCard = ({ tender }) => {
         {/* Procurement Recommendations */}
         <div className="border-t border-slate-200 pt-5">
           <h4 className="text-xs font-semibold text-slate-500 mb-2 flex items-center gap-1.5">
-            <ListTodo className="h-4 w-4 text-slate-400" /> Recommendations
+            <ListTodo className="h-4 w-4 text-slate-600" /> Recommendations
           </h4>
           <p className="text-sm text-dark-800 leading-relaxed bg-brand-50/10 p-4 rounded-md border border-brand-100/30">
             {recommendation}

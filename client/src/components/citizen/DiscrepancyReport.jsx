@@ -61,7 +61,7 @@ export const DiscrepancyReport = ({ result }) => {
         <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-md border border-slate-200">
           <div className={`h-14 w-14 rounded-md border font-bold flex flex-col items-center justify-center ${getMatchScoreStyle(matchScore)}`}>
             <span className="text-xl tracking-tight leading-none">{matchScore}%</span>
-            <span className="text-[8px] font-semibold opacity-85 mt-0.5">Match</span>
+            <span className="text-xs font-semibold opacity-85 mt-0.5">Match</span>
           </div>
           <div>
             <p className="text-xs font-semibold text-dark-800">Verification Score</p>
@@ -128,7 +128,7 @@ export const DiscrepancyReport = ({ result }) => {
 
         <div className="border-t border-slate-200 pt-4">
           <span className="text-xs font-semibold text-slate-500 mb-2 flex items-center gap-1.5">
-            <MessageSquare className="h-4 w-4 text-slate-400" /> Executive Compliance Report
+            <MessageSquare className="h-4 w-4 text-slate-600" /> Executive Compliance Report
           </span>
           <p className="text-xs text-dark-800 leading-relaxed bg-brand-50/10 p-4 rounded-md border border-brand-100/30">
             {aiReport}

@@ -3,15 +3,50 @@
 @tailwind utilities;
 
 @layer base {
+  /* Government service guidance (GIGW 3.0, which follows WCAG 2.1 AA) asks for
+     body text that is readable without zooming. The app used to set almost
+     everything at 12px, which looked like an internal dashboard rather than a
+     public service. */
+  html {
+    font-size: 100%;
+  }
+
   body {
     @apply bg-surface text-slate-900;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  h1 {
+    @apply text-2xl font-semibold tracking-tight text-slate-900;
+  }
+
+  h2 {
+    @apply text-lg font-semibold tracking-tight text-slate-900;
+  }
+
+  /* A visible focus ring on anything reachable by keyboard. Without this a
+     keyboard user cannot tell where they are, which fails WCAG 2.4.7. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-offset-2 ring-brand-600;
   }
 }
 
-/* Custom Scrollbar Styles for elegant dashboard appearance */
+@layer components {
+  /* Jump straight to the page content. Hidden until focused, so the first Tab
+     on any page offers it. Required by WCAG 2.4.1. */
+  .skip-link {
+    @apply sr-only;
+  }
+
+  .skip-link:focus {
+    @apply not-sr-only fixed left-4 top-4 z-50 rounded-md bg-brand-800 px-4 py-2 text-sm font-medium text-white shadow-lg;
+  }
+}
+
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -22,9 +57,19 @@
   @apply bg-slate-300 rounded-full hover:bg-slate-400 transition-colors;
 }
 
-/* Leaflet Map responsiveness fix */
 .leaflet-container {
   width: 100%;
   height: 100%;
-  border-radius: 0.75rem;
+  border-radius: 0.5rem;
+}
+
+/* Honour a reader who has asked the system for less movement. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

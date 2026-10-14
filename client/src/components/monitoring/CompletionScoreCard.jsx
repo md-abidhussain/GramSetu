@@ -24,7 +24,7 @@ export const CompletionScoreCard = ({ score = 0, status = 'Pending' }) => {
     <Card className="h-full flex flex-col justify-between">
       <CardHeader>
         <div>
-          <span className="text-xs text-slate-400 font-bold">Audit Metric</span>
+          <span className="text-xs text-slate-600 font-bold">Audit Metric</span>
           <CardTitle className="text-base mt-0.5">Physical Completion</CardTitle>
         </div>
       </CardHeader>
@@ -57,7 +57,7 @@ export const CompletionScoreCard = ({ score = 0, status = 'Pending' }) => {
           {/* Central score display */}
           <div className="absolute flex flex-col items-center justify-center">
             <span className="text-2xl font-bold tracking-tight text-dark-800 leading-none">{score}</span>
-            <span className="text-[9px] uppercase font-bold text-slate-400 tracking-wider mt-0.5">Score</span>
+            <span className="text-xs uppercase font-bold text-slate-600 tracking-wider mt-0.5">Score</span>
           </div>
         </div>
 

@@ -1,18 +1,8 @@
 import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  FileText, 
-  Activity, 
-  ShieldAlert, 
-  LogOut,
-  Shield,
-  Users,
-  BarChart3,
-  Award,
-  Bell
-} from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth.js';
+import { isCitizenUser, makeIsCurrent, navItemsFor } from './navItems.js';
 
 export const Sidebar = () => {
   const { logoutUser, user } = useAuth();
@@ -24,42 +14,18 @@ export const Sidebar = () => {
     navigate('/login');
   };
 
-  const isCitizen = Boolean(user && (user.isCitizen || user.role === 'citizen'));
-
-  // Citizens report problems. Officials review what citizens reported, from
-  // the complaints list on their dashboard. Neither needs the other's menu.
-  const currentUrl = location.pathname + location.search;
-  const isCurrent = (path) =>
-    currentUrl === path || (path === '/verify?tab=submit' && currentUrl === '/verify');
-
-  const navItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, audience: 'official' },
-    { name: 'Tender Intelligence', path: '/tenders', icon: FileText, audience: 'official' },
-    { name: 'Project Monitoring', path: '/projects', icon: Activity, audience: 'official' },
-    { name: 'Contractor Registry', path: '/contractors', icon: Users, audience: 'official' },
-    { name: 'Contractor Analytics', path: '/contractors-analysis', icon: BarChart3, audience: 'official' },
-    { name: 'New complaint', path: '/verify?tab=submit', icon: ShieldAlert, audience: 'citizen' },
-    { name: 'My complaints', path: '/verify?tab=track', icon: FileText, audience: 'citizen' },
-    { name: 'Rewards', path: '/verify?tab=rewards', icon: Award, audience: 'citizen' },
-    { name: 'Updates', path: '/verify?tab=notifications', icon: Bell, audience: 'citizen' },
-  ];
-
-  const filteredItems = navItems.filter((item) =>
-    item.audience === (isCitizen ? 'citizen' : 'official')
-  );
+  const isCitizen = isCitizenUser(user);
+  const isCurrent = makeIsCurrent(location.pathname + location.search);
+  const filteredItems = navItemsFor(user);
 
   return (
-    <div className="w-64 bg-brand-800 text-brand-100 h-full flex flex-col border-r border-brand-900">
-      <div className="h-16 flex items-center px-6 border-b border-brand-900 gap-2">
-        <div className="h-9 w-9 bg-brand-600 rounded-md flex items-center justify-center text-white font-bold">
-          GS
-        </div>
-        <div>
-          <h1 className="font-bold text-white text-base tracking-tight leading-tight">GramSetu AI</h1>
-          <span className="text-xs text-brand-500 font-semibold tracking-wider uppercase flex items-center gap-0.5">
-            <Shield className="h-2.5 w-2.5" /> Audit Platform
-          </span>
-        </div>
+    <div className="hidden w-64 shrink-0 flex-col border-r border-brand-900 bg-brand-800 text-brand-100 md:flex">
+      {/* The name is already in the header above the content. This panel just
+          says which part of the service these links belong to. */}
+      <div className="border-b border-brand-900 px-6 py-4">
+        <p className="text-sm font-semibold text-white">
+          {isCitizen ? 'Your reports' : 'Official tools'}
+        </p>
       </div>
 
       <nav className="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
@@ -92,12 +58,12 @@ export const Sidebar = () => {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-semibold text-white truncate">{user.name}</p>
-                <p className="text-xs text-slate-400 capitalize">{user.role}</p>
+                <p className="text-xs text-slate-600 capitalize">{user.role}</p>
               </div>
             </div>
             <button
               onClick={handleLogout}
-              className="flex items-center justify-center gap-2 w-full px-3 py-2 bg-brand-900 hover:bg-red-950/40 hover:text-red-400 text-slate-400 text-xs font-medium rounded-md transition-colors"
+              className="flex items-center justify-center gap-2 w-full px-3 py-2 bg-brand-900 hover:bg-red-950/40 hover:text-red-400 text-slate-600 text-xs font-medium rounded-md transition-colors"
             >
               <LogOut className="h-3.5 w-3.5" />
               <span>Log Out</span>

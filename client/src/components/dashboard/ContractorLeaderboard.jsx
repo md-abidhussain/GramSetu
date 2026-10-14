@@ -37,42 +37,48 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
     <Card className="h-full">
       <CardHeader>
         <div>
-          <CardTitle className="text-base font-bold">
-            Contractor Intelligence Registry
-          </CardTitle>
-          <p className="text-xs text-slate-400 mt-0.5">National contractor performance & AI Trust standing directory</p>
+          <CardTitle className="text-base font-semibold">Contractors</CardTitle>
+          <p className="mt-1 text-sm text-slate-600">
+            Ranked by their record on completed work and public reports.
+          </p>
         </div>
       </CardHeader>
 
       <CardContent className="p-0 overflow-y-auto max-h-[380px]">
         <div className="divide-y divide-slate-100">
           {sortedContractors.length === 0 ? (
-            <p className="text-xs text-slate-400 text-center py-12">No contractors seeded in the registry.</p>
+            <p className="py-12 text-center text-sm text-slate-600">No contractors on record yet.</p>
           ) : (
             sortedContractors.map((item, idx) => (
-              <div 
-                key={item._id} 
+              <button
+                key={item._id}
+                type="button"
                 onClick={() => setSelectedContractor(item)}
-                className="p-4 flex items-center gap-3.5 hover:bg-slate-50/50 transition-colors cursor-pointer"
+                className="flex w-full items-start gap-3 p-4 text-left transition-colors hover:bg-slate-50"
               >
                 {getRankBadge(idx)}
 
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-xs text-dark-800 truncate">{item.name}</h4>
-                  <div className="flex items-center gap-3 mt-1 text-xs text-slate-400">
-                    <span>Reg: {item.registrationId}</span>
-                    <span>Completed: {item.completedCount}</span>
-                    <span className="text-rose-600">Complaints: {item.citizenComplaintsCount || 0}</span>
-                  </div>
-                </div>
+                {/* The score sits on its own line below the name rather than
+                    beside it. Squeezed into the same row it collided with the
+                    name on a narrow panel and the labels were clipped. */}
+                <div className="min-w-0 flex-1">
+                  <h4 className="truncate text-sm font-semibold text-slate-900">{item.name}</h4>
 
-                <div className="text-right">
-                  <div className={`px-2 py-0.5 rounded text-xs font-semibold inline-block ${getScoreColor(item.trustScore)}`}>
-                    {item.trustScore}% Trust
+                  <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-600">
+                    <span>{item.completedCount ?? 0} completed</span>
+                    <span>
+                      {item.citizenComplaintsCount || 0} public{' '}
+                      {(item.citizenComplaintsCount || 0) === 1 ? 'report' : 'reports'}
+                    </span>
                   </div>
-                  <span className="block text-[8px] text-slate-400 mt-0.5">Performance: {item.performanceScore}</span>
+
+                  <div className="mt-2">
+                    <span className={`inline-block rounded px-2 py-0.5 text-sm font-medium ${getScoreColor(item.trustScore)}`}>
+                      Trust score {item.trustScore}%
+                    </span>
+                  </div>
                 </div>
-              </div>
+              </button>
             ))
           )}
         </div>
@@ -86,14 +92,14 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
             {/* Modal Header */}
             <div className="bg-slate-800 text-white p-5 flex items-center justify-between">
               <div>
-                <span className="text-[9px] text-slate-400 font-bold">Contractor Profile & Auditing metrics</span>
+                <span className="text-sm text-slate-300">Contractor record</span>
                 <h3 className="text-base font-bold flex items-center gap-2 mt-0.5">
                   <Award className="h-5 w-5 text-brand-500" /> {selectedContractor.name}
                 </h3>
               </div>
               <button 
                 onClick={() => setSelectedContractor(null)}
-                className="text-slate-400 hover:text-white transition-colors"
+                className="text-slate-600 hover:text-white transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -104,47 +110,47 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
               
               {/* Profile details */}
               <div className="bg-slate-50 border border-slate-200 rounded p-4">
-                <span className="text-xs text-slate-500 font-bold">AI Executive Summary</span>
+                <span className="text-sm font-medium text-slate-700">Summary</span>
                 <p className="text-slate-700 mt-1 leading-relaxed italic">{selectedContractor.aiSummary}</p>
                 <div className="grid grid-cols-2 gap-4 mt-3 pt-3 border-t border-slate-200 text-slate-500">
-                  <p><span className="font-semibold text-slate-400">Registration ID:</span> {selectedContractor.registrationId}</p>
-                  <p><span className="font-semibold text-slate-400">Registered Since:</span> {new Date(selectedContractor.createdAt).toLocaleDateString()}</p>
+                  <p><span className="font-semibold text-slate-600">Registration ID:</span> {selectedContractor.registrationId}</p>
+                  <p><span className="font-semibold text-slate-600">Registered Since:</span> {new Date(selectedContractor.createdAt).toLocaleDateString()}</p>
                 </div>
               </div>
 
               {/* Metrics Grid */}
               <div>
-                <h4 className="text-xs text-slate-500 font-bold mb-2.5">Key Performance Indicators</h4>
+                <h4 className="mb-3 text-sm font-medium text-slate-700">Their record</h4>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3.5">
                   
                   <div className="bg-emerald-50/20 border border-emerald-100 rounded p-3 text-center">
-                    <span className="block text-[9px] font-semibold text-slate-500 uppercase">AI Trust Score</span>
-                    <span className="text-lg font-black text-emerald-600 block mt-1">{selectedContractor.trustScore}%</span>
+                    <span className="block text-sm font-medium text-slate-600">Trust score</span>
+                    <span className="text-2xl font-semibold text-emerald-600 block mt-1">{selectedContractor.trustScore}%</span>
                   </div>
 
                   <div className="bg-slate-50 border border-slate-100 rounded p-3 text-center">
-                    <span className="block text-[9px] font-semibold text-slate-500 uppercase">Completed Works</span>
-                    <span className="text-lg font-black text-slate-800 block mt-1">{selectedContractor.completedCount}</span>
+                    <span className="block text-sm font-medium text-slate-600">Completed Works</span>
+                    <span className="text-2xl font-semibold text-slate-800 block mt-1">{selectedContractor.completedCount}</span>
                   </div>
 
                   <div className="bg-amber-50/20 border border-amber-100 rounded p-3 text-center">
-                    <span className="block text-[9px] font-semibold text-slate-500 uppercase">Delayed Projects</span>
-                    <span className="text-lg font-black text-amber-600 block mt-1">{selectedContractor.delayedCount}</span>
+                    <span className="block text-sm font-medium text-slate-600">Delayed Projects</span>
+                    <span className="text-2xl font-semibold text-amber-600 block mt-1">{selectedContractor.delayedCount}</span>
                   </div>
 
                   <div className="bg-rose-50/20 border border-rose-100 rounded p-3 text-center">
-                    <span className="block text-[9px] font-semibold text-slate-500 uppercase">Budget Overruns</span>
-                    <span className="text-lg font-black text-rose-600 block mt-1">{selectedContractor.budgetOverrunsCount}</span>
+                    <span className="block text-sm font-medium text-slate-600">Budget Overruns</span>
+                    <span className="text-2xl font-semibold text-rose-600 block mt-1">{selectedContractor.budgetOverrunsCount}</span>
                   </div>
 
                   <div className="bg-rose-50/10 border border-rose-100/50 rounded p-3 text-center">
-                    <span className="block text-[9px] font-semibold text-slate-500 uppercase">Citizen Complaints</span>
-                    <span className="text-lg font-black text-rose-700 block mt-1">{selectedContractor.citizenComplaintsCount || 0}</span>
+                    <span className="block text-sm font-medium text-slate-600">Citizen Complaints</span>
+                    <span className="text-2xl font-semibold text-rose-700 block mt-1">{selectedContractor.citizenComplaintsCount || 0}</span>
                   </div>
 
                   <div className="bg-amber-50/10 border border-amber-100/50 rounded p-3 text-center">
-                    <span className="block text-[9px] font-semibold text-slate-500 uppercase">Quality Issues Flagged</span>
-                    <span className="text-lg font-black text-amber-700 block mt-1">{selectedContractor.qualityIssuesCount || 0}</span>
+                    <span className="block text-sm font-medium text-slate-600">Quality Issues Flagged</span>
+                    <span className="text-2xl font-semibold text-amber-700 block mt-1">{selectedContractor.qualityIssuesCount || 0}</span>
                   </div>
 
                 </div>
@@ -154,13 +160,13 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="border border-slate-200 rounded p-4 bg-white shadow-sm">
                   <h4 className="text-xs font-semibold text-slate-500 mb-3 flex items-center gap-1">
-                    <TrendingUp className="h-3.5 w-3.5 text-brand-600" /> Performance Trend History
+                    <TrendingUp className="h-4 w-4 text-brand-600" aria-hidden="true" /> Performance over time
                   </h4>
                   <div className="flex items-end gap-2.5 h-16 pt-3 px-2">
                     {(selectedContractor.performanceTrend || [80, 82, 85, 94]).map((val, idx) => (
                       <div key={idx} className="flex-1 flex flex-col items-center">
                         <div className="w-full bg-brand-500 rounded-t" style={{ height: `${val / 1.5}px` }} />
-                        <span className="text-[8px] text-slate-400 mt-1">{val}</span>
+                        <span className="text-xs text-slate-600 mt-1">{val}</span>
                       </div>
                     ))}
                   </div>
@@ -168,13 +174,13 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
 
                 <div className="border border-slate-200 rounded p-4 bg-white shadow-sm">
                   <h4 className="text-xs font-semibold text-slate-500 mb-3 flex items-center gap-1">
-                    <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" /> Risk Trend Index
+                    <ShieldCheck className="h-4 w-4 text-emerald-600" aria-hidden="true" /> Risk over time
                   </h4>
                   <div className="flex items-end gap-2.5 h-16 pt-3 px-2">
                     {(selectedContractor.riskTrend || [20, 18, 15, 8]).map((val, idx) => (
                       <div key={idx} className="flex-1 flex flex-col items-center">
                         <div className="w-full bg-emerald-500 rounded-t" style={{ height: `${val * 1.5}px` }} />
-                        <span className="text-[8px] text-slate-400 mt-1">{val}%</span>
+                        <span className="text-xs text-slate-600 mt-1">{val}%</span>
                       </div>
                     ))}
                   </div>
@@ -185,7 +191,7 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
               <div className="border border-slate-200 rounded-lg overflow-hidden">
                 <div className="bg-slate-50 border-b border-slate-200 px-4 py-2.5 flex items-center justify-between">
                   <h4 className="text-xs font-semibold text-slate-500 flex items-center gap-1.5">
-                    <FileSpreadsheet className="h-4 w-4" /> Recent Audit & Inspection Reports
+                    <FileSpreadsheet className="h-4 w-4" aria-hidden="true" /> Recent inspections
                   </h4>
                 </div>
                 <div className="divide-y divide-slate-100 bg-white">
@@ -194,18 +200,18 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
                       <div key={index} className="p-3 flex items-start justify-between gap-4">
                         <div>
                           <p className="font-semibold text-dark-800 text-xs">{ins.projectTitle}</p>
-                          <span className="text-[9px] text-slate-400 flex items-center gap-1 mt-0.5">
+                          <span className="text-xs text-slate-600 flex items-center gap-1 mt-0.5">
                             <Calendar className="h-3 w-3" /> {new Date().toLocaleDateString()}
                           </span>
                         </div>
-                        <span className="text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100 rounded px-2 py-0.5">
+                        <span className="text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-100 rounded px-2 py-0.5">
                           {ins.result}
                         </span>
                       </div>
                     ))
                   ) : (
-                    <div className="p-4 text-center text-slate-400 italic text-xs">
-                      No inspections recorded recently.
+                    <div className="p-4 text-center text-slate-600 italic text-xs">
+                      No inspections recorded yet.
                     </div>
                   )}
                 </div>
@@ -219,7 +225,7 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
                 onClick={() => setSelectedContractor(null)}
                 className="px-4 py-1.5 bg-slate-800 text-white rounded text-xs font-semibold shadow hover:bg-slate-900 transition-colors"
               >
-                Close Profile
+                Close
               </button>
             </div>
 

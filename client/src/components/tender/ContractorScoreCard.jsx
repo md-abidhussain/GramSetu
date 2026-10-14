@@ -31,9 +31,9 @@ export const ContractorScoreCard = ({ contractor }) => {
     <Card className="h-full">
       <CardHeader>
         <div>
-          <span className="text-xs text-slate-400 font-bold">Contractor Performance Ledger</span>
+          <span className="text-xs text-slate-600 font-bold">Contractor Performance Ledger</span>
           <CardTitle className="text-lg mt-0.5">{name}</CardTitle>
-          <span className="text-xs text-slate-400">ID: {registrationId}</span>
+          <span className="text-xs text-slate-600">ID: {registrationId}</span>
         </div>
       </CardHeader>
       
@@ -42,7 +42,7 @@ export const ContractorScoreCard = ({ contractor }) => {
         <div className="flex items-center gap-5 bg-slate-50/50 p-4.5 rounded-2xl border border-slate-100/80">
           <div className={`h-16 w-16 rounded-2xl flex flex-col items-center justify-center border font-bold ${getScoreColor(performanceScore)}`}>
             <span className="text-2xl tracking-tighter leading-none">{performanceScore}</span>
-            <span className="text-[9px] font-semibold opacity-85">Pts</span>
+            <span className="text-xs font-semibold opacity-85">Pts</span>
           </div>
           <div className="flex-1">
             <div className="flex justify-between items-center text-xs font-semibold text-dark-800 mb-1.5">
@@ -64,13 +64,13 @@ export const ContractorScoreCard = ({ contractor }) => {
           <div className="p-3 bg-slate-50 rounded-xl text-center border border-slate-100">
             <CalendarCheck className="h-4.5 w-4.5 text-emerald-500 mx-auto mb-1.5" />
             <p className="text-base font-bold text-dark-800 leading-none">{completedOnTime}</p>
-            <p className="text-[9px] text-slate-400 uppercase font-semibold mt-1">On Time</p>
+            <p className="text-xs text-slate-600 uppercase font-semibold mt-1">On Time</p>
           </div>
 
           <div className="p-3 bg-slate-50 rounded-xl text-center border border-slate-100">
             <Clock className="h-4.5 w-4.5 text-amber-500 mx-auto mb-1.5" />
             <p className="text-base font-bold text-dark-800 leading-none">{delayedCount}</p>
-            <p className="text-[9px] text-slate-400 uppercase font-semibold mt-1">Delayed</p>
+            <p className="text-xs text-slate-600 uppercase font-semibold mt-1">Delayed</p>
           </div>
 
           <div className="p-3 bg-slate-50 rounded-xl text-center border border-slate-100">
@@ -78,7 +78,7 @@ export const ContractorScoreCard = ({ contractor }) => {
             <p className="text-base font-bold text-dark-800 leading-none">
               {averageBudgetVariance > 0 ? `+${averageBudgetVariance}%` : `${averageBudgetVariance}%`}
             </p>
-            <p className="text-[9px] text-slate-400 uppercase font-semibold mt-1">Budget Var.</p>
+            <p className="text-xs text-slate-600 uppercase font-semibold mt-1">Budget Var.</p>
           </div>
         </div>
       </CardContent>

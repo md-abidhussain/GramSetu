@@ -48,7 +48,7 @@ export const RiskChart = ({ analytics }) => {
       <CardHeader>
         <div>
           <CardTitle>Risk Assessments</CardTitle>
-          <p className="text-xs text-slate-400 mt-0.5">Distribution of calculated risks between tenders and projects</p>
+          <p className="text-xs text-slate-600 mt-0.5">Distribution of calculated risks between tenders and projects</p>
         </div>
       </CardHeader>
 

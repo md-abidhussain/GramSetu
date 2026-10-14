@@ -63,7 +63,7 @@ export const ContractorAnalysisPage = () => {
                 <CardTitle className="flex items-center gap-2">
                   <BarChart3 className="h-4.5 w-4.5 text-brand-600" /> Contractor Performance & Trust Review
                 </CardTitle>
-                <p className="text-xs text-slate-400 mt-1">Historical project performance, feedback themes, and trust indicators</p>
+                <p className="text-xs text-slate-600 mt-1">Historical project performance, feedback themes, and trust indicators</p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
                 <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600">
@@ -103,19 +103,19 @@ export const ContractorAnalysisPage = () => {
                 <div className="space-y-4">
                   <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                     <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                      <p className="text-xs text-slate-400">Total Projects</p>
+                      <p className="text-xs text-slate-600">Total Projects</p>
                       <p className="mt-2 text-2xl font-semibold text-dark-800">{analysis.metrics.totalProjects}</p>
                     </div>
                     <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                      <p className="text-xs text-slate-400">Completion Score</p>
+                      <p className="text-xs text-slate-600">Completion Score</p>
                       <p className="mt-2 text-2xl font-semibold text-dark-800">{analysis.metrics.averageCompletionScore}%</p>
                     </div>
                     <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                      <p className="text-xs text-slate-400">On-Time Rate</p>
+                      <p className="text-xs text-slate-600">On-Time Rate</p>
                       <p className="mt-2 text-2xl font-semibold text-dark-800">{analysis.metrics.onTimeRate}%</p>
                     </div>
                     <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                      <p className="text-xs text-slate-400">Trust Score</p>
+                      <p className="text-xs text-slate-600">Trust Score</p>
                       <p className="mt-2 text-2xl font-semibold text-dark-800">{analysis.metrics.trustScore}/100</p>
                     </div>
                   </div>

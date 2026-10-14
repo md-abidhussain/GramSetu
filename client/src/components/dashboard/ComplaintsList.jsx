@@ -185,9 +185,9 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
       <CardHeader>
         <div>
           <CardTitle className="flex items-center gap-1.5 text-base">
-            <MessageSquare className="h-5 w-5 text-brand-600" /> Government Complaints Review Feed
+            <MessageSquare className="h-5 w-5 text-brand-600" aria-hidden="true" /> Reports from the public
           </CardTitle>
-          <p className="text-xs text-slate-400 mt-0.5">Audit municipal defect notifications and direct local inspection tasks</p>
+          <p className="mt-1 text-sm text-slate-600">Open a report to see who filed it, what they sent, and to assign an inspector.</p>
         </div>
       </CardHeader>
 
@@ -197,7 +197,7 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
           {/* Complaints Feed List */}
           <div className="lg:col-span-1 space-y-3 max-h-[520px] overflow-y-auto pr-2">
             {complaints.length === 0 ? (
-              <p className="text-xs text-slate-400 text-center py-12 bg-slate-50/50 rounded-md">No citizen complaints registered</p>
+              <p className="text-xs text-slate-600 text-center py-12 bg-slate-50/50 rounded-md">No citizen complaints registered</p>
             ) : (
               complaints.map((item) => (
                 <div
@@ -222,13 +222,18 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className="font-bold text-rose-600">Match Index: {item.matchScore}%</span>
-                    <span className={`px-2 py-0.5 rounded text-[9px] font-bold border ${getStatusBadgeColor(item.status)}`}>
+                    {/* How closely the citizen's photo matches the project's own
+                        record. A low number means they differ, which is the
+                        interesting case, so it is not coloured as an alarm. */}
+                    <span className="text-sm font-medium text-slate-700">
+                      Photo match {item.matchScore}%
+                    </span>
+                    <span className={`rounded border px-2 py-0.5 text-xs font-medium ${getStatusBadgeColor(item.status)}`}>
                       {item.status}
                     </span>
                   </div>
                   <h4 className="font-bold text-dark-800 truncate mb-0.5">{item.project?.title || item.customProjectTitle || 'Custom Report'}</h4>
-                  <p className="text-slate-400 truncate flex items-center gap-1">
+                  <p className="text-slate-600 truncate flex items-center gap-1">
                     <MapPin className="h-3 w-3 shrink-0" /> {item.project?.location?.address || 'Custom Coordinates'}
                   </p>
                   <p className="text-slate-500 mt-2 line-clamp-2">{item.description}</p>
@@ -251,7 +256,7 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                     <h3 className="text-sm font-bold text-dark-800">
                       {selectedReport.project?.title || selectedReport.customProjectTitle || 'Custom Project Site'}
                     </h3>
-                    <p className="text-slate-400 text-xs mt-0.5">
+                    <p className="text-slate-600 text-xs mt-0.5">
                       Reporter: {selectedReport.citizen?.name || 'Anonymous Citizen'} • Severity: <span className="font-semibold text-rose-600">{selectedReport.severity}</span>
                     </p>
                   </div>
@@ -270,8 +275,8 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                 {/* Evidence Photo Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <span className="block text-xs text-slate-400 font-bold mb-1.5 flex items-center gap-1">
-                      <ImageIcon className="h-3.5 w-3.5 text-slate-400" /> Citizen Evidence
+                    <span className="block text-xs text-slate-600 font-bold mb-1.5 flex items-center gap-1">
+                      <ImageIcon className="h-3.5 w-3.5 text-slate-600" /> Citizen Evidence
                     </span>
                     <a href={selectedReport.citizenImageUrl} target="_blank" rel="noreferrer" className="block relative h-32 rounded border border-slate-200 overflow-hidden bg-white hover:opacity-90 transition-opacity">
                       <img src={selectedReport.citizenImageUrl} alt="Citizen Upload" className="w-full h-full object-cover" />
@@ -279,15 +284,15 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                   </div>
 
                   <div>
-                    <span className="block text-xs text-slate-400 font-bold mb-1.5 flex items-center gap-1">
-                      <ImageIcon className="h-3.5 w-3.5 text-slate-400" /> Official Site Verification
+                    <span className="block text-xs text-slate-600 font-bold mb-1.5 flex items-center gap-1">
+                      <ImageIcon className="h-3.5 w-3.5 text-slate-600" /> Official Site Verification
                     </span>
                     {selectedReport.inspectorAfterImageUrl ? (
                       <a href={selectedReport.inspectorAfterImageUrl} target="_blank" rel="noreferrer" className="block relative h-32 rounded border border-slate-200 overflow-hidden bg-white hover:opacity-90 transition-opacity">
                         <img src={selectedReport.inspectorAfterImageUrl} alt="Inspector Upload" className="w-full h-full object-cover" />
                       </a>
                     ) : (
-                      <div className="h-32 rounded border border-dashed border-slate-200 flex items-center justify-center text-slate-400 italic">
+                      <div className="h-32 rounded border border-dashed border-slate-200 flex items-center justify-center text-slate-600 italic">
                         Inspection evidence not uploaded yet
                       </div>
                     )}
@@ -297,13 +302,13 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                 {/* Info summary */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-3.5 rounded border border-slate-200">
                   <div className="space-y-1">
-                    <p><span className="text-slate-400 font-medium">Assigned Officer:</span> <span className="font-semibold">{selectedReport.assignedOfficer?.name || 'Not Assigned'}</span></p>
-                    <p><span className="text-slate-400 font-medium">Inspection Date:</span> <span className="font-semibold">{formatDate(selectedReport.inspectionDate) || 'Not Scheduled'}</span></p>
-                    <p><span className="text-slate-400 font-medium">Resolution ETA:</span> <span className="font-semibold">{formatDate(selectedReport.resolutionEta) || 'TBD'}</span></p>
+                    <p><span className="text-slate-600 font-medium">Assigned Officer:</span> <span className="font-semibold">{selectedReport.assignedOfficer?.name || 'Not Assigned'}</span></p>
+                    <p><span className="text-slate-600 font-medium">Inspection Date:</span> <span className="font-semibold">{formatDate(selectedReport.inspectionDate) || 'Not Scheduled'}</span></p>
+                    <p><span className="text-slate-600 font-medium">Resolution ETA:</span> <span className="font-semibold">{formatDate(selectedReport.resolutionEta) || 'TBD'}</span></p>
                   </div>
                   <div className="space-y-1">
-                    <p><span className="text-slate-400 font-medium">Duplicate Check:</span> <span className="font-semibold text-amber-600">{selectedReport.duplicateFound ? 'Duplicate Found' : 'Clean'}</span></p>
-                    <p><span className="text-slate-400 font-medium">Detected Anomalies:</span> <span className="font-semibold text-rose-600 capitalize">{selectedReport.detectedIssues?.join(', ') || 'None'}</span></p>
+                    <p><span className="text-slate-600 font-medium">Duplicate Check:</span> <span className="font-semibold text-amber-600">{selectedReport.duplicateFound ? 'Duplicate Found' : 'Clean'}</span></p>
+                    <p><span className="text-slate-600 font-medium">Detected Anomalies:</span> <span className="font-semibold text-rose-600 capitalize">{selectedReport.detectedIssues?.join(', ') || 'None'}</span></p>
                   </div>
                 </div>
 
@@ -495,7 +500,7 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                 </div>
               </div>
             ) : (
-              <div className="flex-1 flex flex-col items-center justify-center text-slate-400 p-12 text-center">
+              <div className="flex-1 flex flex-col items-center justify-center text-slate-600 p-12 text-center">
                 <MessageSquare className="h-10 w-10 text-slate-300 mb-2" />
                 <p className="text-sm font-semibold text-slate-700">Choose a complaint to review</p>
                 <p className="text-sm mt-1 max-w-xs">Pick one from the list to see who reported it, what they reported, and to assign an inspector.</p>

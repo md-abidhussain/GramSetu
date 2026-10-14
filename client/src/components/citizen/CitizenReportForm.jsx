@@ -189,9 +189,9 @@ export const CitizenReportForm = ({ onSubmitSuccess }) => {
                   className="absolute inset-0 opacity-0 cursor-pointer"
                   disabled={loading}
                 />
-                <Camera className="h-6 w-6 text-slate-400 mb-1" />
+                <Camera className="h-6 w-6 text-slate-600 mb-1" />
                 <span className="text-xs font-medium text-dark-800">Snap or Upload photo</span>
-                <span className="text-xs text-slate-400">PNG, JPG up to 5MB</span>
+                <span className="text-xs text-slate-600">PNG, JPG up to 5MB</span>
               </div>
 
               {preview ? (
@@ -199,7 +199,7 @@ export const CitizenReportForm = ({ onSubmitSuccess }) => {
                   <img src={preview} alt="Citizen report preview" className="w-full h-full object-cover" />
                 </div>
               ) : (
-                <div className="h-32 rounded-xl bg-slate-100 flex items-center justify-center border border-slate-200 text-slate-400 text-xs">
+                <div className="h-32 rounded-xl bg-slate-100 flex items-center justify-center border border-slate-200 text-slate-600 text-xs">
                   No image selected
                 </div>
               )}
