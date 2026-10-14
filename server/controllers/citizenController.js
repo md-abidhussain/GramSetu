@@ -36,8 +36,11 @@ export const createCitizenReport = async (req, res, next) => {
     const { projectId, lat, lng, description, referenceScaleCmPerPixel, customProjectTitle } = req.body;
     const citizenId = req.user?._id; // Loaded via protectCitizen middleware
 
-    if (!projectId || !lat || !lng || !description) {
-      return res.status(400).json({ message: 'projectId, lat, lng, and description are required' });
+    // lat and lng are not tested for truthiness here: 0 is a real coordinate on
+    // both axes, so a complaint on the equator would have been refused.
+    // toLatitude and toLongitude below decide what counts as valid.
+    if (!projectId || !description) {
+      return res.status(400).json({ message: 'A project and a description are required' });
     }
 
     const latitude = toLatitude(lat);
