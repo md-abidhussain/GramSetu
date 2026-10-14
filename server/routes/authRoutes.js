@@ -8,7 +8,7 @@ import {
   logout,
   getInspectors
 } from '../controllers/authController.js';
-import { protectAny, protectAuthority } from '../middleware/authMiddleware.js';
+import { protectAny, protectAuthority, restrictTo } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
