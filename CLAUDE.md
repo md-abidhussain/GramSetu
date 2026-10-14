@@ -79,6 +79,26 @@ listing projects is public and cheap.
 - No React error boundary, so one component throwing blanks the page.
 - `server.js` is 513 lines, most of it inline seed data.
 
+## Dependency advisories
+
+`npm audit` in `client/` reports 15 advisories. All 15 are in build tooling —
+Vite, Vitest, Tailwind and the packages underneath them. Those run on a developer
+machine and in CI; none of their code is in the bundle a browser downloads. The
+check that matters is `npm audit --omit=dev`, which is what actually ships:
+
+    cd client && npm audit --omit=dev    # expect: found 0 vulnerabilities
+
+Two advisories did affect shipped code. React Router 6 had an open redirect in
+`<Link>` and `useNavigate`, and a constructor-injection flaw in SSR hydration.
+Neither was reachable here — every route target in this app is a hardcoded string
+and there is no server-side rendering — but the fix was a clean version bump, so
+`react-router-dom` is on 7.x. No router API in use changed between 6 and 7.
+
+Tailwind and Vite were deliberately left where they are. Clearing their advisories
+means Tailwind 4, which replaces the config format the whole palette is written in,
+for a vulnerability that cannot reach a user. That trade is not worth it. Revisit
+when there is a reason to upgrade other than the audit number.
+
 ## Conventions
 
 Plain language in the interface — "New complaint", not "Submit Damage Evidence".
