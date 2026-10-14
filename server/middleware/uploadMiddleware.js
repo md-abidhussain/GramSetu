@@ -30,13 +30,8 @@ export const uploadImage = multer({
   fileFilter: claimedTypeFilter(IMAGE_TYPES, 'Only images are allowed (JPG, PNG, WEBP, GIF).')
 }).single('image');
 
-/**
- * Runs after multer and checks what the file really is.
- *
- * A .exe renamed and sent as image/png passes the filter above, because the
- * filter can only read the claim. By this point the bytes are in memory, so the
- * file's own signature can be read instead of trusted.
- */
+// A program renamed and sent as image/png passes the filter above, which can
+// only read the claim. The bytes are in memory by now, so read the signature.
 export const verifyFileContents = (allowed, label) => (req, res, next) => {
   if (!req.file) {
     return next();

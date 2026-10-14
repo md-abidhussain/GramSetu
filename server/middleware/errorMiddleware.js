@@ -1,14 +1,8 @@
 import multer from 'multer';
 
-/**
- * Last stop for anything a route did not handle.
- *
- * The cases below are failures the caller caused and can fix, so they are
- * explained. Anything else is a bug or an outage on our side: it is logged in
- * full and answered with one sentence, because the message on an unexpected
- * error tends to name a database, a file path or a query, and none of that is
- * the caller's business.
- */
+// Failures the caller caused are explained. Anything else is logged in full and
+// answered with one sentence, because an unexpected error's message tends to
+// name a database, a path or a query.
 export const errorHandler = (err, req, res, next) => {
   console.error(`Unhandled error on ${req.method} ${req.originalUrl}:`, err);
 

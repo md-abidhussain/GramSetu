@@ -1,11 +1,8 @@
 // Rules about what may be used as a login or a password. They are here, rather
 // than spread through the auth controller, so each one can be tested on its own.
 
-/**
- * Values arriving in a JSON body can be objects, and a Mongo query treats
- * `{ "$ne": null }` as an operator rather than a value. Forcing a string first
- * means a crafted body can only ever be searched for as text.
- */
+// A JSON body can carry an object, and Mongo reads { "$ne": null } as an
+// operator rather than a value. Forcing a string means it can only be text.
 export const toIdentifier = (value) => {
   if (typeof value === 'string') {
     return value.trim();
@@ -29,11 +26,8 @@ export const isValidPhone = (value) => PHONE_SHAPE.test(toIdentifier(value).repl
 
 export const MINIMUM_PASSWORD_LENGTH = 8;
 
-/**
- * Returns null when the password is acceptable, or a sentence explaining what
- * is wrong. Length is what actually protects an account, so that is the rule;
- * forced symbols push people towards "Password1!" and a sticky note.
- */
+// Null when acceptable, otherwise a sentence saying what is wrong. Length is
+// what protects an account; forced symbols just produce "Password1!".
 export const describePasswordProblem = (password) => {
   if (typeof password !== 'string' || password.length === 0) {
     return 'A password is required.';

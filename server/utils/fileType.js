@@ -1,9 +1,5 @@
-// What a file actually is, read from its first bytes.
-//
-// multer only sees the content type the browser claims, and a caller writing
-// their own request can claim anything. These signatures are the formats the
-// app sends on to Cloudinary and the PDF parser, so they are the formats worth
-// accepting.
+// What a file actually is, read from its first bytes, because multer only sees
+// the content type the caller claims.
 
 const startsWith = (buffer, bytes) =>
   buffer.length >= bytes.length && bytes.every((byte, index) => buffer[index] === byte);

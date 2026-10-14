@@ -1,14 +1,9 @@
 const serviceUrl = () => process.env.SEGMENTATION_SERVICE_URL?.replace(/\/$/, '');
 
-/**
- * Measures road defects by sending the photo to the YOLOv8 segmentation
- * service, which returns an area and size per defect.
- *
- * That service runs separately and is not deployed alongside the rest of the
- * app, so this returns what happened instead of throwing. A complaint is still
- * worth filing without measurements, and the report says they are missing
- * rather than inventing numbers.
- */
+// Measures defects by sending the photo to the YOLOv8 service, which is not
+// deployed alongside the app. It returns what happened rather than throwing: a
+// report is still worth filing without measurements, and saying they are
+// missing beats inventing numbers.
 export const quantifyDefects = async (file, scaleCmPerPixel) => {
   const baseUrl = serviceUrl();
   const scale = Number(scaleCmPerPixel);
