@@ -12,8 +12,8 @@ commits stay in the history. Say so plainly if asked who built it.
 ```
 npm run install:all     # root, installs server and client
 npm run dev             # both together
-cd server && npm test   # 40 tests, Node's built-in runner
-cd client && npm test   # 6 tests, vitest with jsdom
+cd server && npm test   # 76 tests, Node's built-in runner
+cd client && npm test   # 15 tests, vitest with jsdom
 ```
 
 Server needs `server/.env`; copy `.env.example` and fill it in. The server exits
@@ -83,6 +83,31 @@ missing. Never fill this in with placeholder numbers.
 tested without a database. They are the two checks in this app that are expensive
 to get wrong, so they are plain functions with tests.
 
+**Official accounts are issued, not self-served.** `POST /auth/authority/register`
+is behind `protectAuthority` and `restrictTo('Admin')`. It used to be open and
+took `role` from the body, Admin included, so anyone could make themselves an
+administrator. The public login page has no official sign-up because of this.
+
+**An upload is what its bytes say it is.** multer can only read the content type
+the caller claims. `verifyImageContents` and `verifyPdfContents` run after it and
+read the file's own signature, then correct `req.file.mimetype` to match. Do not
+add an upload route without one of them.
+
+**An unexpected error tells the caller nothing.** `errorMiddleware` explains the
+failures a caller caused and answers everything else with one sentence, because
+the message on an unexpected error names connection strings and queries. Give an
+error a `status` below 500 to have its message shown.
+
+**Plain language is a rule, not a preference.** The interface said "Flagged
+Anomalies" and "Sync Ledger" while this file said to write plainly. If a label
+would not be said out loud by a district officer or a member of the public, it is
+wrong. The same goes for type: nothing below 12px, and no `slate-400` on white,
+which fails contrast at any size.
+
+**The banner says this is not a government service.** Every page carries it, top
+and bottom. The design borrows the conventions of a public service portal, which
+is exactly why it has to be unmistakable that it is not one.
+
 **Rate limits protect money.** Submitting a complaint or tender stores a file and
 calls Gemini. Writes to those routes allow 30 per hour; reads are skipped because
 listing projects is public and cheap.
@@ -98,6 +123,10 @@ listing projects is public and cheap.
   is most of the risk, but a broken route wiring would not be caught.
 - The error boundary is a single one at the top of the tree, so a crash replaces
   the whole screen rather than just the panel that failed.
+- The session token is returned in the response body as well as in an HttpOnly
+  cookie. See docs/SECURITY.md; the cookie is the right mechanism and the body is
+  left over from the earlier client.
+- No account lockout and no second factor. Login is rate limited only.
 - Seed project photos point at Unsplash, which deletes images over time. A missing
   photo degrades gracefully, but the fix is to upload them to the project's own
   Cloudinary account and replace the URLs in `server/data/seedDatabase.js`.
@@ -121,6 +150,11 @@ Tailwind and Vite were deliberately left where they are. Clearing their advisori
 means Tailwind 4, which replaces the config format the whole palette is written in,
 for a vulnerability that cannot reach a user. That trade is not worth it. Revisit
 when there is a reason to upgrade other than the audit number.
+
+## Security
+
+docs/SECURITY.md lists what is protected, what enforces it, and the decisions
+taken knowingly. Keep it true when you change an auth path.
 
 ## Conventions
 

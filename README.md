@@ -37,6 +37,12 @@ GramSetu AI addresses these issues by introducing an automated, decentralized in
 
 ---
 
+### Security
+
+What is protected and what enforces it is written up in
+[docs/SECURITY.md](./docs/SECURITY.md), including the decisions taken knowingly
+and the gaps that remain.
+
 ## 📐 Architecture & System Design
 
 ### Clean Architecture Principles
