@@ -31,7 +31,7 @@ const SiteFooter = () => (
         </dl>
       </div>
 
-      <p className="mt-5 border-t border-slate-100 pt-4 text-xs text-slate-500">
+      <p className="mt-5 border-t border-slate-100 pt-4 text-sm text-slate-600">
         This site is not operated by any government department. Do not submit
         real personal information.
       </p>

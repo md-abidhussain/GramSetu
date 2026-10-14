@@ -163,9 +163,9 @@ export const ProjectLifecycleSection = ({ projectId, project }) => {
 
         {user?.role !== 'citizen' && (
           <form onSubmit={handleSubmit} className="rounded-2xl border border-slate-100 bg-slate-50/70 p-4 space-y-3">
-            {message && <p className="text-xs text-slate-500">{message}</p>}
+            {message && <p className="text-sm text-slate-600">{message}</p>}
             {nextStatuses.length === 0 ? (
-              <p className="text-xs text-slate-500">This project has reached the end of the lifecycle workflow.</p>
+              <p className="text-sm text-slate-600">This project has reached the end of the lifecycle workflow.</p>
             ) : (
               <>
                 <select
@@ -202,7 +202,7 @@ export const ProjectLifecycleSection = ({ projectId, project }) => {
                   <span className="text-sm font-semibold text-dark-800">{entry.status}</span>
                   <span className="text-xs text-slate-600">{entry.updatedBy}</span>
                 </div>
-                <p className="mt-1 text-xs text-slate-500">{entry.remarks || 'No remarks provided.'}</p>
+                <p className="mt-1 text-sm text-slate-600">{entry.remarks || 'No remarks provided.'}</p>
                 <p className="mt-1 text-xs text-slate-600">{new Date(entry.timestamp).toLocaleString()}</p>
               </div>
             ))}

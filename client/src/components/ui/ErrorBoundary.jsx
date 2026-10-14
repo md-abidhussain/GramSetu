@@ -45,7 +45,7 @@ class ErrorBoundary extends React.Component {
         </div>
         {/* Only while developing. A citizen has no use for a stack trace. */}
         {import.meta.env.DEV && (
-          <p className="mt-8 max-w-lg font-mono text-xs text-slate-500">{this.state.message}</p>
+          <p className="mt-8 max-w-lg font-mono text-sm text-slate-600">{this.state.message}</p>
         )}
       </div>
     );

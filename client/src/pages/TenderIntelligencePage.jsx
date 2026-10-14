@@ -36,7 +36,7 @@ export const TenderIntelligencePage = () => {
   };
 
   return (
-    <PageLayout title="Tender Intelligence">
+    <PageLayout title="Tenders">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left Column: Upload Form & Past Audits */}
         <div className="lg:col-span-4 space-y-6">
@@ -45,13 +45,13 @@ export const TenderIntelligencePage = () => {
           {/* Past Audits List */}
           <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm">
             <h3 className="font-semibold text-xs text-slate-600 mb-3.5 flex items-center gap-1.5">
-              <FileSpreadsheet className="h-4.5 w-4.5 text-slate-600" /> Audit Ledger History
+              <FileSpreadsheet className="h-5 w-5 text-slate-600" aria-hidden="true" /> Checked recently
             </h3>
             
             {loading && tenders.length === 0 ? (
-              <p className="text-xs text-slate-500 italic py-4">Loading audit logs...</p>
+              <p className="text-sm text-slate-600 py-4">Loading…</p>
             ) : tenders.length === 0 ? (
-              <p className="text-xs text-slate-500 italic py-4">No audits conducted yet.</p>
+              <p className="text-sm text-slate-600 py-4">No tenders checked yet.</p>
             ) : (
               <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
                 {tenders.map((item) => (

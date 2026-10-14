@@ -22,7 +22,7 @@ export const ProjectMonitoringPage = () => {
   };
 
   return (
-    <PageLayout title="Government Project Monitoring">
+    <PageLayout title="Projects">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left Column: Form & History List */}
         <div className="lg:col-span-4 space-y-6">
@@ -39,9 +39,9 @@ export const ProjectMonitoringPage = () => {
             </h3>
             
             {loading && projects.length === 0 ? (
-              <p className="text-xs text-slate-500 italic py-4">Loading project ledger...</p>
+              <p className="text-sm text-slate-600 py-4">Loading projects…</p>
             ) : projects.length === 0 ? (
-              <p className="text-xs text-slate-500 italic py-4">No projects registered yet.</p>
+              <p className="text-sm text-slate-600 py-4">No projects yet.</p>
             ) : (
               <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
                 {projects.map((item) => (

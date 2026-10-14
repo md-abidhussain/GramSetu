@@ -25,7 +25,7 @@ export const TenderSummaryCard = ({ tender }) => {
       <CardHeader>
         <div className="flex flex-col gap-1 md:flex-row md:items-center justify-between w-full">
           <div>
-            <span className="text-xs text-brand-600 font-bold">Procurement Review</span>
+            <span className="text-sm font-medium text-brand-700">Tender</span>
             <CardTitle className="text-xl mt-0.5">{title}</CardTitle>
           </div>
           <div className="mt-2 md:mt-0 flex gap-2 shrink-0">
@@ -116,15 +116,16 @@ export const TenderSummaryCard = ({ tender }) => {
           </div>
         </div>
 
-        {/* Procurement Recommendations */}
-        <div className="border-t border-slate-200 pt-5">
-          <h4 className="text-xs font-semibold text-slate-500 mb-2 flex items-center gap-1.5">
-            <ListTodo className="h-4 w-4 text-slate-600" /> Recommendations
-          </h4>
-          <p className="text-sm text-dark-800 leading-relaxed bg-brand-50/10 p-4 rounded-md border border-brand-100/30">
-            {recommendation}
-          </p>
-        </div>
+        {recommendation && (
+          <div className="border-t border-slate-200 pt-5">
+            <h4 className="mb-2 flex items-center gap-1.5 text-sm font-medium text-slate-700">
+              <ListTodo className="h-4 w-4 text-slate-600" aria-hidden="true" /> What to do next
+            </h4>
+            <p className="rounded-md border border-brand-100/30 bg-brand-50/10 p-4 text-sm leading-relaxed text-slate-900">
+              {recommendation}
+            </p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

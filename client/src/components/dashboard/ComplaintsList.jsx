@@ -292,7 +292,7 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                         <img src={selectedReport.inspectorAfterImageUrl} alt="Inspector Upload" className="w-full h-full object-cover" />
                       </a>
                     ) : (
-                      <div className="h-32 rounded border border-dashed border-slate-200 flex items-center justify-center text-slate-600 italic">
+                      <div className="h-32 rounded border border-dashed border-slate-200 flex items-center justify-center text-slate-600">
                         Inspection evidence not uploaded yet
                       </div>
                     )}
@@ -313,14 +313,14 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                 </div>
 
                 <div className="border-t border-slate-100 pt-3">
-                  <span className="block text-xs text-slate-500 font-bold">Citizen Narrative</span>
+                  <span className="block text-sm text-slate-600 font-bold">Citizen Narrative</span>
                   <p className="text-slate-700 mt-1 leading-relaxed">{selectedReport.description}</p>
                 </div>
 
                 {/* Gemini comparative report analysis if discrepancies exist */}
                 {selectedReport.aiReport && (
                   <div className="border-t border-slate-100 pt-3">
-                    <span className="block text-xs text-slate-500 font-bold flex items-center gap-1">
+                    <span className="block text-sm text-slate-600 font-bold flex items-center gap-1">
                       <ShieldAlert className="h-3.5 w-3.5 text-brand-600" /> AI Discrepancy Assessment
                     </span>
                     <p className="text-slate-700 bg-brand-50/15 border border-brand-100 p-2.5 rounded mt-1.5 leading-relaxed">
@@ -332,8 +332,8 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                 {/* Inspector Site Notes */}
                 {selectedReport.inspectorNotes && (
                   <div className="border-t border-slate-100 pt-3">
-                    <span className="block text-xs text-slate-500 font-bold">Inspector Notes</span>
-                    <p className="text-slate-700 bg-slate-100/50 border border-slate-200 p-2.5 rounded mt-1.5 leading-relaxed italic">
+                    <span className="block text-sm text-slate-600 font-bold">Inspector Notes</span>
+                    <p className="text-slate-700 bg-slate-100/50 border border-slate-200 p-2.5 rounded mt-1.5 leading-relaxed">
                       {selectedReport.inspectorNotes}
                     </p>
                   </div>

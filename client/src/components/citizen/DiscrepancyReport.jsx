@@ -106,11 +106,11 @@ export const DiscrepancyReport = ({ result }) => {
                   <div key={`${defect.type}-${index}`} className="rounded-md border border-brand-100 bg-brand-50/10 p-3 text-xs text-dark-800">
                     <div className="flex justify-between font-bold capitalize"><span>{defect.type.replaceAll('_', ' ')}</span><span>{Math.round(defect.confidence * 100)}% confidence</span></div>
                     <p className="mt-1 text-slate-600">Area: {defect.areaCm2} cm² · Width: {defect.widthCm} cm · Height: {defect.heightCm} cm · Equivalent diameter: {defect.equivalentDiameterCm} cm</p>
-                    <p className="mt-1 text-xs text-slate-500">{defect.depthNote}</p>
+                    <p className="mt-1 text-sm text-slate-600">{defect.depthNote}</p>
                   </div>
                 ))}
               </div>
-            ) : <p className="rounded-md bg-slate-50 border border-slate-200 p-3 text-xs text-slate-500">No defects were segmented in this image.</p>}
+            ) : <p className="rounded-md bg-slate-50 border border-slate-200 p-3 text-sm text-slate-600">No defects were segmented in this image.</p>}
           </div>
         )}
 

@@ -17,9 +17,10 @@ export const ContractorAnalysisPage = () => {
     const loadContractors = async () => {
       try {
         const data = await getContractors();
-        setContractors(data);
-        if (data.length > 0) {
-          setSelectedContractor(data[0]._id);
+        const list = Array.isArray(data) ? data : [];
+        setContractors(list);
+        if (list.length > 0) {
+          setSelectedContractor(list[0]._id);
         }
       } catch (error) {
         console.error(error);
@@ -54,16 +55,16 @@ export const ContractorAnalysisPage = () => {
   }, [analysis, filter]);
 
   return (
-    <PageLayout title="Contractor Trust Analytics">
+    <PageLayout title="Contractor record">
       <div className="space-y-6">
         <Card>
           <CardHeader>
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
               <div>
                 <CardTitle className="flex items-center gap-2">
-                  <BarChart3 className="h-4.5 w-4.5 text-brand-600" /> Contractor Performance & Trust Review
+                  <BarChart3 className="h-4.5 w-4.5 text-brand-600" /> Contractor record
                 </CardTitle>
-                <p className="text-xs text-slate-600 mt-1">Historical project performance, feedback themes, and trust indicators</p>
+                <p className="mt-1 text-sm text-slate-600">Their past projects, what the public reported, and how their score moved</p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
                 <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600">
@@ -95,32 +96,36 @@ export const ContractorAnalysisPage = () => {
           </CardHeader>
           <CardContent>
             {loading ? (
-              <p className="text-sm text-slate-500">Loading analysis dashboard...</p>
-            ) : !analysis ? (
-              <p className="text-sm text-slate-500">Select a contractor to inspect the trust profile.</p>
+              <p className="text-sm text-slate-600">Loading…</p>
+            ) : !analysis?.metrics ? (
+              // Guards on metrics, not just on analysis: a response without it
+              // used to crash the page on the first figure below.
+              <p className="text-sm text-slate-600">
+                Choose a contractor to see their record.
+              </p>
             ) : (
               <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
                 <div className="space-y-4">
                   <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                      <p className="text-xs text-slate-600">Total Projects</p>
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                      <p className="text-sm text-slate-600">Projects</p>
                       <p className="mt-2 text-2xl font-semibold text-dark-800">{analysis.metrics.totalProjects}</p>
                     </div>
-                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                      <p className="text-xs text-slate-600">Completion Score</p>
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                      <p className="text-sm text-slate-600">Average progress</p>
                       <p className="mt-2 text-2xl font-semibold text-dark-800">{analysis.metrics.averageCompletionScore}%</p>
                     </div>
-                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                      <p className="text-xs text-slate-600">On-Time Rate</p>
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                      <p className="text-sm text-slate-600">Finished on time</p>
                       <p className="mt-2 text-2xl font-semibold text-dark-800">{analysis.metrics.onTimeRate}%</p>
                     </div>
-                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                      <p className="text-xs text-slate-600">Trust Score</p>
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                      <p className="text-sm text-slate-600">Trust score</p>
                       <p className="mt-2 text-2xl font-semibold text-dark-800">{analysis.metrics.trustScore}/100</p>
                     </div>
                   </div>
 
-                  <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-brand-50 to-white p-5">
+                  <div className="rounded-lg border border-slate-200 bg-gradient-to-br from-brand-50 to-white p-5">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 text-sm font-semibold text-dark-800">
                         <TrendingUp className="h-4 w-4 text-brand-600" /> Trust summary
@@ -146,7 +151,7 @@ export const ContractorAnalysisPage = () => {
                     </p>
                   </div>
 
-                  <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                  <div className="rounded-lg border border-slate-200 bg-white p-4">
                     <div className="flex items-center gap-2 text-sm font-semibold text-dark-800">
                       <BarChart3 className="h-4 w-4 text-brand-600" /> Project outcomes
                     </div>
@@ -167,7 +172,7 @@ export const ContractorAnalysisPage = () => {
                     </div>
                   </div>
 
-                  <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-4">
+                  <div className="rounded-lg border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-4">
                     <div className="flex items-center gap-2 text-sm font-semibold text-dark-800">
                       <TrendingUp className="h-4 w-4 text-brand-600" /> Historical project overview
                     </div>
@@ -176,7 +181,7 @@ export const ContractorAnalysisPage = () => {
                         <div key={entry._id} className="flex items-center justify-between rounded-xl border border-slate-100 bg-white px-3 py-3 text-sm">
                           <div>
                             <p className="font-semibold text-dark-800">{entry.title}</p>
-                            <p className="text-xs text-slate-500">{entry.lifecycleStatus}</p>
+                            <p className="text-sm text-slate-600">{entry.lifecycleStatus}</p>
                           </div>
                           <div className="text-right">
                             <p className="font-semibold text-dark-800">{entry.completionScore}%</p>
@@ -191,7 +196,7 @@ export const ContractorAnalysisPage = () => {
                 </div>
 
                 <div className="space-y-4">
-                  <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                  <div className="rounded-lg border border-slate-200 bg-white p-4">
                     <div className="flex items-center gap-2 text-sm font-semibold text-dark-800">
                       <ShieldCheck className="h-4 w-4 text-brand-600" /> Work distribution
                     </div>
@@ -207,7 +212,7 @@ export const ContractorAnalysisPage = () => {
                     </div>
                   </div>
 
-                  <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                  <div className="rounded-lg border border-slate-200 bg-white p-4">
                     <div className="flex items-center gap-2 text-sm font-semibold text-dark-800">
                       <MessageSquareQuote className="h-4 w-4 text-brand-600" /> Citizen feedback remarks
                     </div>
@@ -217,7 +222,7 @@ export const ContractorAnalysisPage = () => {
                       ) : analysis.feedback.map((remark) => (
                         <div key={remark.id} className="rounded-xl border border-slate-100 bg-slate-50 p-3">
                           <p className="text-sm font-semibold text-dark-800">{remark.title}</p>
-                          <p className="mt-1 text-xs text-slate-500">{remark.summary}</p>
+                          <p className="mt-1 text-sm text-slate-600">{remark.summary}</p>
                         </div>
                       ))}
                     </div>

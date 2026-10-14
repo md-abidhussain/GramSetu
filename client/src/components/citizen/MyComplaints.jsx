@@ -55,7 +55,7 @@ export const MyComplaints = ({ complaints: myComplaints, loading: loadingComplai
         <Card>
           <CardHeader className="pb-3 border-b border-slate-100">
             <CardTitle className="text-xs font-semibold text-slate-500 flex items-center gap-1.5">
-              <ListFilter className="h-4 w-4" /> My Submissions
+              <ListFilter className="h-4 w-4" aria-hidden="true" /> Your reports
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
@@ -64,7 +64,7 @@ export const MyComplaints = ({ complaints: myComplaints, loading: loadingComplai
                 <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-brand-600 mx-auto" />
               </div>
             ) : myComplaints.length === 0 ? (
-              <div className="text-center py-12 text-slate-500 text-xs italic">
+              <div className="text-center py-12 text-sm text-slate-600">
                 No complaints submitted yet.
               </div>
             ) : (
@@ -196,7 +196,7 @@ export const MyComplaints = ({ complaints: myComplaints, loading: loadingComplai
               {selectedComplaint.inspectorNotes && (
                 <div className="border-t border-slate-100 pt-3">
                   <span className="text-xs font-semibold text-slate-500 block">Inspector Site Notes</span>
-                  <p className="text-slate-600 text-xs mt-1 italic leading-relaxed bg-brand-50/10 p-2.5 rounded border border-brand-100">{selectedComplaint.inspectorNotes}</p>
+                  <p className="text-slate-600 text-xs mt-1 leading-relaxed bg-brand-50/10 p-2.5 rounded border border-brand-100">{selectedComplaint.inspectorNotes}</p>
                 </div>
               )}
 
@@ -213,15 +213,15 @@ export const MyComplaints = ({ complaints: myComplaints, loading: loadingComplai
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <p className="text-xs text-slate-500 font-semibold mb-1 text-center">Your photo</p>
+                    <p className="text-sm text-slate-600 font-semibold mb-1 text-center">Your photo</p>
                     <div className="border border-slate-200 rounded-lg overflow-hidden h-40 bg-slate-50">
                       <img src={selectedComplaint.citizenImageUrl} alt="Citizen before" className="w-full h-full object-cover" />
                     </div>
                   </div>
 
                   <div>
-                    <p className="text-xs text-slate-500 font-semibold mb-1 text-center">Official Verification Proof (After)</p>
-                    <div className="border border-slate-200 rounded-lg overflow-hidden h-40 bg-slate-50 flex items-center justify-center text-slate-500 text-xs italic">
+                    <p className="text-sm text-slate-600 font-semibold mb-1 text-center">Official Verification Proof (After)</p>
+                    <div className="border border-slate-200 rounded-lg overflow-hidden h-40 bg-slate-50 flex items-center justify-center text-sm text-slate-600">
                       {selectedComplaint.inspectorAfterImageUrl ? (
                         <img src={selectedComplaint.inspectorAfterImageUrl} alt="Inspector after" className="w-full h-full object-cover" />
                       ) : (
@@ -235,8 +235,8 @@ export const MyComplaints = ({ complaints: myComplaints, loading: loadingComplai
             </CardContent>
           </Card>
         ) : (
-          <Card className="h-64 flex items-center justify-center text-slate-500 text-xs italic border border-dashed border-slate-300">
-            Awaiting Selection
+          <Card className="h-64 flex items-center justify-center text-sm text-slate-600 border border-dashed border-slate-300">
+            Choose a report to see what happened to it.
           </Card>
         )}
       </div>

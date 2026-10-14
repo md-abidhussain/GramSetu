@@ -111,7 +111,7 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
               {/* Profile details */}
               <div className="bg-slate-50 border border-slate-200 rounded p-4">
                 <span className="text-sm font-medium text-slate-700">Summary</span>
-                <p className="text-slate-700 mt-1 leading-relaxed italic">{selectedContractor.aiSummary}</p>
+                <p className="text-slate-700 mt-1 leading-relaxed">{selectedContractor.aiSummary}</p>
                 <div className="grid grid-cols-2 gap-4 mt-3 pt-3 border-t border-slate-200 text-slate-500">
                   <p><span className="font-semibold text-slate-600">Registration ID:</span> {selectedContractor.registrationId}</p>
                   <p><span className="font-semibold text-slate-600">Registered Since:</span> {new Date(selectedContractor.createdAt).toLocaleDateString()}</p>
@@ -210,7 +210,7 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
                       </div>
                     ))
                   ) : (
-                    <div className="p-4 text-center text-slate-600 italic text-xs">
+                    <div className="p-4 text-center text-slate-600 text-xs">
                       No inspections recorded yet.
                     </div>
                   )}

@@ -70,7 +70,7 @@ export const ContractorManagementPage = () => {
   };
 
   return (
-    <PageLayout title="Contractor Management">
+    <PageLayout title="Contractors">
       <div className="grid grid-cols-1 xl:grid-cols-[1.1fr_0.9fr] gap-6">
         <Card>
           <CardHeader>
@@ -102,7 +102,7 @@ export const ContractorManagementPage = () => {
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <p className="font-semibold text-dark-800">{contractor.name}</p>
-                        <p className="text-xs text-slate-500">{contractor.registrationId}</p>
+                        <p className="text-sm text-slate-600">{contractor.registrationId}</p>
                       </div>
                       <span className="rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
                         {contractor.performanceScore}% trust

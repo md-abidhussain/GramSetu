@@ -85,7 +85,7 @@ export const TenderUploadForm = ({ onUploadSuccess }) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>AI-Powered Tender Analysis</CardTitle>
+        <CardTitle>Check a tender</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -173,7 +173,7 @@ export const TenderUploadForm = ({ onUploadSuccess }) => {
             loading={loading}
             disabled={loading}
           >
-            {loading ? 'Extracting & Auditing...' : 'Upload & Analyze Tender'}
+            {loading ? 'Reading the document…' : 'Upload and check'}
           </Button>
         </form>
       </CardContent>

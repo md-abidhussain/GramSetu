@@ -104,7 +104,7 @@ export const CitizenVerificationPage = () => {
 
 
   return (
-    <PageLayout title="Complaints">
+    <PageLayout title="Your reports">
       <div className="max-w-6xl mx-auto space-y-6">
         
         {/* Profile Summary Header */}
@@ -115,17 +115,17 @@ export const CitizenVerificationPage = () => {
             </div>
             <div>
               <h3 className="font-bold text-dark-800 text-sm">{user?.name}</h3>
-              <p className="text-xs text-slate-600 mt-0.5">Citizen Auditor • Registered via {user?.email || user?.phone || 'Mobile'}</p>
+              <p className="mt-0.5 text-sm text-slate-600">{user?.email || user?.phone || 'Signed in'}</p>
             </div>
           </div>
           
           <div className="flex items-center gap-4">
             <div className="bg-emerald-50 border border-emerald-100 rounded px-4 py-2 text-center">
-              <p className="text-xs text-slate-600 font-semibold">Civic Points</p>
+              <p className="text-sm font-medium text-slate-700">Points earned</p>
               <p className="text-lg font-black text-emerald-600">{user?.points || 0}</p>
             </div>
             <div className="bg-brand-50 border border-brand-100 rounded px-4 py-2 text-center">
-              <p className="text-xs text-slate-600 font-semibold">Volunteer Score</p>
+              <p className="text-sm font-medium text-slate-700">Reports accepted</p>
               <p className="text-lg font-black text-brand-600">{user?.volunteerScore || 0}</p>
             </div>
           </div>

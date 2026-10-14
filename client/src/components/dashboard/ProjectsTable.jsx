@@ -132,7 +132,7 @@ export const ProjectsTable = ({ projects = [], onSelectProject }) => {
                     </td>
                     <td className="px-6 py-4.5 text-center">
                       <div className="flex flex-col items-center gap-1">
-                        <span className="text-xs text-slate-500 font-semibold">{proj.lifecycleStatus || 'Project Created'}</span>
+                        <span className="text-sm text-slate-600 font-semibold">{proj.lifecycleStatus || 'Project Created'}</span>
                         {proj.completionScore !== undefined ? (
                           <span className={`inline-flex font-bold text-sm ${
                             proj.completionScore >= 80 ? 'text-emerald-600' : proj.completionScore >= 50 ? 'text-amber-500' : 'text-rose-500'
