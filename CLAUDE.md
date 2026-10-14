@@ -12,8 +12,8 @@ commits stay in the history. Say so plainly if asked who built it.
 ```
 npm run install:all     # root, installs server and client
 npm run dev             # both together
-cd server && npm test   # Node's built-in runner, no extra dependency
-cd client && npm test   # vitest
+cd server && npm test   # 40 tests, Node's built-in runner
+cd client && npm test   # 6 tests, vitest with jsdom
 ```
 
 Server needs `server/.env`; copy `.env.example` and fill it in. The server exits
@@ -70,22 +70,37 @@ because nothing else records it yet. The stack trace is shown only in
 development. Its tests are the one place a crash path can actually be exercised,
 so keep them.
 
+**A missing measurement is recorded as missing.** When the segmentation service
+is not running, `quantifyDefects` returns `status: 'unavailable'` and no defects.
+It used to return an empty result marked `completed` with the message "AI defect
+segmentation was simulated", which told an official a measurement had been taken
+when none had, and fed a severity score computed from nothing. Severity now falls
+back to the issues Gemini found in the photo, and the report says sizes are
+missing. Never fill this in with placeholder numbers.
+
+**Who may read a complaint, and what an official may decide, live in
+`utils/access.js`.** Both were inline in the controller, where they could not be
+tested without a database. They are the two checks in this app that are expensive
+to get wrong, so they are plain functions with tests.
+
 **Rate limits protect money.** Submitting a complaint or tender stores a file and
 calls Gemini. Writes to those routes allow 30 per hour; reads are skipped because
 listing projects is public and cheap.
 
 ## Known gaps — real, not hidden
 
-- The YOLOv8 segmentation service is **not deployed**. `SEGMENTATION_SERVICE_URL`
-  defaults to localhost, so that feature throws in production. The model is trained
-  and runs locally. Do not describe it as live.
-- Seed project photos point at Unsplash, which deletes images over time. A missing
-  photo degrades gracefully now, but the fix is to host them somewhere owned.
-- No integration tests against a real database. Component tests cover the error
-  boundary only; the rest of the suite is validation and scoring logic.
+- The YOLOv8 segmentation service is **not deployed**. Without
+  `SEGMENTATION_SERVICE_URL` the app records defect measurement as unavailable and
+  says so in the report. The model is trained and runs locally. Do not describe it
+  as live.
+- No tests that go through HTTP to a real database. The suite covers the
+  authorization rules, validators, scoring and the error boundary as units, which
+  is most of the risk, but a broken route wiring would not be caught.
 - The error boundary is a single one at the top of the tree, so a crash replaces
   the whole screen rather than just the panel that failed.
-- `server.js` is 513 lines, most of it inline seed data.
+- Seed project photos point at Unsplash, which deletes images over time. A missing
+  photo degrades gracefully, but the fix is to upload them to the project's own
+  Cloudinary account and replace the URLs in `server/data/seedDatabase.js`.
 
 ## Dependency advisories
 
