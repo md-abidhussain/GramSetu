@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card.jsx';
 import { Button } from '../ui/Button.jsx';
 import { useAuth } from '../../hooks/useAuth.js';
@@ -24,6 +24,18 @@ import {
 export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
   const { user } = useAuth(); // Logged-in authority official
   const [selectedReport, setSelectedReport] = useState(null);
+  const detailPanelRef = useRef(null);
+
+  // Below a wide screen the detail sits under the list instead of beside it,
+  // far enough down that picking a complaint looked like nothing happened.
+  useEffect(() => {
+    if (!selectedReport || !detailPanelRef.current) return;
+    const { top, bottom } = detailPanelRef.current.getBoundingClientRect();
+    const outOfView = top > window.innerHeight * 0.75 || bottom < 0;
+    if (outOfView) {
+      detailPanelRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [selectedReport]);
   
   // Dynamic inspectors list for assignments
   const [inspectors, setInspectors] = useState([]);
@@ -194,10 +206,19 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                     setSelectedReport(item);
                     setActionError(null);
                   }}
-                  className={`p-3.5 rounded border transition-colors cursor-pointer text-xs ${
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setSelectedReport(item);
+                      setActionError(null);
+                    }
+                  }}
+                  className={`p-3.5 rounded border transition-colors cursor-pointer text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 ${
                     selectedReport?._id === item._id
-                      ? 'border-brand-700 bg-brand-50/10'
-                      : 'border-slate-200 hover:border-slate-400 bg-white'
+                      ? 'border-brand-600 bg-brand-50 ring-1 ring-brand-600'
+                      : 'border-slate-200 hover:border-brand-400 hover:bg-brand-50/40 bg-white'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
@@ -217,7 +238,10 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
           </div>
 
           {/* Detailed Workflow Actions Panel */}
-          <div className="lg:col-span-2 bg-slate-50/30 border border-slate-200 rounded-lg p-5 flex flex-col justify-between min-h-[480px]">
+          <div
+            ref={detailPanelRef}
+            className="lg:col-span-2 bg-slate-50/30 border border-slate-200 rounded-lg p-5 flex flex-col justify-between min-h-[480px]"
+          >
             {selectedReport ? (
               <div className="space-y-4 animate-fadeIn text-xs">
                 
@@ -473,8 +497,8 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center text-slate-400 p-12 text-center">
                 <MessageSquare className="h-10 w-10 text-slate-300 mb-2" />
-                <p className="text-xs font-semibold">Select a citizen complaint</p>
-                <p className="text-xs mt-0.5">Click any report in the left sidebar to audit the damage details and trigger workflow actions.</p>
+                <p className="text-sm font-semibold text-slate-700">Choose a complaint to review</p>
+                <p className="text-sm mt-1 max-w-xs">Pick one from the list to see who reported it, what they reported, and to assign an inspector.</p>
               </div>
             )}
           </div>
