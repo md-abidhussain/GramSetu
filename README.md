@@ -3,10 +3,17 @@
 GramSetu AI is a next-generation GovTech enterprise platform designed for auditing, monitoring, and validating public infrastructure works. By combining a **Clean Architecture** codebase, **Dual-Pipeline AI Fusion (Gemini Vision + YOLOv8-Seg)**, and role-based access control, GramSetu AI connects citizens, inspectors, and administrators in a closed-loop quality assurance cycle.
 
 ### 🌐 Live Deployments
-* **Frontend Portal:** [https://gram-setu-self.vercel.app/](https://gram-setu-self.vercel.app/)
+* **Frontend Portal:** [https://gramsetu-india.vercel.app](https://gramsetu-india.vercel.app)
 * **Backend API Gateway:** [https://gramsetu-31ax.onrender.com](https://gramsetu-31ax.onrender.com)
 
 ---
+
+> **What is running in the hosted demo:** the React client, the Express API and
+> the Gemini vision analysis. The YOLOv8 segmentation service is a separate
+> Python service that runs locally (setup below) and is **not deployed** with
+> the demo, so complaints filed on the live site record defect measurements as
+> unavailable rather than estimating them. The backend is on Render's free
+> tier, so the first request after an idle period can take up to a minute.
 
 ## 📌 Problem Statement & Limitations
 

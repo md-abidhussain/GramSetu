@@ -16,7 +16,7 @@ const citizenReportSchema = new mongoose.Schema({
   }],
   referenceScaleCmPerPixel: { type: Number, min: 0, default: 0.25 },
   segmentation: {
-    status: { type: String, enum: ['pending', 'completed'], default: 'pending' },
+    status: { type: String, enum: ['pending', 'completed', 'scale_missing', 'unavailable'], default: 'pending' },
     message: { type: String },
     defects: [{
       type: { type: String },

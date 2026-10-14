@@ -1,19 +1,32 @@
 const serviceUrl = () => process.env.SEGMENTATION_SERVICE_URL?.replace(/\/$/, '');
 
 /**
- * Sends an uploaded photo to the local YOLOv8-Seg service. The service uses a
- * road-defect segmentation checkpoint and returns mask-derived measurements.
- * Semantic segmentation is a required stage of citizen verification.
+ * Measures road defects by sending the photo to the YOLOv8 segmentation
+ * service, which returns an area and size per defect.
+ *
+ * That service runs separately and is not deployed alongside the rest of the
+ * app, so this returns what happened instead of throwing. A complaint is still
+ * worth filing without measurements, and the report says they are missing
+ * rather than inventing numbers.
  */
 export const quantifyDefects = async (file, scaleCmPerPixel) => {
   const baseUrl = serviceUrl();
   const scale = Number(scaleCmPerPixel);
 
   if (!baseUrl) {
-    throw new Error('AI defect segmentation is not configured. Set SEGMENTATION_SERVICE_URL and start the YOLOv8-Seg service.');
+    return {
+      status: 'unavailable',
+      defects: [],
+      message: 'Automated defect measurement is not running. Everything else in this report is unaffected.'
+    };
   }
+
   if (!Number.isFinite(scale) || scale <= 0) {
-    throw new Error('A positive calibrated reference scale (cm per pixel) is required for AI defect quantification.');
+    return {
+      status: 'scale_missing',
+      defects: [],
+      message: 'Defect sizes need a calibrated reference scale, which was not supplied with this photo.'
+    };
   }
 
   const form = new FormData();
@@ -23,13 +36,31 @@ export const quantifyDefects = async (file, scaleCmPerPixel) => {
     form.append('confidence', process.env.SEGMENTATION_MIN_CONFIDENCE);
   }
 
-  const timeout = AbortSignal.timeout(30000);
   try {
-    const response = await fetch(`${baseUrl}/segment`, { method: 'POST', body: form, signal: timeout });
-    if (!response.ok) throw new Error(`Segmentation service returned ${response.status}`);
-    return await response.json();
+    const response = await fetch(`${baseUrl}/segment`, {
+      method: 'POST',
+      body: form,
+      signal: AbortSignal.timeout(30000)
+    });
+
+    if (!response.ok) {
+      throw new Error(`the service returned ${response.status}`);
+    }
+
+    const body = await response.json();
+    return {
+      status: 'completed',
+      defects: Array.isArray(body.defects) ? body.defects : [],
+      message: body.message
+    };
   } catch (error) {
-    console.warn('Defect segmentation unavailable:', error.message);
-    throw new Error(`AI defect segmentation failed: ${error.message}`);
+    // Logged rather than raised: an official reading the complaint needs to
+    // know the measurement is missing, not why the service was down.
+    console.warn('Defect measurement unavailable:', error.message);
+    return {
+      status: 'unavailable',
+      defects: [],
+      message: 'The defect measurement service did not respond, so sizes are missing from this report.'
+    };
   }
 };

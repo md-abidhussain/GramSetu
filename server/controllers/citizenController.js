@@ -11,6 +11,7 @@ import { quantifyDefects } from '../services/segmentationService.js';
 import { updateContractorScore } from '../services/contractorScoreService.js';
 import { generateCitizenComplaintPDF } from '../services/pdfReportService.js';
 import { isValidId, toLatitude, toLongitude, toText } from '../utils/validators.js';
+import { canViewReport, isAllowedDecision } from '../utils/access.js';
 
 // Helper to notify authority users
 const notifyAuthorities = async (message, type = 'info') => {
@@ -103,19 +104,10 @@ export const createCitizenReport = async (req, res, next) => {
       aiAnalysis = await detectDamageSingleImage(citizenImageUrl);
     }
 
-    // 4. YOLO Segmentation Defect Quantification
-    let segmentation;
-    try {
-      segmentation = await quantifyDefects(req.file, referenceScaleCmPerPixel);
-    } catch (segError) {
-      console.warn('YOLO segmentation service offline:', segError.message);
-      segmentation = {
-        status: 'completed',
-        scaleCmPerPixel: Number(referenceScaleCmPerPixel) || 0.25,
-        defects: [],
-        message: 'AI defect segmentation was simulated during system inspection.'
-      };
-    }
+    // 4. Measure the defects in the photo, if that service is running.
+    // It reports its own status, so a missing measurement is recorded as
+    // missing instead of being filled in with made-up numbers.
+    const segmentation = await quantifyDefects(req.file, referenceScaleCmPerPixel);
 
     const segmentedIssueTypes = (segmentation.defects || [])
       .map(({ type }) => type)
@@ -213,10 +205,6 @@ export const createCitizenReport = async (req, res, next) => {
 };
 
 // Get all reports (with citizen isolation)
-// A citizen may only open their own complaint. Officials may open any.
-const canView = (req, report) =>
-  !req.isCitizen || String(report.citizen?._id ?? report.citizen) === String(req.user._id);
-
 export const getCitizenReports = async (req, res, next) => {
   try {
     let filter = {};
@@ -254,7 +242,7 @@ export const getCitizenReportById = async (req, res, next) => {
       return res.status(404).json({ message: 'Citizen report not found' });
     }
 
-    if (!canView(req, report)) {
+    if (!canViewReport(req, report)) {
       return res.status(403).json({ message: 'You can only view your own complaints' });
     }
 
@@ -378,8 +366,7 @@ export const resolveComplaint = async (req, res, next) => {
     // The status field accepts every stage of the complaint lifecycle, so
     // without this an official could post any stage here and jump a complaint
     // straight to published, skipping inspection.
-    const ALLOWED_DECISIONS = ['Accepted', 'Rejected', 'Need More Evidence'];
-    if (!ALLOWED_DECISIONS.includes(decision)) {
+    if (!isAllowedDecision(decision)) {
       return res.status(400).json({ message: 'Decision must be Accepted, Rejected, or Need More Evidence' });
     }
 
@@ -443,7 +430,7 @@ export const downloadCitizenReport = async (req, res, next) => {
       return res.status(404).json({ message: 'Complaint report not found' });
     }
 
-    if (!canView(req, complaint)) {
+    if (!canViewReport(req, complaint)) {
       return res.status(403).json({ message: 'You can only download your own complaints' });
     }
 
