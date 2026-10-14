@@ -38,7 +38,7 @@ export const DiscrepancyReport = ({ result }) => {
       <CardHeader>
         <div className="flex justify-between items-center w-full">
           <div>
-            <span className="text-[10px] text-brand-600 font-bold uppercase tracking-wider">Verification Ledger</span>
+            <span className="text-xs text-brand-600 font-bold">Verification Ledger</span>
             <CardTitle className="text-lg mt-0.5 flex items-center gap-1.5">
               <CheckCircle2 className="h-4.5 w-4.5 text-brand-600" /> Compliance Report
             </CardTitle>
@@ -61,11 +61,11 @@ export const DiscrepancyReport = ({ result }) => {
         <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-md border border-slate-200">
           <div className={`h-14 w-14 rounded-md border font-bold flex flex-col items-center justify-center ${getMatchScoreStyle(matchScore)}`}>
             <span className="text-xl tracking-tight leading-none">{matchScore}%</span>
-            <span className="text-[8px] uppercase tracking-wider font-semibold opacity-85 mt-0.5">Match</span>
+            <span className="text-[8px] font-semibold opacity-85 mt-0.5">Match</span>
           </div>
           <div>
-            <p className="text-xs font-bold text-dark-800">Verification Score</p>
-            <p className="text-[11px] text-slate-600 leading-normal mt-0.5">
+            <p className="text-xs font-semibold text-dark-800">Verification Score</p>
+            <p className="text-xs text-slate-600 leading-normal mt-0.5">
               {matchScore >= 80 
                 ? 'Current photo aligns well with official completion records.' 
                 : 'Current photo shows clear structural inconsistencies compared to completion records.'}
@@ -75,7 +75,7 @@ export const DiscrepancyReport = ({ result }) => {
 
         {/* Detected Issues */}
         <div>
-          <span className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Detected Anomalies</span>
+          <span className="block text-xs font-semibold text-slate-500 mb-2">Detected Anomalies</span>
           <div className="flex flex-wrap gap-1.5">
             {detectedIssues.length === 0 || (detectedIssues.length === 1 && detectedIssues[0] === 'none') ? (
               <span className="inline-flex text-xs px-2.5 py-1 bg-slate-100 text-slate-600 rounded-md">
@@ -97,7 +97,7 @@ export const DiscrepancyReport = ({ result }) => {
 
         {segmentation?.status === 'completed' && (
           <div>
-            <span className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <span className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-slate-500">
               <Ruler className="h-4 w-4 text-brand-700" /> Defect Measurements
             </span>
             {segmentation.defects?.length ? (
@@ -106,7 +106,7 @@ export const DiscrepancyReport = ({ result }) => {
                   <div key={`${defect.type}-${index}`} className="rounded-md border border-brand-100 bg-brand-50/10 p-3 text-xs text-dark-800">
                     <div className="flex justify-between font-bold capitalize"><span>{defect.type.replaceAll('_', ' ')}</span><span>{Math.round(defect.confidence * 100)}% confidence</span></div>
                     <p className="mt-1 text-slate-600">Area: {defect.areaCm2} cm² · Width: {defect.widthCm} cm · Height: {defect.heightCm} cm · Equivalent diameter: {defect.equivalentDiameterCm} cm</p>
-                    <p className="mt-1 text-[11px] text-slate-500">{defect.depthNote}</p>
+                    <p className="mt-1 text-xs text-slate-500">{defect.depthNote}</p>
                   </div>
                 ))}
               </div>
@@ -119,7 +119,7 @@ export const DiscrepancyReport = ({ result }) => {
         )}
 
         <div className="border-t border-slate-200 pt-4">
-          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+          <span className="text-xs font-semibold text-slate-500 mb-2 flex items-center gap-1.5">
             <MessageSquare className="h-4 w-4 text-slate-400" /> Executive Compliance Report
           </span>
           <p className="text-xs text-dark-800 leading-relaxed bg-brand-50/10 p-4 rounded-md border border-brand-100/30">

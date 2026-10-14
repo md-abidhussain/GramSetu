@@ -32,7 +32,7 @@ export const Topbar = ({ title }) => {
         <div className="flex items-center gap-3">
           <div className="text-right hidden md:block">
             <p className="text-xs font-semibold text-dark-800">{user ? user.name : 'Citizen User'}</p>
-            <p className="text-[10px] text-slate-400 capitalize">{user ? user.role : 'Public Guest'}</p>
+            <p className="text-xs text-slate-400 capitalize">{user ? user.role : 'Public Guest'}</p>
           </div>
           <div className="h-9 w-9 bg-brand-50 text-brand-600 rounded-md flex items-center justify-center font-bold text-sm select-none border border-brand-100">
             {user ? user.name.charAt(0).toUpperCase() : 'C'}

@@ -24,7 +24,7 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
       'bg-slate-100 text-slate-600'
     ];
     const colorClass = badgeColors[index] || 'bg-slate-50 text-slate-500';
-    return <span className={`h-5 w-5 rounded font-bold text-[10px] flex items-center justify-center shrink-0 ${colorClass}`}>{index + 1}</span>;
+    return <span className={`h-5 w-5 rounded font-bold text-xs flex items-center justify-center shrink-0 ${colorClass}`}>{index + 1}</span>;
   };
 
   const getScoreColor = (score) => {
@@ -59,7 +59,7 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
 
                 <div className="flex-1 min-w-0">
                   <h4 className="font-semibold text-xs text-dark-800 truncate">{item.name}</h4>
-                  <div className="flex items-center gap-3 mt-1 text-[10px] text-slate-400">
+                  <div className="flex items-center gap-3 mt-1 text-xs text-slate-400">
                     <span>Reg: {item.registrationId}</span>
                     <span>Completed: {item.completedCount}</span>
                     <span className="text-rose-600">Complaints: {item.citizenComplaintsCount || 0}</span>
@@ -67,7 +67,7 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
                 </div>
 
                 <div className="text-right">
-                  <div className={`px-2 py-0.5 rounded text-[10px] font-bold inline-block ${getScoreColor(item.trustScore)}`}>
+                  <div className={`px-2 py-0.5 rounded text-xs font-semibold inline-block ${getScoreColor(item.trustScore)}`}>
                     {item.trustScore}% Trust
                   </div>
                   <span className="block text-[8px] text-slate-400 mt-0.5">Performance: {item.performanceScore}</span>
@@ -86,7 +86,7 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
             {/* Modal Header */}
             <div className="bg-slate-800 text-white p-5 flex items-center justify-between">
               <div>
-                <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Contractor Profile & Auditing metrics</span>
+                <span className="text-[9px] text-slate-400 font-bold">Contractor Profile & Auditing metrics</span>
                 <h3 className="text-base font-bold flex items-center gap-2 mt-0.5">
                   <Award className="h-5 w-5 text-brand-500" /> {selectedContractor.name}
                 </h3>
@@ -104,7 +104,7 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
               
               {/* Profile details */}
               <div className="bg-slate-50 border border-slate-200 rounded p-4">
-                <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">AI Executive Summary</span>
+                <span className="text-xs text-slate-500 font-bold">AI Executive Summary</span>
                 <p className="text-slate-700 mt-1 leading-relaxed italic">{selectedContractor.aiSummary}</p>
                 <div className="grid grid-cols-2 gap-4 mt-3 pt-3 border-t border-slate-200 text-slate-500">
                   <p><span className="font-semibold text-slate-400">Registration ID:</span> {selectedContractor.registrationId}</p>
@@ -114,7 +114,7 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
 
               {/* Metrics Grid */}
               <div>
-                <h4 className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-2.5">Key Performance Indicators</h4>
+                <h4 className="text-xs text-slate-500 font-bold mb-2.5">Key Performance Indicators</h4>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3.5">
                   
                   <div className="bg-emerald-50/20 border border-emerald-100 rounded p-3 text-center">
@@ -153,7 +153,7 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
               {/* Historical Trends */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="border border-slate-200 rounded p-4 bg-white shadow-sm">
-                  <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-1">
+                  <h4 className="text-xs font-semibold text-slate-500 mb-3 flex items-center gap-1">
                     <TrendingUp className="h-3.5 w-3.5 text-brand-600" /> Performance Trend History
                   </h4>
                   <div className="flex items-end gap-2.5 h-16 pt-3 px-2">
@@ -167,7 +167,7 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
                 </div>
 
                 <div className="border border-slate-200 rounded p-4 bg-white shadow-sm">
-                  <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-1">
+                  <h4 className="text-xs font-semibold text-slate-500 mb-3 flex items-center gap-1">
                     <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" /> Risk Trend Index
                   </h4>
                   <div className="flex items-end gap-2.5 h-16 pt-3 px-2">
@@ -184,7 +184,7 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
               {/* Recent Inspection Logs */}
               <div className="border border-slate-200 rounded-lg overflow-hidden">
                 <div className="bg-slate-50 border-b border-slate-200 px-4 py-2.5 flex items-center justify-between">
-                  <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                  <h4 className="text-xs font-semibold text-slate-500 flex items-center gap-1.5">
                     <FileSpreadsheet className="h-4 w-4" /> Recent Audit & Inspection Reports
                   </h4>
                 </div>
@@ -193,7 +193,7 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
                     selectedContractor.recentInspections.map((ins, index) => (
                       <div key={index} className="p-3 flex items-start justify-between gap-4">
                         <div>
-                          <p className="font-semibold text-dark-800 text-[11px]">{ins.projectTitle}</p>
+                          <p className="font-semibold text-dark-800 text-xs">{ins.projectTitle}</p>
                           <span className="text-[9px] text-slate-400 flex items-center gap-1 mt-0.5">
                             <Calendar className="h-3 w-3" /> {new Date().toLocaleDateString()}
                           </span>
@@ -204,7 +204,7 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
                       </div>
                     ))
                   ) : (
-                    <div className="p-4 text-center text-slate-400 italic text-[11px]">
+                    <div className="p-4 text-center text-slate-400 italic text-xs">
                       No inspections recorded recently.
                     </div>
                   )}
@@ -217,7 +217,7 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
             <div className="bg-slate-50 p-4 border-t border-slate-200 flex justify-end">
               <button
                 onClick={() => setSelectedContractor(null)}
-                className="px-4 py-1.5 bg-slate-800 text-white rounded text-xs font-bold shadow hover:bg-slate-900 transition-colors"
+                className="px-4 py-1.5 bg-slate-800 text-white rounded text-xs font-semibold shadow hover:bg-slate-900 transition-colors"
               >
                 Close Profile
               </button>

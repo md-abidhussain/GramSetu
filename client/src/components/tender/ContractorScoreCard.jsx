@@ -31,7 +31,7 @@ export const ContractorScoreCard = ({ contractor }) => {
     <Card className="h-full">
       <CardHeader>
         <div>
-          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Contractor Performance Ledger</span>
+          <span className="text-xs text-slate-400 font-bold">Contractor Performance Ledger</span>
           <CardTitle className="text-lg mt-0.5">{name}</CardTitle>
           <span className="text-xs text-slate-400">ID: {registrationId}</span>
         </div>
@@ -42,7 +42,7 @@ export const ContractorScoreCard = ({ contractor }) => {
         <div className="flex items-center gap-5 bg-slate-50/50 p-4.5 rounded-2xl border border-slate-100/80">
           <div className={`h-16 w-16 rounded-2xl flex flex-col items-center justify-center border font-bold ${getScoreColor(performanceScore)}`}>
             <span className="text-2xl tracking-tighter leading-none">{performanceScore}</span>
-            <span className="text-[9px] uppercase tracking-wider font-semibold opacity-85">Pts</span>
+            <span className="text-[9px] font-semibold opacity-85">Pts</span>
           </div>
           <div className="flex-1">
             <div className="flex justify-between items-center text-xs font-semibold text-dark-800 mb-1.5">

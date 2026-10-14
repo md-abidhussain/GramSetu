@@ -12,7 +12,7 @@ export const Input = ({
   return (
     <div className={`w-full ${className}`}>
       {label && (
-        <label htmlFor={id} className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
+        <label htmlFor={id} className="block text-xs font-semibold text-slate-500 mb-1.5">
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
@@ -42,7 +42,7 @@ export const Textarea = ({
   return (
     <div className={`w-full ${className}`}>
       {label && (
-        <label htmlFor={id} className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
+        <label htmlFor={id} className="block text-xs font-semibold text-slate-500 mb-1.5">
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}

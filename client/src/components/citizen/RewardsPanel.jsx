@@ -9,11 +9,11 @@ export const RewardsPanel = ({ rewards, loading: loadingRewards, user }) => {
     <div className="space-y-6">
       {/* Badges Display */}
       <div className="bg-white border border-slate-200 rounded-lg p-5">
-        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Earned Civic Badges</h3>
+        <h3 className="text-xs font-semibold text-slate-500 mb-3">Earned Civic Badges</h3>
         <div className="flex flex-wrap gap-2.5">
           {user?.badges?.length > 0 ? (
             user.badges.map((badge, idx) => (
-              <span key={idx} className="inline-flex items-center gap-1 text-[10px] font-bold px-3 py-1 bg-amber-50 text-amber-700 border border-amber-100 rounded-full shadow-sm">
+              <span key={idx} className="inline-flex items-center gap-1 text-xs font-semibold px-3 py-1 bg-amber-50 text-amber-700 border border-amber-100 rounded-full shadow-sm">
                 <Award className="h-3.5 w-3.5" /> {badge}
               </span>
             ))
@@ -26,7 +26,7 @@ export const RewardsPanel = ({ rewards, loading: loadingRewards, user }) => {
       {/* Rewards List */}
       <Card>
         <CardHeader className="pb-3 border-b border-slate-100">
-          <CardTitle className="text-xs font-bold text-slate-500 uppercase tracking-wider">Historical Reward Ledger</CardTitle>
+          <CardTitle className="text-xs font-semibold text-slate-500">Historical Reward Ledger</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {loadingRewards ? (
@@ -53,7 +53,7 @@ export const RewardsPanel = ({ rewards, loading: loadingRewards, user }) => {
                     <tr key={rew._id} className="hover:bg-slate-50/50">
                       <td className="px-6 py-3 font-semibold text-dark-800">
                         {rew.title}
-                        <span className="block text-[10px] text-slate-500 font-normal mt-0.5">{rew.description}</span>
+                        <span className="block text-xs text-slate-500 font-normal mt-0.5">{rew.description}</span>
                       </td>
                       <td className="px-6 py-3 text-slate-600">{rew.rewardType}</td>
                       <td className="px-6 py-3 text-center text-emerald-600 font-bold">+{rew.amount}</td>

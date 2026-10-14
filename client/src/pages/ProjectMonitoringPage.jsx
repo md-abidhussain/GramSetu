@@ -34,7 +34,7 @@ export const ProjectMonitoringPage = () => {
 
           {/* Project List */}
           <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm">
-            <h3 className="font-semibold text-xs text-slate-400 uppercase tracking-wider mb-3.5 flex items-center gap-1.5">
+            <h3 className="font-semibold text-xs text-slate-400 mb-3.5 flex items-center gap-1.5">
               <Activity className="h-4.5 w-4.5 text-slate-400" /> Infrastructure Projects
             </h3>
             
@@ -56,7 +56,7 @@ export const ProjectMonitoringPage = () => {
                   >
                     <div className="min-w-0 flex-1">
                       <p className="text-dark-800 font-semibold truncate">{item.title}</p>
-                      <p className="text-[10px] text-slate-400 truncate mt-0.5">{item.location.address || 'No Address'}</p>
+                      <p className="text-xs text-slate-400 truncate mt-0.5">{item.location.address || 'No Address'}</p>
                     </div>
                     <div className="text-right">
                       <div className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase ${
@@ -95,7 +95,7 @@ export const ProjectMonitoringPage = () => {
                     <FileText className="h-3.5 w-3.5 text-slate-400" /> Export Audit PDF
                   </button>
                   <div className="text-right">
-                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Contractor</span>
+                    <span className="text-xs text-slate-400 font-bold block">Contractor</span>
                     <span className="text-xs font-semibold text-dark-800">{selectedProject.contractor?.name || 'N/A'}</span>
                   </div>
                 </div>
@@ -117,12 +117,12 @@ export const ProjectMonitoringPage = () => {
 
               {/* Image Comparison Box */}
               <div className="bg-white border border-slate-100 p-5 rounded-2xl shadow-sm">
-                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Audit Photographic Ledger</h4>
+                <h4 className="text-xs font-semibold text-slate-400 mb-3">Audit Photographic Ledger</h4>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Before */}
                   <div>
-                    <span className="block text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2">Before construction</span>
+                    <span className="block text-xs text-slate-400 font-bold mb-2">Before construction</span>
                     <a href={selectedProject.beforeImageUrl} target="_blank" rel="noreferrer" className="block relative h-48 rounded-xl overflow-hidden border border-slate-200 hover:opacity-95 transition-opacity">
                       <img src={selectedProject.beforeImageUrl} alt="Before" className="w-full h-full object-cover" />
                       <span className="absolute bottom-2 right-2 bg-dark-900/60 text-white font-bold text-[9px] px-2 py-0.5 rounded flex items-center gap-1">
@@ -133,7 +133,7 @@ export const ProjectMonitoringPage = () => {
 
                   {/* After */}
                   <div>
-                    <span className="block text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2">Verified Completion</span>
+                    <span className="block text-xs text-slate-400 font-bold mb-2">Verified Completion</span>
                     {selectedProject.afterImageUrl ? (
                       <a href={selectedProject.afterImageUrl} target="_blank" rel="noreferrer" className="block relative h-48 rounded-xl overflow-hidden border border-slate-200 hover:opacity-95 transition-opacity">
                         <img src={selectedProject.afterImageUrl} alt="After" className="w-full h-full object-cover" />
@@ -145,7 +145,7 @@ export const ProjectMonitoringPage = () => {
                       <div className="h-48 rounded-xl bg-slate-100 flex flex-col items-center justify-center text-slate-400 border border-dashed border-slate-200">
                         <Activity className="h-8 w-8 text-slate-300 mb-1" />
                         <span className="text-xs font-semibold text-dark-800">Awaiting Completion Upload</span>
-                        <span className="text-[10px] text-slate-400 mt-0.5">Use the upload panel to file post-build audit</span>
+                        <span className="text-xs text-slate-400 mt-0.5">Use the upload panel to file post-build audit</span>
                       </div>
                     )}
                   </div>

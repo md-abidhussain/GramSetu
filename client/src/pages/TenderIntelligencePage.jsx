@@ -44,7 +44,7 @@ export const TenderIntelligencePage = () => {
 
           {/* Past Audits List */}
           <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm">
-            <h3 className="font-semibold text-xs text-slate-400 uppercase tracking-wider mb-3.5 flex items-center gap-1.5">
+            <h3 className="font-semibold text-xs text-slate-400 mb-3.5 flex items-center gap-1.5">
               <FileSpreadsheet className="h-4.5 w-4.5 text-slate-400" /> Audit Ledger History
             </h3>
             
@@ -66,7 +66,7 @@ export const TenderIntelligencePage = () => {
                   >
                     <div className="min-w-0 flex-1">
                       <p className="text-dark-800 font-semibold truncate">{item.title}</p>
-                      <p className="text-[10px] text-slate-400 truncate mt-0.5">{item.contractor?.name || 'N/A'}</p>
+                      <p className="text-xs text-slate-400 truncate mt-0.5">{item.contractor?.name || 'N/A'}</p>
                     </div>
                     <ChevronRight className="h-4 w-4 text-slate-300" />
                   </div>

@@ -1,15 +1,13 @@
 /** @type {import('tailwindcss').Config} */
 
-// Deep forest green for the chrome and primary actions, on a warm off-white
-// page rather than stark white.
+// Navy carries the brand, as most Indian government service portals do, on a
+// warm beige page rather than stark white. Saffron is the accent, and only at
+// shade 700 when it carries text, because lighter saffron does not meet the
+// contrast GIGW asks for.
 //
-// The app also uses green for "verified" and "resolved", so the two are kept
-// apart by weight, not hue: the brand green is dark and solid, while a status
-// is a pale pill that always carries its word. Relying on more than colour is
-// what WCAG asks for anyway.
-//
-// Saffron is the accent, and only at shade 700 when it carries text, because
-// lighter saffron does not meet the contrast GIGW asks for.
+// Green is kept out of the brand scale on purpose: the app uses green to mean
+// verified or resolved, and a green button would blur that.
+
 export default {
   content: [
     "./index.html",
@@ -19,19 +17,19 @@ export default {
     extend: {
       colors: {
         brand: {
-          50: '#f1f7f3',
-          100: '#dcebe2',
-          200: '#bbd8c7',
-          300: '#8dbda2',
-          400: '#589a79',
-          500: '#2f7a59',
-          600: '#1b5e40', // 7.72:1 on white, and white on it - AAA both ways
-          700: '#14532d',
-          800: '#0f3f23', // sidebar and header chrome - 11.96:1 with white text
-          900: '#0a2b18',
+          50: '#f2f6fb',
+          100: '#e3ecf7',
+          200: '#c2d5ec',
+          300: '#93b4db',
+          400: '#5c8bc6',
+          500: '#336aae',
+          600: '#1b4f91', // 8.16:1 on white, and white on it - AAA both ways
+          700: '#143c6f',
+          800: '#0e2c53', // sidebar and header chrome
+          900: '#091d38',
         },
         surface: {
-          DEFAULT: '#faf9f7', // warm off-white, easier on the eye than pure white
+          DEFAULT: '#f7f4ee', // warm beige page, so white cards lift off it
           raised: '#ffffff',
         },
         accent: {

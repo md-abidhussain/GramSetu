@@ -14,19 +14,19 @@ export const ProjectsTable = ({ projects = [], onSelectProject }) => {
     switch (status) {
       case 'Verified':
         return (
-          <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
+          <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
             <CheckCircle className="h-3 w-3" /> Verified
           </span>
         );
       case 'Flagged':
         return (
-          <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded font-medium bg-rose-50 text-rose-700 border border-rose-100">
+          <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded font-medium bg-rose-50 text-rose-700 border border-rose-100">
             <AlertCircle className="h-3 w-3" /> Flagged
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded font-medium bg-amber-50 text-amber-700 border border-amber-100">
+          <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded font-medium bg-amber-50 text-amber-700 border border-amber-100">
             <AlertTriangle className="h-3 w-3" /> Pending
           </span>
         );
@@ -97,7 +97,7 @@ export const ProjectsTable = ({ projects = [], onSelectProject }) => {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-slate-50/70 border-y border-slate-100 text-slate-400 font-bold uppercase tracking-wider">
+              <tr className="bg-slate-50/70 border-y border-slate-100 text-slate-400 font-bold">
                 <th className="px-6 py-3.5">Project Details</th>
                 <th className="px-6 py-3.5">Contractor</th>
                 <th className="px-6 py-3.5 text-center">Lifecycle</th>
@@ -122,7 +122,7 @@ export const ProjectsTable = ({ projects = [], onSelectProject }) => {
                   >
                     <td className="px-6 py-4.5">
                       <p className="font-semibold text-dark-800 group-hover:text-brand-600 transition-colors">{proj.title}</p>
-                      <p className="text-[10px] text-slate-400 mt-0.5 truncate max-w-xs">{proj.location.address}</p>
+                      <p className="text-xs text-slate-400 mt-0.5 truncate max-w-xs">{proj.location.address}</p>
                     </td>
                     <td className="px-6 py-4.5">
                       <p className="font-medium text-dark-800">{proj.contractor?.name || 'N/A'}</p>
@@ -130,7 +130,7 @@ export const ProjectsTable = ({ projects = [], onSelectProject }) => {
                     </td>
                     <td className="px-6 py-4.5 text-center">
                       <div className="flex flex-col items-center gap-1">
-                        <span className="text-[10px] text-slate-500 font-semibold">{proj.lifecycleStatus || 'Project Created'}</span>
+                        <span className="text-xs text-slate-500 font-semibold">{proj.lifecycleStatus || 'Project Created'}</span>
                         {proj.completionScore !== undefined ? (
                           <span className={`inline-flex font-bold text-sm ${
                             proj.completionScore >= 80 ? 'text-emerald-600' : proj.completionScore >= 50 ? 'text-amber-500' : 'text-rose-500'
@@ -138,7 +138,7 @@ export const ProjectsTable = ({ projects = [], onSelectProject }) => {
                             {proj.completionScore}%
                           </span>
                         ) : (
-                          <span className="text-slate-500 italic text-[11px]">Unverified</span>
+                          <span className="text-slate-500 italic text-xs">Unverified</span>
                         )}
                       </div>
                     </td>
