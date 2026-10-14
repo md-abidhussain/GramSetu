@@ -63,6 +63,13 @@ reason — a status colour doing double duty as a series colour makes green ambi
 to pass as a point in the Atlantic. Equally, `if (!lat)` rejects the equator. Use
 `toLatitude` / `toLongitude` in `server/utils/validators.js`.
 
+**A render crash shows a message, not a blank page.** React unmounts the whole
+tree when a render throws. `components/ui/ErrorBoundary.jsx` wraps the router in
+`App.jsx` and catches it, offering a reload and a link out, and logs the error
+because nothing else records it yet. The stack trace is shown only in
+development. Its tests are the one place a crash path can actually be exercised,
+so keep them.
+
 **Rate limits protect money.** Submitting a complaint or tender stores a file and
 calls Gemini. Writes to those routes allow 30 per hour; reads are skipped because
 listing projects is public and cheap.
@@ -74,9 +81,10 @@ listing projects is public and cheap.
   and runs locally. Do not describe it as live.
 - Seed project photos point at Unsplash, which deletes images over time. A missing
   photo degrades gracefully now, but the fix is to host them somewhere owned.
-- No integration tests against a real database, and no React component tests. The
-  suite covers the validation and scoring logic only.
-- No React error boundary, so one component throwing blanks the page.
+- No integration tests against a real database. Component tests cover the error
+  boundary only; the rest of the suite is validation and scoring logic.
+- The error boundary is a single one at the top of the tree, so a crash replaces
+  the whole screen rather than just the panel that failed.
 - `server.js` is 513 lines, most of it inline seed data.
 
 ## Dependency advisories
