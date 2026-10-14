@@ -33,7 +33,7 @@ export const NotificationsPanel = ({ notifications, loading: loadingNotification
                   </div>
                   <div>
                     <p className="text-xs text-dark-800 leading-normal font-medium">{notif.message}</p>
-                    <span className="text-xs text-slate-400 block mt-1">{formatDate(notif.createdAt)}</span>
+                    <span className="text-xs text-slate-600 block mt-1">{formatDate(notif.createdAt)}</span>
                   </div>
                 </div>
 

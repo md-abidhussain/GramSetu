@@ -37,7 +37,7 @@ export const NotificationBell = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={toggleDropdown}
-        className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-all duration-200 focus:outline-none relative"
+        className="p-2 text-slate-600 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-all duration-200 focus:outline-none relative"
       >
         <Bell className="h-5 w-5" />
         {unreadCount > 0 && (
@@ -58,7 +58,7 @@ export const NotificationBell = () => {
 
           <div className="max-h-64 overflow-y-auto divide-y divide-slate-50">
             {notifications.length === 0 ? (
-              <div className="p-6 text-center text-xs text-slate-400">
+              <div className="p-6 text-center text-xs text-slate-600">
                 No notifications yet.
               </div>
             ) : (
@@ -75,7 +75,7 @@ export const NotificationBell = () => {
                     <p className={`text-xs text-dark-800 leading-normal ${!n.read ? 'font-medium' : ''}`}>
                       {n.message}
                     </p>
-                    <span className="text-xs text-slate-400 mt-1 block">
+                    <span className="text-xs text-slate-600 mt-1 block">
                       {new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>

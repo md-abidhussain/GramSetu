@@ -44,8 +44,8 @@ export const TenderIntelligencePage = () => {
 
           {/* Past Audits List */}
           <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm">
-            <h3 className="font-semibold text-xs text-slate-400 mb-3.5 flex items-center gap-1.5">
-              <FileSpreadsheet className="h-4.5 w-4.5 text-slate-400" /> Audit Ledger History
+            <h3 className="font-semibold text-xs text-slate-600 mb-3.5 flex items-center gap-1.5">
+              <FileSpreadsheet className="h-4.5 w-4.5 text-slate-600" /> Audit Ledger History
             </h3>
             
             {loading && tenders.length === 0 ? (
@@ -66,7 +66,7 @@ export const TenderIntelligencePage = () => {
                   >
                     <div className="min-w-0 flex-1">
                       <p className="text-dark-800 font-semibold truncate">{item.title}</p>
-                      <p className="text-xs text-slate-400 truncate mt-0.5">{item.contractor?.name || 'N/A'}</p>
+                      <p className="text-xs text-slate-600 truncate mt-0.5">{item.contractor?.name || 'N/A'}</p>
                     </div>
                     <ChevronRight className="h-4 w-4 text-slate-300" />
                   </div>
@@ -89,7 +89,7 @@ export const TenderIntelligencePage = () => {
               )}
             </div>
           ) : (
-            <div className="bg-white border border-slate-100 rounded-2xl p-12 text-center text-slate-400 flex flex-col items-center justify-center min-h-[400px] shadow-sm">
+            <div className="bg-white border border-slate-100 rounded-2xl p-12 text-center text-slate-600 flex flex-col items-center justify-center min-h-[400px] shadow-sm">
               <FileSpreadsheet className="h-12 w-12 text-slate-200 mb-2.5 animate-pulse" />
               <h4 className="font-semibold text-sm text-dark-800">Awaiting Tender Selection</h4>
               <p className="text-xs max-w-xs mt-1 leading-normal">

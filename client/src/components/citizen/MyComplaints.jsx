@@ -30,7 +30,7 @@ const renderWorkflowMilestones = (status) => {
               }`} style={{ left: '-50%', width: '100%' }} />
             )}
             <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-semibold shadow ${
-              isCompleted ? 'bg-brand-600 text-white' : isActive ? 'bg-brand-500 text-white border-2 border-brand-200' : 'bg-slate-100 text-slate-400 border border-slate-200'
+              isCompleted ? 'bg-brand-600 text-white' : isActive ? 'bg-brand-500 text-white border-2 border-brand-200' : 'bg-slate-100 text-slate-600 border border-slate-200'
             }`}>
               {isCompleted ? <CheckCircle2 className="h-4 w-4" /> : idx + 1}
             </div>
@@ -80,11 +80,11 @@ export const MyComplaints = ({ complaints: myComplaints, loading: loadingComplai
                     <p className="font-semibold text-dark-800 text-xs truncate">
                       {comp.project?.title || comp.customProjectTitle || 'Custom Report'}
                     </p>
-                    <p className="text-xs text-slate-400 mt-0.5 truncate">{comp.description}</p>
+                    <p className="text-xs text-slate-600 mt-0.5 truncate">{comp.description}</p>
 
                     <div className="flex items-center justify-between mt-2.5">
-                      <span className="text-[9px] text-slate-400">{formatDate(comp.createdAt)}</span>
-                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
+                      <span className="text-xs text-slate-600">{formatDate(comp.createdAt)}</span>
+                      <span className={`text-xs font-bold px-1.5 py-0.5 rounded ${
                         comp.status === 'Resolution Published' ? 'bg-emerald-50 text-emerald-700' : comp.status === 'Rejected' ? 'bg-rose-50 text-rose-700' : 'bg-amber-50 text-amber-700'
                       }`}>
                         {comp.status}
@@ -109,12 +109,12 @@ export const MyComplaints = ({ complaints: myComplaints, loading: loadingComplai
                     {selectedComplaint.project?.title || selectedComplaint.customProjectTitle || 'Custom Project Audit'}
                   </CardTitle>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs text-slate-400">Complaint ID: #{selectedComplaint._id.toString().slice(-6).toUpperCase()}</span>
+                    <span className="text-xs text-slate-600">Complaint ID: #{selectedComplaint._id.toString().slice(-6).toUpperCase()}</span>
                     <button
                       onClick={() => window.open(`/api/citizen-reports/${selectedComplaint._id}/report`, '_blank')}
                       className="inline-flex items-center gap-1 px-2 py-0.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-semibold rounded text-slate-700 transition-colors"
                     >
-                      <FileText className="h-3 w-3 text-slate-400" /> Export PDF
+                      <FileText className="h-3 w-3 text-slate-600" /> Export PDF
                     </button>
                   </div>
                 </div>
@@ -136,28 +136,28 @@ export const MyComplaints = ({ complaints: myComplaints, loading: loadingComplai
                   <div>
                     <span className="text-xs font-semibold text-slate-500 block">Current Status</span>
                     <span className="font-bold text-slate-700 flex items-center gap-1 mt-0.5">
-                      <Clock className="h-3.5 w-3.5 text-slate-400" /> {selectedComplaint.status}
+                      <Clock className="h-3.5 w-3.5 text-slate-600" /> {selectedComplaint.status}
                     </span>
                   </div>
 
                   <div>
                     <span className="text-xs font-semibold text-slate-500 block">Assigned Inspector</span>
                     <span className="font-medium text-slate-700 flex items-center gap-1 mt-0.5">
-                      <UserCheck className="h-3.5 w-3.5 text-slate-400" /> {selectedComplaint.assignedOfficer?.name || 'Awaiting Allocation'}
+                      <UserCheck className="h-3.5 w-3.5 text-slate-600" /> {selectedComplaint.assignedOfficer?.name || 'Awaiting Allocation'}
                     </span>
                   </div>
 
                   <div>
                     <span className="text-xs font-semibold text-slate-500 block">Inspection Date</span>
                     <span className="font-medium text-slate-700 flex items-center gap-1 mt-0.5">
-                      <Calendar className="h-3.5 w-3.5 text-slate-400" /> {formatDate(selectedComplaint.inspectionDate)}
+                      <Calendar className="h-3.5 w-3.5 text-slate-600" /> {formatDate(selectedComplaint.inspectionDate)}
                     </span>
                   </div>
 
                   <div>
                     <span className="text-xs font-semibold text-slate-500 block">Resolution ETA</span>
                     <span className="font-medium text-slate-700 flex items-center gap-1 mt-0.5">
-                      <Clock className="h-3.5 w-3.5 text-slate-400" /> {formatDate(selectedComplaint.resolutionEta)}
+                      <Clock className="h-3.5 w-3.5 text-slate-600" /> {formatDate(selectedComplaint.resolutionEta)}
                     </span>
                   </div>
                 </div>
@@ -166,7 +166,7 @@ export const MyComplaints = ({ complaints: myComplaints, loading: loadingComplai
                   <div>
                     <span className="text-xs font-semibold text-slate-500 block">GPS Coordinates</span>
                     <span className="font-medium text-slate-700 flex items-center gap-1 mt-0.5">
-                      <MapPin className="h-3.5 w-3.5 text-slate-400" /> {selectedComplaint.gps.lat.toFixed(4)}, {selectedComplaint.gps.lng.toFixed(4)}
+                      <MapPin className="h-3.5 w-3.5 text-slate-600" /> {selectedComplaint.gps.lat.toFixed(4)}, {selectedComplaint.gps.lng.toFixed(4)}
                     </span>
                   </div>
 

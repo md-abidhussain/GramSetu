@@ -57,7 +57,7 @@ export const RewardsPanel = ({ rewards, loading: loadingRewards, user }) => {
                       </td>
                       <td className="px-6 py-3 text-slate-600">{rew.rewardType}</td>
                       <td className="px-6 py-3 text-center text-emerald-600 font-bold">+{rew.amount}</td>
-                      <td className="px-6 py-3 text-right text-slate-400">{formatDate(rew.createdAt)}</td>
+                      <td className="px-6 py-3 text-right text-slate-600">{formatDate(rew.createdAt)}</td>
                     </tr>
                   ))}
                 </tbody>

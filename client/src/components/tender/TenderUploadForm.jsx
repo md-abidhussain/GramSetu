@@ -158,11 +158,11 @@ export const TenderUploadForm = ({ onUploadSuccess }) => {
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
               />
               <div className="flex flex-col items-center gap-2">
-                <FileUp className="h-8 w-8 text-slate-400" />
+                <FileUp className="h-8 w-8 text-slate-600" />
                 <span className="text-sm font-medium text-dark-800">
                   {file ? file.name : 'Click or drag PDF tender here'}
                 </span>
-                <span className="text-xs text-slate-400">PDF documents up to 10MB</span>
+                <span className="text-xs text-slate-600">PDF documents up to 10MB</span>
               </div>
             </div>
           </div>

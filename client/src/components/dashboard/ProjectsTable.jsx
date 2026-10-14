@@ -46,21 +46,21 @@ export const ProjectsTable = ({ projects = [], onSelectProject }) => {
       <CardHeader>
         <div className="flex flex-col md:flex-row md:items-center justify-between w-full gap-3">
           <div>
-            <CardTitle>Infrastructure Project Ledger</CardTitle>
-            <p className="text-xs text-slate-400 mt-0.5">List of audited infrastructure works and AI inspection metrics</p>
+            <CardTitle>Projects</CardTitle>
+            <p className="mt-1 text-sm text-slate-600">Every project being tracked, who is building it, and its current state.</p>
           </div>
           {/* Filters */}
           <div className="flex flex-wrap gap-2.5 items-center">
             <div className="relative w-48">
-              <span className="absolute inset-y-0 left-3 flex items-center text-slate-400">
+              <span className="absolute inset-y-0 left-3 flex items-center text-slate-600">
                 <Search className="h-4 w-4" />
               </span>
               <input
                 type="text"
-                placeholder="Search projects..."
+                placeholder="Search projects"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-white border border-slate-200 rounded-md pl-9 pr-4 py-2 text-xs transition-colors focus:outline-none focus:border-brand-500 text-dark-800 placeholder-slate-400"
+                className="w-full bg-white border border-slate-200 rounded-md pl-9 pr-4 py-2 text-sm transition-colors focus:outline-none focus:border-brand-500 text-dark-800 placeholder-slate-400"
               />
             </div>
 
@@ -74,7 +74,7 @@ export const ProjectsTable = ({ projects = [], onSelectProject }) => {
               ]}
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="!py-1.5 !px-3 !text-xs !bg-white border-slate-200 w-36"
+              className="!py-2 !px-3 !text-sm !bg-white border-slate-200 w-36"
             />
 
             <Select
@@ -87,7 +87,7 @@ export const ProjectsTable = ({ projects = [], onSelectProject }) => {
               ]}
               value={riskFilter}
               onChange={(e) => setRiskFilter(e.target.value)}
-              className="!py-1.5 !px-3 !text-xs !bg-white border-slate-200 w-32"
+              className="!py-2 !px-3 !text-sm !bg-white border-slate-200 w-32"
             />
           </div>
         </div>
@@ -97,19 +97,19 @@ export const ProjectsTable = ({ projects = [], onSelectProject }) => {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-slate-50/70 border-y border-slate-100 text-slate-400 font-bold">
-                <th className="px-6 py-3.5">Project Details</th>
+              <tr className="bg-slate-50/70 border-y border-slate-100 text-slate-600 font-bold">
+                <th className="px-6 py-3.5">Project</th>
                 <th className="px-6 py-3.5">Contractor</th>
-                <th className="px-6 py-3.5 text-center">Lifecycle</th>
-                <th className="px-6 py-3.5">Risk Rating</th>
-                <th className="px-6 py-3.5">Audit Status</th>
-                <th className="px-6 py-3.5">Audit Date</th>
+                <th className="px-6 py-3.5 text-center">Stage</th>
+                <th className="px-6 py-3.5">Risk</th>
+                <th className="px-6 py-3.5">Status</th>
+                <th className="px-6 py-3.5">Last updated</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200/60 bg-white">
               {filteredProjects.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="text-center py-12 text-slate-400 font-medium bg-slate-50/20">
+                  <td colSpan="6" className="text-center py-12 text-slate-600 font-medium bg-slate-50/20">
                     No infrastructure projects matching selected filters.
                   </td>
                 </tr>
@@ -122,11 +122,13 @@ export const ProjectsTable = ({ projects = [], onSelectProject }) => {
                   >
                     <td className="px-6 py-4.5">
                       <p className="font-semibold text-dark-800 group-hover:text-brand-600 transition-colors">{proj.title}</p>
-                      <p className="text-xs text-slate-400 mt-0.5 truncate max-w-xs">{proj.location.address}</p>
+                      <p className="text-xs text-slate-600 mt-0.5 truncate max-w-xs">{proj.location.address}</p>
                     </td>
                     <td className="px-6 py-4.5">
                       <p className="font-medium text-dark-800">{proj.contractor?.name || 'N/A'}</p>
-                      <p className="text-[9px] text-slate-400 mt-0.5">ID: {proj.contractor?.registrationId || 'N/A'}</p>
+                      {proj.contractor?.registrationId && (
+                        <p className="mt-0.5 text-xs text-slate-600">ID {proj.contractor.registrationId}</p>
+                      )}
                     </td>
                     <td className="px-6 py-4.5 text-center">
                       <div className="flex flex-col items-center gap-1">
@@ -138,7 +140,7 @@ export const ProjectsTable = ({ projects = [], onSelectProject }) => {
                             {proj.completionScore}%
                           </span>
                         ) : (
-                          <span className="text-slate-500 italic text-xs">Unverified</span>
+                          <span className="text-xs text-slate-600">Not yet inspected</span>
                         )}
                       </div>
                     </td>
@@ -148,7 +150,7 @@ export const ProjectsTable = ({ projects = [], onSelectProject }) => {
                     <td className="px-6 py-4.5">
                       {getStatusBadge(proj.status)}
                     </td>
-                    <td className="px-6 py-4.5 text-slate-400">
+                    <td className="px-6 py-4.5 text-slate-600">
                       {new Date(proj.createdAt).toLocaleDateString()}
                     </td>
                   </tr>

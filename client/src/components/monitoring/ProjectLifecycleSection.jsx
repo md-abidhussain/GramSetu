@@ -118,7 +118,7 @@ export const ProjectLifecycleSection = ({ projectId, project }) => {
             <CardTitle className="flex items-center gap-2">
               <Clock3 className="h-4.5 w-4.5 text-brand-600" /> Project Lifecycle
             </CardTitle>
-            <p className="text-xs text-slate-400 mt-0.5">Operational progression and authority updates</p>
+            <p className="text-xs text-slate-600 mt-0.5">Operational progression and authority updates</p>
           </div>
           {user?.role !== 'citizen' && (
             <Button variant="secondary" onClick={() => setMessage('')} className="text-xs px-3 py-2">
@@ -192,18 +192,18 @@ export const ProjectLifecycleSection = ({ projectId, project }) => {
         )}
 
         <div className="rounded-2xl border border-slate-100 bg-white p-4">
-          <h4 className="text-xs font-semibold text-slate-400">Timeline</h4>
+          <h4 className="text-xs font-semibold text-slate-600">Timeline</h4>
           <div className="mt-3 space-y-3">
             {history.length === 0 ? (
-              <p className="text-xs text-slate-400">No lifecycle activity yet.</p>
+              <p className="text-xs text-slate-600">No lifecycle activity yet.</p>
             ) : history.map((entry, idx) => (
               <div key={`${entry.status}-${idx}`} className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-sm font-semibold text-dark-800">{entry.status}</span>
-                  <span className="text-xs text-slate-400">{entry.updatedBy}</span>
+                  <span className="text-xs text-slate-600">{entry.updatedBy}</span>
                 </div>
                 <p className="mt-1 text-xs text-slate-500">{entry.remarks || 'No remarks provided.'}</p>
-                <p className="mt-1 text-xs text-slate-400">{new Date(entry.timestamp).toLocaleString()}</p>
+                <p className="mt-1 text-xs text-slate-600">{new Date(entry.timestamp).toLocaleString()}</p>
               </div>
             ))}
           </div>

@@ -59,8 +59,8 @@ export const MapView = ({ mapData = [] }) => {
       <CardHeader className="pb-3 border-b border-slate-100">
         <div className="flex justify-between items-center w-full">
           <div>
-            <CardTitle className="text-base font-bold">Geospatial Project Tracker</CardTitle>
-            <p className="text-xs text-slate-400 mt-0.5">Plotting regional infrastructure coordinates, health metrics, and audit states</p>
+            <CardTitle className="text-base font-semibold">Where the projects are</CardTitle>
+            <p className="mt-1 text-sm text-slate-600">Each pin is a project. Colour shows whether it is running normally or needs attention.</p>
           </div>
           <div className="flex items-center gap-3 text-xs font-semibold text-slate-500">
             <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-emerald-500" /> Healthy</span>
@@ -97,10 +97,10 @@ export const MapView = ({ mapData = [] }) => {
                 <Popup>
                   <div className="p-1 font-sans text-xs max-w-[180px]">
                     <h4 className="font-bold text-dark-800 text-xs leading-tight">{proj.title}</h4>
-                    <p className="text-[9px] text-slate-400 mt-1">{proj.location.address}</p>
+                    <p className="text-xs text-slate-600 mt-1">{proj.location.address}</p>
                     <button 
                       onClick={() => setSelectedProject(proj)}
-                      className="mt-2 w-full bg-brand-600 hover:bg-brand-700 text-white text-[9px] font-bold py-1 rounded shadow"
+                      className="mt-2 w-full bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold py-1 rounded shadow"
                     >
                       Inspect Audit Profile
                     </button>
@@ -118,14 +118,14 @@ export const MapView = ({ mapData = [] }) => {
               
               <div className="bg-slate-800 text-white p-3 flex items-center justify-between">
                 <div>
-                  <span className="text-[8px] text-slate-400 font-bold">Geospatial Audit Profile</span>
+                  <span className="text-xs text-slate-600 font-bold">Project details</span>
                   <h4 className="font-bold text-xs mt-0.5 flex items-center gap-1.5">
                     <MapPin className="h-4 w-4 text-rose-500" /> {selectedProject.title}
                   </h4>
                 </div>
                 <button 
                   onClick={() => setSelectedProject(null)}
-                  className="text-slate-400 hover:text-white transition-colors"
+                  className="text-slate-600 hover:text-white transition-colors"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -136,7 +136,7 @@ export const MapView = ({ mapData = [] }) => {
                 {/* Visual score pills */}
                 <div className="grid grid-cols-3 gap-2 text-center">
                   <div className="bg-slate-50 border border-slate-100 rounded p-2">
-                    <span className="block text-[8px] font-semibold text-slate-400 uppercase">Health</span>
+                    <span className="block text-xs font-semibold text-slate-600 uppercase">Health</span>
                     <span className={`text-xs font-semibold block mt-0.5 ${
                       selectedProject.healthPercentage >= 80 ? 'text-emerald-600' : selectedProject.healthPercentage >= 50 ? 'text-amber-500' : 'text-rose-600'
                     }`}>
@@ -145,7 +145,7 @@ export const MapView = ({ mapData = [] }) => {
                   </div>
 
                   <div className="bg-slate-50 border border-slate-100 rounded p-2">
-                    <span className="block text-[8px] font-semibold text-slate-400 uppercase">Completion</span>
+                    <span className="block text-xs font-semibold text-slate-600 uppercase">Completion</span>
                     <span className="text-xs font-semibold text-slate-800 block mt-0.5">
                       {selectedProject.completionScore !== null && selectedProject.completionScore !== undefined 
                         ? `${selectedProject.completionScore}%` 
@@ -154,7 +154,7 @@ export const MapView = ({ mapData = [] }) => {
                   </div>
 
                   <div className="bg-slate-50 border border-slate-100 rounded p-2">
-                    <span className="block text-[8px] font-semibold text-slate-400 uppercase">Risk Level</span>
+                    <span className="block text-xs font-semibold text-slate-600 uppercase">Risk Level</span>
                     <span className={`text-xs font-semibold block mt-0.5 ${
                       selectedProject.riskLevel === 'Low' ? 'text-emerald-600' : selectedProject.riskLevel === 'Medium' ? 'text-amber-500' : 'text-rose-600'
                     }`}>
@@ -188,7 +188,7 @@ export const MapView = ({ mapData = [] }) => {
 
                 {/* AI Summary comparison notes */}
                 <div className="border-t border-slate-100 pt-3 bg-brand-50/10 p-2.5 rounded border border-brand-100/30">
-                  <span className="block text-[8px] font-bold text-brand-700 flex items-center gap-1 mb-1">
+                  <span className="block text-xs font-bold text-brand-700 flex items-center gap-1 mb-1">
                     <ShieldCheck className="h-3.5 w-3.5" /> AI Audit Summary & Notes
                   </span>
                   <p className="text-slate-700 leading-relaxed text-xs">
