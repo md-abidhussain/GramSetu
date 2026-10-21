@@ -165,7 +165,9 @@ export const getProjects = async (req, res, next) => {
   try {
     const pagination = readPagination(req.query);
     const [projects, total] = await Promise.all([
-      projectQuery(Project.find(), req).sort({ createdAt: -1 }).skip(pagination.skip).limit(pagination.limit),
+      // lean(): plain objects instead of full Mongoose documents. Read-only
+      // lists do not need change tracking, and it roughly halves the CPU cost.
+      projectQuery(Project.find(), req).sort({ createdAt: -1 }).skip(pagination.skip).limit(pagination.limit).lean(),
       Project.estimatedDocumentCount()
     ]);
     setPaginationHeaders(res, pagination, total);

@@ -11,7 +11,8 @@
     "test:unit": "node --test \"tests/unit/*.test.js\"",
     "test:http": "node --test --test-concurrency=1 \"tests/http/*.test.js\"",
     "lint": "eslint .",
-    "smoke": "node scripts/smoke.js"
+    "smoke": "node scripts/smoke.js",
+    "loadtest": "node scripts/loadtest.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
@@ -30,6 +31,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
+    "autocannon": "^8.0.0",
     "eslint": "^9.39.5",
     "globals": "^15.15.0",
     "mongodb-memory-server": "^10.4.3",

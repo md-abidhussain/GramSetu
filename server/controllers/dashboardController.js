@@ -72,7 +72,8 @@ export const getComplaints = async (req, res, next) => {
         .populate('assignedOfficer', 'name role')
         .sort({ createdAt: -1 })
         .skip(pagination.skip)
-        .limit(pagination.limit),
+        .limit(pagination.limit)
+        .lean(),
       CitizenReport.estimatedDocumentCount()
     ]);
     setPaginationHeaders(res, pagination, total);

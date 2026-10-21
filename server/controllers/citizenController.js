@@ -160,7 +160,8 @@ export const getCitizenReports = async (req, res, next) => {
       reportQuery(CitizenReport.find(filter), { forOfficial: req.isAuthority })
         .sort({ createdAt: -1 })
         .skip(pagination.skip)
-        .limit(pagination.limit),
+        .limit(pagination.limit)
+        .lean(),
       CitizenReport.countDocuments(filter)
     ]);
     setPaginationHeaders(res, pagination, total);
