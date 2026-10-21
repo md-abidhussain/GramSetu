@@ -16,8 +16,11 @@ const contractorSchema = new mongoose.Schema({
   expertise: { type: String, default: '' },
   remarks: { type: String, default: '' },
   pastProjects: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Project' }],
-  performanceScore: { type: Number, default: 85, min: 0, max: 100 }, // Default performance score
-  trustScore: { type: Number, default: 90, min: 0, max: 100 }, // AI Trust Score
+  // Score an official entered at registration (e.g. from past records). Used
+  // until real project evidence exists. See services/contractorScoreService.js.
+  baselineScore: { type: Number, default: 100, min: 0, max: 100 },
+  performanceScore: { type: Number, default: 100, min: 0, max: 100 },
+  trustScore: { type: Number, default: 100, min: 0, max: 100 },
   completedCount: { type: Number, default: 0 },
   completedOnTime: { type: Number, default: 0 },
   delayedCount: { type: Number, default: 0 },
@@ -27,9 +30,12 @@ const contractorSchema = new mongoose.Schema({
   performanceTrend: [{ type: Number }], // array of historical scores
   riskTrend: [{ type: Number }], // array of historical risk ratings (0-100)
   recentInspections: [recentInspectionSchema],
-  aiSummary: { type: String, default: 'Contractor is currently under review.' },
+  aiSummary: { type: String, default: '' },
+  dataSource: { type: String, enum: ['live', 'sample'], default: 'live' },
   createdAt: { type: Date, default: Date.now }
 });
+
+contractorSchema.index({ trustScore: -1 });
 
 const Contractor = mongoose.model('Contractor', contractorSchema);
 export default Contractor;

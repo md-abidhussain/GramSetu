@@ -3,26 +3,32 @@ import Tender from '../models/Tender.js';
 import Contractor from '../models/Contractor.js';
 import CitizenReport from '../models/CitizenReport.js';
 import Notification from '../models/Notification.js';
+import { readPagination, setPaginationHeaders } from '../utils/pagination.js';
 
 export const getSummary = async (req, res, next) => {
   try {
-    const totalProjects = await Project.countDocuments();
-    const completedProjects = await Project.countDocuments({ afterImageUrl: { $exists: true, $ne: null } });
-    
-    // Average completion score (exclude projects where score is null/undefined)
-    const projectsWithScore = await Project.find({ completionScore: { $ne: null, $exists: true } });
-    const avgScore = projectsWithScore.length > 0
-      ? Math.round(projectsWithScore.reduce((sum, p) => sum + (p.completionScore || 0), 0) / projectsWithScore.length)
-      : 100;
-
-    const flaggedProjects = await Project.countDocuments({ status: 'Flagged' });
-    const totalComplaints = await CitizenReport.countDocuments();
-    const activeTendersCount = await Tender.countDocuments();
+    const [totalProjects, completedProjects, scoreStats, flaggedProjects, totalComplaints, activeTendersCount, aiPendingProjects] =
+      await Promise.all([
+        Project.estimatedDocumentCount(),
+        Project.countDocuments({ afterImageUrl: { $exists: true, $nin: [null, ''] } }),
+        // Averaged in the database, over real AI comparisons only.
+        Project.aggregate([
+          { $match: { 'aiAssessment.status': 'completed', completionScore: { $type: 'number' } } },
+          { $group: { _id: null, average: { $avg: '$completionScore' }, count: { $sum: 1 } } }
+        ]),
+        Project.countDocuments({ status: 'Flagged' }),
+        CitizenReport.estimatedDocumentCount(),
+        Tender.estimatedDocumentCount(),
+        Project.countDocuments({ lifecycleStatus: 'Waiting for AI Verification' })
+      ]);
 
     res.json({
       totalProjects,
       completedProjects,
-      averageCompletionScore: avgScore,
+      // null (shown as "no data yet") instead of a made-up 100 when nothing has been assessed.
+      averageCompletionScore: scoreStats[0] ? Math.round(scoreStats[0].average) : null,
+      aiAssessedProjects: scoreStats[0]?.count ?? 0,
+      aiPendingProjects,
       flaggedProjects,
       totalComplaints,
       activeTendersCount
@@ -34,28 +40,11 @@ export const getSummary = async (req, res, next) => {
 
 export const getRiskAnalytics = async (req, res, next) => {
   try {
-    const projectRisk = await Project.aggregate([
-      { $group: { _id: '$riskLevel', count: { $sum: 1 } } }
-    ]);
-    const tenderRisk = await Tender.aggregate([
-      { $group: { _id: '$riskLevel', count: { $sum: 1 } } }
-    ]);
+    const group = [{ $match: { riskLevel: { $in: ['Low', 'Medium', 'High'] } } }, { $group: { _id: '$riskLevel', count: { $sum: 1 } } }];
+    const [projectRisk, tenderRisk] = await Promise.all([Project.aggregate(group), Tender.aggregate(group)]);
 
-    // Format risk response
-    const formatRisk = (riskGroup) => {
-      const risks = { Low: 0, Medium: 0, High: 0 };
-      riskGroup.forEach(g => {
-        if (g._id && risks[g._id] !== undefined) {
-          risks[g._id] = g.count;
-        }
-      });
-      return risks;
-    };
-
-    res.json({
-      projects: formatRisk(projectRisk),
-      tenders: formatRisk(tenderRisk)
-    });
+    const format = (rows) => rows.reduce((risks, row) => ({ ...risks, [row._id]: row.count }), { Low: 0, Medium: 0, High: 0 });
+    res.json({ projects: format(projectRisk), tenders: format(tenderRisk) });
   } catch (error) {
     next(error);
   }
@@ -63,7 +52,10 @@ export const getRiskAnalytics = async (req, res, next) => {
 
 export const getContractorScores = async (req, res, next) => {
   try {
-    const contractors = await Contractor.find().sort({ trustScore: -1 });
+    const contractors = await Contractor.find()
+      .select('name registrationId trustScore performanceScore citizenComplaintsCount delayedCount completedOnTime dataSource')
+      .sort({ trustScore: -1 })
+      .limit(100);
     res.json(contractors);
   } catch (error) {
     next(error);
@@ -72,11 +64,18 @@ export const getContractorScores = async (req, res, next) => {
 
 export const getComplaints = async (req, res, next) => {
   try {
-    const complaints = await CitizenReport.find()
-      .populate('project')
-      .populate('citizen', 'name email phone')
-      .populate('assignedOfficer', 'name role')
-      .sort({ createdAt: -1 });
+    const pagination = readPagination(req.query);
+    const [complaints, total] = await Promise.all([
+      CitizenReport.find()
+        .populate('project', 'title location status')
+        .populate('citizen', 'name email phone')
+        .populate('assignedOfficer', 'name role')
+        .sort({ createdAt: -1 })
+        .skip(pagination.skip)
+        .limit(pagination.limit),
+      CitizenReport.estimatedDocumentCount()
+    ]);
+    setPaginationHeaders(res, pagination, total);
     res.json(complaints);
   } catch (error) {
     next(error);
@@ -86,20 +85,19 @@ export const getComplaints = async (req, res, next) => {
 export const getMapData = async (req, res, next) => {
   try {
     const projects = await Project.find()
+      .select('title location status lifecycleStatus projectHealth healthPercentage completionScore riskLevel contractor')
       .populate('contractor', 'name trustScore')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .limit(500);
     res.json(projects);
   } catch (error) {
     next(error);
   }
 };
 
-// Notification methods
 export const getNotifications = async (req, res, next) => {
   try {
-    const notifications = await Notification.find({ user: req.user._id })
-      .sort({ createdAt: -1 })
-      .limit(50);
+    const notifications = await Notification.find({ user: req.user._id }).sort({ createdAt: -1 }).limit(50);
     res.json(notifications);
   } catch (error) {
     next(error);
@@ -108,19 +106,13 @@ export const getNotifications = async (req, res, next) => {
 
 export const markNotificationRead = async (req, res, next) => {
   try {
-    const notification = await Notification.findById(req.params.id);
-    if (!notification) {
-      return res.status(404).json({ message: 'Notification not found' });
-    }
-
-    // Ensure it belongs to the user
-    if (notification.user.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: 'Unauthorized' });
-    }
-
-    notification.read = true;
-    await notification.save();
-
+    // Ownership is part of the query, so another user's id simply matches nothing.
+    const notification = await Notification.findOneAndUpdate(
+      { _id: req.params.id, user: req.user._id },
+      { $set: { read: true } },
+      { new: true }
+    );
+    if (!notification) return res.status(404).json({ message: 'Notification not found.' });
     res.json(notification);
   } catch (error) {
     next(error);

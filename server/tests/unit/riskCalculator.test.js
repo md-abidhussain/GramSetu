@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { calculateRiskLevel } from '../utils/riskCalculator.js';
+import { calculateRiskLevel } from '../../utils/riskCalculator.js';
 
 describe('calculateRiskLevel', () => {
   it('names each band', () => {

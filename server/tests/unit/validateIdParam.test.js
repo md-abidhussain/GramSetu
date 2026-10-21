@@ -1,6 +1,6 @@
 import test, { describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { validateIdParam } from '../middleware/validateIdParam.js';
+import { validateIdParam } from '../../middleware/validateIdParam.js';
 
 // Stands in for Express: records what the handler did instead of sending it.
 const fakeResponse = () => {

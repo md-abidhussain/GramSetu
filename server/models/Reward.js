@@ -17,8 +17,14 @@ const rewardSchema = new mongoose.Schema({
   amount: { type: Number, default: 0 },
   title: { type: String, required: true },
   description: { type: String, required: true },
+  // At most one reward per complaint: the unique index is the last line of
+  // defence against paying twice.
+  complaint: { type: mongoose.Schema.Types.ObjectId, ref: 'CitizenReport' },
   createdAt: { type: Date, default: Date.now }
 });
+
+rewardSchema.index({ complaint: 1 }, { unique: true, partialFilterExpression: { complaint: { $exists: true } } });
+rewardSchema.index({ citizen: 1, createdAt: -1 });
 
 const Reward = mongoose.model('Reward', rewardSchema);
 export default Reward;

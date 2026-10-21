@@ -7,11 +7,12 @@ import {
   getMapData 
 } from '../controllers/dashboardController.js';
 import { protectAuthority, restrictTo } from '../middleware/authMiddleware.js';
+import { PERMISSIONS } from '../utils/roles.js';
 
 const router = express.Router();
 
 router.use(protectAuthority);
-router.use(restrictTo('District Authority', 'PWD Engineer', 'Admin', 'Government Officer', 'Inspector'));
+router.use(restrictTo(...PERMISSIONS.viewDashboard));
 
 router.get('/summary', getSummary);
 router.get('/risk-analytics', getRiskAnalytics);

@@ -1,179 +1,161 @@
 import Project from '../models/Project.js';
 import Tender from '../models/Tender.js';
-import Authority from '../models/Authority.js';
-import Notification from '../models/Notification.js';
-import { uploadBuffer } from '../services/cloudinaryService.js';
-import { compareBeforeAfter } from '../services/geminiImageCompareService.js';
-import { updateContractorScore } from '../services/contractorScoreService.js';
-import { runMockLifecycleAI } from '../services/mockLifecycleAIService.js';
+import { storeFile, removeStoredFile } from '../services/cloudinaryService.js';
+import { compareBeforeAfter } from '../services/ai/assessments.js';
+import { recalculateContractor } from '../services/contractorScoreService.js';
+import { notifyOfficials } from '../services/notificationService.js';
 import { generateProjectAuditPDF } from '../services/pdfReportService.js';
+import { fetchImage } from '../utils/fetchImage.js';
 import { isValidId, toLatitude, toLongitude, toText } from '../utils/validators.js';
+import { FINAL_DECISIONS, LIFECYCLE, allowedManualSteps, canMoveManually } from '../utils/projectLifecycle.js';
+import { readPagination, setPaginationHeaders } from '../utils/pagination.js';
+import { PERMISSIONS } from '../utils/roles.js';
 
-// Helper to create notifications for all authority users
-const notifyAuthorities = async (message, type = 'info') => {
-  try {
-    const authorities = await Authority.find({ role: { $in: ['Government Officer', 'Inspector', 'District Authority', 'PWD Engineer', 'Admin'] } });
-    const notifications = authorities.map(auth => ({
-      user: auth._id,
-      message,
-      type,
-      read: false
-    }));
-    if (notifications.length > 0) {
-      await Notification.insertMany(notifications);
-    }
-  } catch (error) {
-    console.error('Error creating notifications:', error);
+// What anyone may see about a public works project. Tender text, the tender
+// PDF, budgets and contractor contact details are for officials only.
+const PUBLIC_FIELDS = [
+  'title', 'location', 'status', 'lifecycleStatus', 'projectHealth', 'healthPercentage',
+  'completionScore', 'riskLevel', 'aiAssessment', 'aiComparisonNotes', 'beforeImageUrl', 'afterImageUrl',
+  'contractor', 'tender', 'verifiedComplaintCount', 'dataSource', 'createdAt'
+].join(' ');
+
+const projectQuery = (query, req) => {
+  if (req.isAuthority) {
+    return query
+      .populate('contractor', 'name registrationId contactPerson contactEmail phone trustScore performanceScore')
+      .populate('tender', 'title budgetAllocated riskLevel riskScore timelineStart timelineEnd fileUrl aiAssessment');
   }
+  return query.select(PUBLIC_FIELDS).populate('contractor', 'name').populate('tender', 'title');
 };
 
-const lifecycleTransitions = {
-  'Tender Published': ['Project Created'],
-  'Project Created': ['Construction Started'],
-  'Construction Started': ['Waiting for AI Verification'],
-  'Waiting for AI Verification': ['AI Verified'],
-  'AI Verified': ['Citizen Verification'],
-  'Citizen Verification': ['Under Authority Review'],
-  'Under Authority Review': ['Approved', 'Rejected', 'Maintenance Required'],
-  'Approved': [],
-  'Rejected': [],
-  'Maintenance Required': []
-};
-
-const getAllowedNextStatuses = (currentStatus) => lifecycleTransitions[currentStatus] || [];
-
-const transitionLifecycle = async (project, nextStatus, updatedBy = 'system', remarks = '') => {
-  const allowedNextStatuses = getAllowedNextStatuses(project.lifecycleStatus);
-
-  if (!allowedNextStatuses.includes(nextStatus)) {
-    throw new Error(`Invalid lifecycle transition from ${project.lifecycleStatus} to ${nextStatus}`);
-  }
-
-  project.lifecycleStatus = nextStatus;
-  project.statusHistory.push({
-    status: nextStatus,
-    updatedBy,
-    remarks
-  });
-
-  return project;
-};
+const historyEntry = (status, updatedBy, remarks) => ({ status, updatedBy, remarks, timestamp: new Date() });
 
 export const createProject = async (req, res, next) => {
+  let stored = null;
   try {
     const { title, tenderId, lat, lng, address } = req.body;
-
-    if (!title || !tenderId || !lat || !lng) {
-      return res.status(400).json({ message: 'Title, tenderId, lat, and lng are required' });
-    }
-
     const projectTitle = toText(title, 200);
-    if (!projectTitle) {
-      return res.status(400).json({ message: 'Give the project a title of 200 characters or fewer' });
-    }
-
-    if (!isValidId(tenderId)) {
-      return res.status(400).json({ message: 'That tender does not exist' });
-    }
+    if (!projectTitle) return res.status(400).json({ message: 'Give the project a title of 200 characters or fewer.' });
+    if (!isValidId(tenderId)) return res.status(400).json({ message: 'Choose the tender this project belongs to.' });
 
     const latitude = toLatitude(lat);
     const longitude = toLongitude(lng);
     if (latitude === null || longitude === null) {
-      return res.status(400).json({ message: 'Please give a valid location for the project' });
+      return res.status(400).json({ message: 'Please give a valid location for the project.' });
     }
 
-    const projectAddress = address ? toText(address, 300) : null;
-    if (address && !projectAddress) {
-      return res.status(400).json({ message: 'Shorten the address to 300 characters or fewer' });
-    }
+    const projectAddress = address ? toText(address, 300) : '';
+    if (address && !projectAddress) return res.status(400).json({ message: 'Shorten the address to 300 characters or fewer.' });
+    if (!req.file) return res.status(400).json({ message: 'A "before" photo is required.' });
 
-    if (!req.file) {
-      return res.status(400).json({ message: 'Project "before" image is required' });
-    }
+    const tender = await Tender.findById(tenderId).select('contractor').lean();
+    if (!tender) return res.status(404).json({ message: 'Tender not found.' });
 
-    // Find tender and its contractor
-    const tender = await Tender.findById(tenderId);
-    if (!tender) {
-      return res.status(404).json({ message: 'Associated Tender not found' });
-    }
-
-    const contractorId = tender.contractor;
-
-    // Upload "before" image
-    const uploadResult = await uploadBuffer(req.file.buffer, 'projects/before');
-
-    // Create project
+    stored = await storeFile(req.file, 'projects/before');
     const project = await Project.create({
       title: projectTitle,
-      tender: tenderId,
-      contractor: contractorId,
-      location: {
-        lat: latitude,
-        lng: longitude,
-        address: projectAddress || ''
-      },
-      beforeImageUrl: uploadResult.secure_url,
+      tender: tender._id,
+      contractor: tender.contractor,
+      location: { lat: latitude, lng: longitude, address: projectAddress },
+      beforeImageUrl: stored.url,
+      beforeImagePublicId: stored.publicId,
       status: 'Pending',
-      lifecycleStatus: 'Project Created',
-      statusHistory: [{
-        status: 'Project Created',
-        updatedBy: 'system',
-        remarks: 'Project created from tender intake.'
-      }]
+      lifecycleStatus: LIFECYCLE.CREATED,
+      statusHistory: [historyEntry(LIFECYCLE.CREATED, req.user.name, 'Project created from tender.')]
     });
+    stored = null;
 
-    const populatedProject = await project.populate(['tender', 'contractor']);
-    res.status(201).json(populatedProject);
+    res.status(201).json(await projectQuery(Project.findById(project._id), req));
   } catch (error) {
+    if (stored) await removeStoredFile(stored);
     next(error);
   }
 };
 
-export const completeProject = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-
-    if (!req.file) {
-      return res.status(400).json({ message: 'Project "after" image is required' });
-    }
-
-    const project = await Project.findById(id);
-    if (!project) {
-      return res.status(404).json({ message: 'Project not found' });
-    }
-
-    if (!project.beforeImageUrl) {
-      return res.status(400).json({ message: 'Project does not have a "before" image yet' });
-    }
-
-    // Upload "after" image
-    const uploadResult = await uploadBuffer(req.file.buffer, 'projects/after');
-    project.afterImageUrl = uploadResult.secure_url;
-
-    // Run Gemini Before/After Comparison
-    const comparison = await compareBeforeAfter(project.beforeImageUrl, project.afterImageUrl);
-
-    // Update completion and health metrics
+/** Writes an AI comparison onto a project and advances the lifecycle only if it really ran. */
+const applyComparison = (project, comparison, actor) => {
+  project.aiAssessment = { status: comparison.status, reason: comparison.reason, model: comparison.model, assessedAt: comparison.assessedAt };
+  if (comparison.status === 'completed') {
     project.completionScore = comparison.completionScore;
     project.riskLevel = comparison.riskLevel;
     project.projectHealth = comparison.projectHealth;
     project.aiComparisonNotes = comparison.notes;
+    project.status = comparison.completionScore >= 80 ? 'Verified' : 'Flagged';
+    project.lifecycleStatus = LIFECYCLE.AI_VERIFIED;
+    project.statusHistory.push(historyEntry(LIFECYCLE.AI_VERIFIED, 'AI comparison', `Completion score ${comparison.completionScore}% (${comparison.model}).`));
+  } else {
+    // No scores are written. The project waits until the comparison can run.
+    project.completionScore = null;
+    project.riskLevel = null;
+    project.aiComparisonNotes = undefined;
+    project.status = 'Pending';
+    project.statusHistory.push(historyEntry(LIFECYCLE.AWAITING_AI, actor, `AI comparison did not run (${comparison.reason || comparison.status}). Retry from the project page.`));
+  }
+};
 
-    const lifecycleUpdated = await transitionLifecycle(project, 'Waiting for AI Verification', 'system', 'Completion image uploaded and ready for AI assessment.');
-    lifecycleUpdated.status = comparison.completionScore >= 80 ? 'Verified' : 'Flagged';
-    await lifecycleUpdated.save();
+export const completeProject = async (req, res, next) => {
+  let stored = null;
+  try {
+    const project = await Project.findById(req.params.id);
+    if (!project) return res.status(404).json({ message: 'Project not found.' });
 
-    // Trigger contractor score recalculation
-    await updateContractorScore(project.contractor);
+    // Checked before the upload and the AI call, which both cost money.
+    if (project.lifecycleStatus !== LIFECYCLE.CONSTRUCTION) {
+      return res.status(409).json({
+        message: `Completion photos can be added once construction has started. This project is "${project.lifecycleStatus}".`
+      });
+    }
+    if (!project.beforeImageUrl) return res.status(409).json({ message: 'This project has no "before" photo to compare against.' });
+    if (!req.file) return res.status(400).json({ message: 'An "after" photo is required.' });
 
-    // Notify authorities
-    await notifyAuthorities(
-      `Project "${project.title}" entered AI verification with a completion score of ${project.completionScore}% (${project.status}).`,
-      project.status === 'Verified' ? 'success' : 'warning'
+    const comparison = await compareBeforeAfter(project.beforeImageUrl, { buffer: req.file.buffer, mimeType: req.file.mimetype });
+    stored = await storeFile(req.file, 'projects/after');
+
+    project.afterImageUrl = stored.url;
+    project.afterImagePublicId = stored.publicId;
+    project.lifecycleStatus = LIFECYCLE.AWAITING_AI;
+    project.statusHistory.push(historyEntry(LIFECYCLE.AWAITING_AI, req.user.name, 'Completion photo uploaded.'));
+    applyComparison(project, comparison, req.user.name);
+
+    // Optimistic concurrency: if someone else changed this project meanwhile, save() fails.
+    await project.save();
+    stored = null;
+
+    await recalculateContractor(project.contractor);
+    await notifyOfficials(
+      comparison.status === 'completed'
+        ? `Project "${project.title}" was compared by AI: ${project.completionScore}% complete.`
+        : `Project "${project.title}" has a completion photo, but the AI comparison could not run. It needs a retry.`,
+      { type: comparison.status === 'completed' ? (project.status === 'Verified' ? 'success' : 'warning') : 'warning' }
     );
 
-    const populatedProject = await project.populate(['tender', 'contractor']);
-    res.json(populatedProject);
+    res.json(await projectQuery(Project.findById(project._id), req));
+  } catch (error) {
+    if (stored) await removeStoredFile(stored);
+    next(error);
+  }
+};
+
+/** Re-runs the comparison for a project whose AI step failed earlier. */
+export const retryAiVerification = async (req, res, next) => {
+  try {
+    const project = await Project.findById(req.params.id);
+    if (!project) return res.status(404).json({ message: 'Project not found.' });
+    if (project.lifecycleStatus !== LIFECYCLE.AWAITING_AI || !project.afterImageUrl) {
+      return res.status(409).json({ message: 'Only a project waiting for AI verification can be retried.' });
+    }
+
+    let after;
+    try {
+      after = await fetchImage(project.afterImageUrl);
+    } catch (error) {
+      return next(error);
+    }
+    const comparison = await compareBeforeAfter(project.beforeImageUrl, after);
+    applyComparison(project, comparison, req.user.name);
+    await project.save();
+    await recalculateContractor(project.contractor);
+    res.json(await projectQuery(Project.findById(project._id), req));
   } catch (error) {
     next(error);
   }
@@ -181,7 +163,12 @@ export const completeProject = async (req, res, next) => {
 
 export const getProjects = async (req, res, next) => {
   try {
-    const projects = await Project.find().populate(['tender', 'contractor']).sort({ createdAt: -1 });
+    const pagination = readPagination(req.query);
+    const [projects, total] = await Promise.all([
+      projectQuery(Project.find(), req).sort({ createdAt: -1 }).skip(pagination.skip).limit(pagination.limit),
+      Project.estimatedDocumentCount()
+    ]);
+    setPaginationHeaders(res, pagination, total);
     res.json(projects);
   } catch (error) {
     next(error);
@@ -190,10 +177,8 @@ export const getProjects = async (req, res, next) => {
 
 export const getProjectById = async (req, res, next) => {
   try {
-    const project = await Project.findById(req.params.id).populate(['tender', 'contractor']);
-    if (!project) {
-      return res.status(404).json({ message: 'Project not found' });
-    }
+    const project = await projectQuery(Project.findById(req.params.id), req);
+    if (!project) return res.status(404).json({ message: 'Project not found.' });
     res.json(project);
   } catch (error) {
     next(error);
@@ -202,14 +187,18 @@ export const getProjectById = async (req, res, next) => {
 
 export const getProjectLifecycle = async (req, res, next) => {
   try {
-    const project = await Project.findById(req.params.id);
-    if (!project) {
-      return res.status(404).json({ message: 'Project not found' });
-    }
+    const project = await Project.findById(req.params.id).select('lifecycleStatus statusHistory').lean();
+    if (!project) return res.status(404).json({ message: 'Project not found.' });
+
+    const history = [...(project.statusHistory || [])]
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+      // Officials' names are internal; the public sees what happened and when.
+      .map((entry) => (req.isAuthority ? entry : { status: entry.status, timestamp: entry.timestamp, remarks: entry.remarks }));
 
     res.json({
       currentStatus: project.lifecycleStatus,
-      history: project.statusHistory.slice().sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+      allowedNextStatuses: req.isAuthority ? allowedManualSteps(project.lifecycleStatus) : [],
+      history
     });
   } catch (error) {
     next(error);
@@ -218,60 +207,36 @@ export const getProjectLifecycle = async (req, res, next) => {
 
 export const updateProjectLifecycle = async (req, res, next) => {
   try {
-    const { status, remarks } = req.body;
+    const { status } = req.body;
+    if (typeof status !== 'string' || !status) return res.status(400).json({ message: 'Choose the next stage.' });
+    const remarks = req.body.remarks ? toText(req.body.remarks, 1000) : '';
+    if (req.body.remarks && !remarks) return res.status(400).json({ message: 'Keep remarks to 1000 characters.' });
+
     const project = await Project.findById(req.params.id);
+    if (!project) return res.status(404).json({ message: 'Project not found.' });
 
-    if (!project) {
-      return res.status(404).json({ message: 'Project not found' });
-    }
-
-    if (!status) {
-      return res.status(400).json({ message: 'Status is required' });
-    }
-
-    if (project.lifecycleStatus === 'Approved' || project.lifecycleStatus === 'Rejected' || project.lifecycleStatus === 'Maintenance Required') {
-      return res.status(400).json({ message: 'Project lifecycle is already complete' });
-    }
-
-    const allowedNextStatuses = getAllowedNextStatuses(project.lifecycleStatus);
-    if (!allowedNextStatuses.includes(status)) {
-      return res.status(400).json({ message: `Invalid lifecycle transition from ${project.lifecycleStatus} to ${status}` });
-    }
-
-    const updatedProject = await transitionLifecycle(project, status, req.user?.name || 'authority', remarks || '');
-
-    if (status === 'Waiting for AI Verification' && (!project.completionScore || !project.afterImageUrl)) {
-      return res.status(400).json({ message: 'Project requires completion data before AI verification' });
-    }
-
-    if (status === 'Waiting for AI Verification') {
-      const aiResult = await runMockLifecycleAI(project);
-      updatedProject.completionScore = aiResult.completionScore;
-      updatedProject.riskLevel = aiResult.riskLevel;
-      updatedProject.aiComparisonNotes = aiResult.recommendation;
-      updatedProject.status = aiResult.completionScore >= 80 ? 'Verified' : 'Flagged';
-      updatedProject.lifecycleStatus = 'AI Verified';
-      updatedProject.statusHistory.push({
-        status: 'AI Verified',
-        updatedBy: req.user?.name || 'system',
-        remarks: aiResult.recommendation
+    if (!canMoveManually(project.lifecycleStatus, status)) {
+      const allowed = allowedManualSteps(project.lifecycleStatus);
+      return res.status(409).json({
+        message: allowed.length
+          ? `From "${project.lifecycleStatus}" the next stage can be: ${allowed.join(', ')}.`
+          : `"${project.lifecycleStatus}" cannot be changed by hand.`
       });
     }
-
-    if (status === 'Approved') {
-      updatedProject.status = 'Verified';
+    if (FINAL_DECISIONS.includes(status) && !PERMISSIONS.decideProject.includes(req.user.role)) {
+      return res.status(403).json({ message: 'Only a District Authority, Government Officer or Admin can make the final decision.' });
     }
 
-    if (status === 'Rejected' || status === 'Maintenance Required') {
-      updatedProject.status = 'Flagged';
-    }
+    project.lifecycleStatus = status;
+    project.statusHistory.push(historyEntry(status, req.user.name, remarks));
+    if (status === LIFECYCLE.APPROVED) project.status = 'Verified';
+    if (status === LIFECYCLE.REJECTED || status === LIFECYCLE.MAINTENANCE) project.status = 'Flagged';
+    await project.save();
 
-    await updatedProject.save();
+    if (FINAL_DECISIONS.includes(status)) await recalculateContractor(project.contractor);
+    await notifyOfficials(`Project "${project.title}" moved to ${status}.`);
 
-    await notifyAuthorities(`Project "${updatedProject.title}" moved to ${updatedProject.lifecycleStatus}.`, 'info');
-
-    const populatedProject = await updatedProject.populate(['tender', 'contractor']);
-    res.json(populatedProject);
+    res.json(await projectQuery(Project.findById(project._id), req));
   } catch (error) {
     next(error);
   }
@@ -279,15 +244,11 @@ export const updateProjectLifecycle = async (req, res, next) => {
 
 export const downloadProjectReport = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const project = await Project.findById(id).populate(['tender', 'contractor']);
-    if (!project) {
-      return res.status(404).json({ message: 'Project not found' });
-    }
+    const project = await Project.findById(req.params.id).populate('contractor', 'name').populate('tender', 'title');
+    if (!project) return res.status(404).json({ message: 'Project not found.' });
 
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="audit-report-${id}.pdf"`);
-
+    res.setHeader('Content-Disposition', `attachment; filename="audit-report-${project._id}.pdf"`);
     await generateProjectAuditPDF(project, res);
   } catch (error) {
     next(error);

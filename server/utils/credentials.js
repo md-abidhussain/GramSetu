@@ -24,6 +24,13 @@ const PHONE_SHAPE = /^(?:\+?91)?[6-9]\d{9}$/;
 
 export const isValidPhone = (value) => PHONE_SHAPE.test(toIdentifier(value).replace(/[\s-]/g, ''));
 
+// Stored as the bare ten digits, so "+91 98765-43210" and "9876543210" are the
+// same account rather than two.
+export const normalizePhone = (value) => {
+  const digits = toIdentifier(value).replace(/[\s-]/g, '').replace(/^\+?91(?=\d{10}$)/, '');
+  return /^[6-9]\d{9}$/.test(digits) ? digits : '';
+};
+
 export const MINIMUM_PASSWORD_LENGTH = 8;
 
 // Null when acceptable, otherwise a sentence saying what is wrong. Length is

@@ -8,6 +8,7 @@ import Tender from '../models/Tender.js';
 import CitizenReport from '../models/CitizenReport.js';
 import Reward from '../models/Reward.js';
 import Notification from '../models/Notification.js';
+import { logger } from '../utils/logger.js';
 
 // The sample data the demo runs on: a handful of authorities, contractors,
 // projects and tenders, plus the public demo logins. It is a few hundred lines
@@ -15,6 +16,12 @@ import Notification from '../models/Notification.js';
 //
 // This wipes every collection before writing, so server.js only calls it when
 // SEED_DB says to. See the note there.
+//
+// Every seeded record is marked dataSource: 'sample' and the interface labels
+// it as sample data. Seeded scores were written by hand: they are NOT AI
+// results and are recorded with aiAssessment.status = 'sample_data'.
+// Contractor names are fictional; earlier versions used real companies'
+// names with invented performance scores.
 const seedDatabase = async () => {
   try {
     // Drop all old/fake collections for a clean setup
@@ -27,14 +34,14 @@ const seedDatabase = async () => {
     await Reward.deleteMany({});
     await Notification.deleteMany({});
 
-    console.log('Cleared database collections. Re-seeding realistic records...');
+    logger.info('seed: collections cleared');
 
     // 1. Seed Authorities
-    const salt = await bcrypt.genSalt(10);
+    const salt = await bcrypt.genSalt(12);
     const authorityPassword = await bcrypt.hash('authority123', salt);
     const inspectorPassword = await bcrypt.hash('inspector123', salt);
 
-    const auth1 = await Authority.create({
+    await Authority.create({
       name: 'Dr. Ramesh Kumar (District Magistrate)',
       email: 'authority@gramsetu.gov',
       uniqueUserId: 'AUTH-2026-9021',
@@ -50,7 +57,7 @@ const seedDatabase = async () => {
       role: 'Inspector'
     });
 
-    const auth3 = await Authority.create({
+    await Authority.create({
       name: 'Er. Alok Sharma (PWD)',
       email: 'engineer@gramsetu.gov',
       uniqueUserId: 'AUTH-2026-3042',
@@ -58,7 +65,7 @@ const seedDatabase = async () => {
       role: 'PWD Engineer'
     });
 
-    const auth4 = await Authority.create({
+    await Authority.create({
       name: 'Shri Vikram Dev (Chief Officer)',
       email: 'officer@gramsetu.gov',
       uniqueUserId: 'AUTH-2026-5542',
@@ -66,15 +73,21 @@ const seedDatabase = async () => {
       role: 'Government Officer'
     });
 
-    const auth5 = await Authority.create({
-      name: 'System Admin',
-      email: 'admin@gramsetu.gov',
-      uniqueUserId: 'AUTH-2026-0001',
-      passwordHash: authorityPassword,
-      role: 'Admin'
-    });
+    // The Admin can create official accounts, so its password is never a
+    // published demo value. It is only seeded when ADMIN_PASSWORD is set.
+    if (process.env.ADMIN_PASSWORD && process.env.ADMIN_PASSWORD.length >= 12) {
+      await Authority.create({
+        name: 'System Admin',
+        email: (process.env.ADMIN_EMAIL || 'admin@gramsetu.gov').toLowerCase(),
+        uniqueUserId: 'AUTH-2026-0001',
+        passwordHash: await bcrypt.hash(process.env.ADMIN_PASSWORD, 12),
+        role: 'Admin'
+      });
+    } else {
+      logger.warn('seed: ADMIN_PASSWORD not set (or under 12 characters), so no Admin account was created');
+    }
 
-    console.log('Seeded 5 official Authority accounts.');
+    logger.info('seed: official demo accounts created');
 
     // 2. Seed Citizen
     const citizenPassword = await bcrypt.hash('citizen123', salt);
@@ -88,7 +101,7 @@ const seedDatabase = async () => {
       badges: ['Verified Contributor']
     });
 
-    console.log('Seeded demo citizen account (email: citizen@gmail.com / phone: 9999999999 / pass: citizen123).');
+    logger.info('seed: demo citizen account created');
 
     // 3. Seed Reward
     await Reward.create({
@@ -99,11 +112,11 @@ const seedDatabase = async () => {
       description: 'Awarded 150 points for registering and completing first infrastructure audit verification.'
     });
 
-    // 4. Seed Contractors (NCC, L&T, Afcons, KNR, HG, PNC)
+    // 4. Seed Contractors (fictional names)
     const contractorData = [
       {
-        name: 'L&T Construction',
-        registrationId: 'LNT-2026-001',
+        name: 'Sahyadri Infra Works (sample)',
+        registrationId: 'SMP-SIW-2026-001',
         performanceScore: 94,
         trustScore: 95,
         completedCount: 42,
@@ -117,11 +130,11 @@ const seedDatabase = async () => {
           { projectTitle: 'Solar Street Lighting Upgrade', result: 'Verified - High Quality' },
           { projectTitle: 'PMGSY Rural Road Upgrade', result: 'Passed - Minor Wear' }
         ],
-        aiSummary: 'Top-tier contractor with exceptional safety compliance, zero structural discrepancies, and excellent budget adherence.'
+        aiSummary: 'Sample profile (written by hand, not AI): Top-tier contractor with exceptional safety compliance, zero structural discrepancies, and excellent budget adherence.'
       },
       {
-        name: 'NCC Limited',
-        registrationId: 'NCC-2026-002',
+        name: 'Narmada Civil Contractors (sample)',
+        registrationId: 'SMP-NCC-2026-002',
         performanceScore: 84,
         trustScore: 82,
         completedCount: 29,
@@ -134,11 +147,11 @@ const seedDatabase = async () => {
         recentInspections: [
           { projectTitle: 'Government School Renovation', result: 'Verified - Minor Paint Spills' }
         ],
-        aiSummary: 'Consistent contractor with reliable concrete work, though experiences occasional labor mobilization delays.'
+        aiSummary: 'Sample profile (written by hand, not AI): Consistent contractor with reliable concrete work, though experiences occasional labor mobilization delays.'
       },
       {
-        name: 'Afcons',
-        registrationId: 'AFC-2026-003',
+        name: 'Ganga Waterline Projects (sample)',
+        registrationId: 'SMP-GWP-2026-003',
         performanceScore: 91,
         trustScore: 92,
         completedCount: 35,
@@ -151,11 +164,11 @@ const seedDatabase = async () => {
         recentInspections: [
           { projectTitle: 'Village Water Pipeline Network', result: 'Verified - Perfect Alignment' }
         ],
-        aiSummary: 'Highly qualified infrastructure developer specializing in heavy civil works, canal layouts, and water pipelines.'
+        aiSummary: 'Sample profile (written by hand, not AI): Highly qualified infrastructure developer specializing in heavy civil works, canal layouts, and water pipelines.'
       },
       {
-        name: 'KNR Construction',
-        registrationId: 'KNR-2026-004',
+        name: 'Kaveri Road Builders (sample)',
+        registrationId: 'SMP-KRB-2026-004',
         performanceScore: 78,
         trustScore: 75,
         completedCount: 18,
@@ -168,11 +181,11 @@ const seedDatabase = async () => {
         recentInspections: [
           { projectTitle: 'PHC Construction', result: 'Flagged - Foundation Hairline Cracks' }
         ],
-        aiSummary: 'Exhibits average project execution quality. Marked by escalating citizen complaints regarding pavement thickness.'
+        aiSummary: 'Sample profile (written by hand, not AI): Exhibits average project execution quality. Marked by escalating citizen complaints regarding pavement thickness.'
       },
       {
-        name: 'HG Infra',
-        registrationId: 'HGI-2026-005',
+        name: 'Himgiri Bridge Engineering (sample)',
+        registrationId: 'SMP-HBE-2026-005',
         performanceScore: 89,
         trustScore: 90,
         completedCount: 24,
@@ -185,11 +198,11 @@ const seedDatabase = async () => {
         recentInspections: [
           { projectTitle: 'Bridge Rehabilitation Project', result: 'Verified - High Grade Rebar Used' }
         ],
-        aiSummary: 'Specializes in highway overpasses and bridges. Displays strong performance with clean timeline records.'
+        aiSummary: 'Sample profile (written by hand, not AI): Specializes in highway overpasses and bridges. Displays strong performance with clean timeline records.'
       },
       {
-        name: 'PNC Infratech',
-        registrationId: 'PNC-2026-006',
+        name: 'Deccan Paving Company (sample)',
+        registrationId: 'SMP-DPC-2026-006',
         performanceScore: 86,
         trustScore: 88,
         completedCount: 31,
@@ -202,12 +215,14 @@ const seedDatabase = async () => {
         recentInspections: [
           { projectTitle: 'Smart Drainage Pavement Upgrade', result: 'Verified - Passed Water Logging test' }
         ],
-        aiSummary: 'Solid execution capacity. Occasional localized complaints regarding sidewalk finishings.'
+        aiSummary: 'Sample profile (written by hand, not AI): Solid execution capacity. Occasional localized complaints regarding sidewalk finishings.'
       }
     ];
 
-    const contractors = await Contractor.create(contractorData);
-    console.log(`Seeded ${contractors.length} premium contractors.`);
+    const contractors = await Contractor.create(
+      contractorData.map((contractor) => ({ ...contractor, baselineScore: contractor.performanceScore, dataSource: 'sample' }))
+    );
+    logger.info('seed: sample contractors created', { count: contractors.length });
 
     // 5. Seed Tenders and Projects
     const projectsData = [
@@ -215,7 +230,7 @@ const seedDatabase = async () => {
         title: 'PMGSY Rural Road Upgrade',
         description: 'Overhaul and tar laying for Rohaniya-Sector 3 connecting road under PM Gram Sadak Yojana.',
         budget: 4500000,
-        contractor: contractors[0]._id, // L&T
+        contractor: contractors[0]._id, // sample contractor
         riskLevel: 'Low',
         location: { lat: 25.3176, lng: 82.9739, address: 'Rohaniya Block Link Rd, Varanasi, UP' },
         beforeImageUrl: 'https://images.unsplash.com/photo-1515162305285-0293e4767cc2?q=80&w=600',
@@ -230,7 +245,7 @@ const seedDatabase = async () => {
         title: 'Government School Renovation',
         description: 'Comprehensive painting, roof rebuilding, and toilet installations at Vikash Nagar High School.',
         budget: 2500000,
-        contractor: contractors[1]._id, // NCC
+        contractor: contractors[1]._id, // sample contractor
         riskLevel: 'Medium',
         location: { lat: 26.8467, lng: 80.9462, address: 'Vikas Nagar Central School, Lucknow, UP' },
         beforeImageUrl: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=600',
@@ -245,7 +260,7 @@ const seedDatabase = async () => {
         title: 'Village Water Pipeline Network',
         description: 'Connecting Phaphamau village households with clean drinking water pipeline grid.',
         budget: 1800000,
-        contractor: contractors[2]._id, // Afcons
+        contractor: contractors[2]._id, // sample contractor
         riskLevel: 'Low',
         location: { lat: 25.4358, lng: 81.8463, address: 'Phaphamau Water Works, Prayagraj, UP' },
         beforeImageUrl: 'https://images.unsplash.com/photo-1542013936693-8848e5740a7a?q=80&w=600',
@@ -260,7 +275,7 @@ const seedDatabase = async () => {
         title: 'Primary Health Centre Construction',
         description: 'Setting up a new modular double-storey rural clinic and trauma room facility.',
         budget: 6000000,
-        contractor: contractors[3]._id, // KNR
+        contractor: contractors[3]._id, // sample contractor
         riskLevel: 'High',
         location: { lat: 26.7606, lng: 83.3731, address: 'Pipraich Main Health Centre, Gorakhpur, UP' },
         beforeImageUrl: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=600',
@@ -275,7 +290,7 @@ const seedDatabase = async () => {
         title: 'Bridge Rehabilitation Project',
         description: 'Replacing girders and rebar layers on the old Ganga Canal concrete highway bypass.',
         budget: 12500000,
-        contractor: contractors[4]._id, // HG Infra
+        contractor: contractors[4]._id, // sample contractor
         riskLevel: 'Low',
         location: { lat: 26.4499, lng: 80.3319, address: 'Ganga Canal PWD Bridge, Kanpur, UP' },
         beforeImageUrl: 'https://images.unsplash.com/photo-1545624446-43a9cc961631?q=80&w=600',
@@ -290,7 +305,7 @@ const seedDatabase = async () => {
         title: 'Smart Drainage Pavement Upgrade',
         description: 'Upgrading open storm drains to heavy-duty smart culverts and laying concrete side pavements.',
         budget: 3200000,
-        contractor: contractors[5]._id, // PNC
+        contractor: contractors[5]._id, // sample contractor
         riskLevel: 'Medium',
         location: { lat: 25.4484, lng: 78.5685, address: 'Civil Lines Road 4, Jhansi, UP' },
         beforeImageUrl: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=600',
@@ -312,7 +327,9 @@ const seedDatabase = async () => {
         budget: proj.budget,
         contractor: proj.contractor,
         riskLevel: proj.riskLevel,
-        status: proj.lifecycleStatus === 'Project Created' || proj.lifecycleStatus === 'Tender Published' ? 'Approved' : 'Completed'
+        aiSummary: 'Sample tender record. No document was analysed.',
+        aiAssessment: { status: 'sample_data' },
+        dataSource: 'sample'
       });
 
       // Create Project
@@ -324,7 +341,10 @@ const seedDatabase = async () => {
         beforeImageUrl: proj.beforeImageUrl,
         afterImageUrl: proj.afterImageUrl,
         completionScore: proj.completionScore,
-        riskLevel: proj.riskLevel,
+        riskLevel: proj.completionScore === null ? null : proj.riskLevel,
+        aiAssessment: proj.completionScore === null ? undefined : { status: 'sample_data' },
+        aiComparisonNotes: proj.completionScore === null ? undefined : 'Sample data: this score was written by hand, not produced by AI.',
+        dataSource: 'sample',
         projectHealth: proj.projectHealth,
         healthPercentage: proj.healthPercentage,
         status: proj.status,
@@ -337,7 +357,7 @@ const seedDatabase = async () => {
       projects.push(project);
     }
 
-    console.log('Seeded 6 realistic Tenders and Projects.');
+    logger.info('seed: sample tenders and projects created');
 
     // 5. Seed Citizen Reports / Complaints linked to demoCitizen and projects
     await CitizenReport.create({
@@ -347,28 +367,21 @@ const seedDatabase = async () => {
       gps: { lat: 25.3176, lng: 82.9739 },
       description: 'Major road cracking and large pothole formed near the main junction of the road completed last week.',
       detectedIssues: ['crack', 'pothole'],
-      aiReport: 'AI visual check confirmed severe structural cracking and defect formation matching road wear indicators. Manual verification is recommended.',
+      aiReport: 'Sample data (written by hand, not AI): cracking and a pothole near the junction.',
       matchScore: 82,
       flaggedAsDiscrepancy: true,
-      referenceScaleCmPerPixel: 0.5,
+      aiAssessment: { status: 'sample_data' },
       segmentation: {
-        status: 'completed',
-        message: 'AI defect segmentation completed successfully.',
+        status: 'simulated',
+        message: 'Sample data: no detection model was run on this photo.',
         defects: [
-          {
-            type: 'pothole',
-            confidence: 0.89,
-            maskAreaPixels: 16752,
-            areaCm2: 4188,
-            widthCm: 125,
-            heightCm: 33,
-            equivalentDiameterCm: 125.7,
-            boundingBoxPixels: { x: 100, y: 150, width: 250, height: 66 }
-          }
+          { type: 'pothole', confidence: null, simulated: true, measurementBasis: 'bounding_box', areaFractionOfImage: 0.08, boundingBoxPixels: { x: 100, y: 150, width: 250, height: 66 } }
         ]
       },
       severity: 'High',
-      status: 'Authority Notification',
+      severityBasis: ['sample_data'],
+      dataSource: 'sample',
+      status: 'Inspector Assigned',
       assignedOfficer: auth2._id, // Inspector Sanjay Singh
       createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000) // 3 days ago
     });
@@ -380,16 +393,14 @@ const seedDatabase = async () => {
       gps: { lat: 25.3185, lng: 82.9782 },
       description: 'The third street light pole is completely non-functional and the wiring box is left exposed.',
       detectedIssues: ['broken_infrastructure'],
-      aiReport: 'AI analysis suggests wiring safety exposure risk and public infrastructure default.',
+      aiReport: 'Sample data (written by hand, not AI): exposed wiring box on a street light pole.',
       matchScore: 90,
       flaggedAsDiscrepancy: true,
-      referenceScaleCmPerPixel: 0.25,
-      segmentation: {
-        status: 'completed',
-        message: 'No visible surface cracking detected. Infrastructure issue flagged.',
-        defects: []
-      },
+      aiAssessment: { status: 'sample_data' },
+      segmentation: { status: 'not_configured', message: 'Sample data: no detection model was run on this photo.', defects: [] },
       severity: 'Medium',
+      severityBasis: ['sample_data'],
+      dataSource: 'sample',
       status: 'Inspector Assigned',
       assignedOfficer: auth2._id, // Inspector Sanjay Singh
       inspectionDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // Scheduled tomorrow
@@ -397,10 +408,12 @@ const seedDatabase = async () => {
       createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) // 1 day ago
     });
 
-    console.log('Seeded 2 realistic citizen complaints linked to Abhishek Maurya.');
+    logger.info('seed: sample complaints created');
 
   } catch (error) {
-    console.error('Error seeding database:', error.message);
+    // A half-seeded database is worse than none: stop the server so it is noticed.
+    logger.error('seed failed', { error: error.message });
+    throw error;
   }
 };
 export default seedDatabase;

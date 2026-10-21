@@ -1,30 +1,24 @@
 import PDFDocument from 'pdfkit';
-import https from 'https';
+import { fetchImage } from '../utils/fetchImage.js';
 
-/**
- * Downloads a remote image URL to a buffer for PDF inclusion
- */
-const downloadImageBuffer = (url) => {
-  return new Promise((resolve) => {
-    if (!url) return resolve(null);
-    https.get(url, (res) => {
-      if (res.statusCode !== 200) {
-        console.error(`Failed to fetch image status code: ${res.statusCode}`);
-        return resolve(null);
-      }
-      const chunks = [];
-      res.on('data', (chunk) => chunks.push(chunk));
-      res.on('end', () => resolve(Buffer.concat(chunks)));
-      res.on('error', (err) => {
-        console.error('Error fetching image chunks:', err);
-        resolve(null);
-      });
-    }).on('error', (err) => {
-      console.error('Connection error fetching image:', err);
-      resolve(null);
-    });
-  });
+/** Downloads an image for the PDF; null (shown as "not available") on any failure. */
+const downloadImageBuffer = async (url) => {
+  if (!url) return null;
+  try {
+    return (await fetchImage(url, { timeoutMs: 10_000 })).buffer;
+  } catch {
+    return null;
+  }
 };
+
+const AI_STATUS_TEXT = {
+  completed: 'AI analysis completed',
+  not_configured: 'AI analysis not configured on this server',
+  unavailable: 'AI analysis did not run (service unavailable)',
+  invalid_response: 'AI analysis returned an unusable answer',
+  sample_data: 'Sample data - not a real AI result'
+};
+const aiStatusText = (status) => AI_STATUS_TEXT[status] || 'No AI analysis recorded';
 
 /**
  * Draws a professional header logo banner
@@ -124,7 +118,7 @@ export const generateProjectAuditPDF = async (project, stream) => {
   doc.font('Helvetica').fillColor('#0f172a').text(project.location?.address || 'N/A', rightColX + 90, currentY + 20, { width: 160 });
 
   doc.font('Helvetica-Bold').fillColor('#475569').text('Project Health:', rightColX, currentY + 50);
-  doc.font('Helvetica-Bold').fillColor(project.healthPercentage < 70 ? '#b91c1c' : '#15803d').text(`${project.healthPercentage || 100}% (${project.projectHealth || 'Healthy'})`, rightColX + 90, currentY + 50);
+  doc.font('Helvetica-Bold').fillColor(project.healthPercentage < 70 ? '#b91c1c' : '#15803d').text(`${project.healthPercentage ?? 100}% (${project.projectHealth || 'Healthy'})`, rightColX + 90, currentY + 50);
 
   // 3. AI Verification block
   drawSectionHeader(doc, 'AI Verification & Auditor Remarks', 280);
@@ -133,14 +127,18 @@ export const generateProjectAuditPDF = async (project, stream) => {
   doc.font('Helvetica-Bold').fontSize(9).fillColor('#475569').text('Verification Status:', leftColX, currentY);
   doc.font('Helvetica-Bold').fillColor(project.status === 'Verified' ? '#15803d' : '#b91c1c').text(project.status || 'Pending', leftColX + 110, currentY);
 
+  const projectAiDone = project.aiAssessment?.status === 'completed';
   doc.font('Helvetica-Bold').fillColor('#475569').text('Completion Score:', leftColX, currentY + 20);
-  doc.font('Helvetica').fillColor('#0f172a').text(`${project.completionScore || '0'}%`, leftColX + 110, currentY + 20);
+  doc.font('Helvetica').fillColor('#0f172a').text(projectAiDone ? `${project.completionScore}%` : 'Not assessed', leftColX + 110, currentY + 20);
 
   doc.font('Helvetica-Bold').fillColor('#475569').text('Risk Assessment:', leftColX, currentY + 40);
-  doc.font('Helvetica-Bold').fillColor(project.riskLevel === 'High' ? '#b91c1c' : project.riskLevel === 'Medium' ? '#b45309' : '#15803d').text(project.riskLevel || 'Low', leftColX + 110, currentY + 40);
+  doc.font('Helvetica-Bold').fillColor(project.riskLevel === 'High' ? '#b91c1c' : project.riskLevel === 'Medium' ? '#b45309' : '#0f172a').text(projectAiDone ? project.riskLevel : 'Not assessed', leftColX + 110, currentY + 40);
 
-  doc.font('Helvetica-Bold').fillColor('#475569').text('Auditor Reasoning & Findings:', leftColX, currentY + 60);
-  doc.font('Helvetica').fillColor('#334155').text(project.aiComparisonNotes || 'No findings recorded.', leftColX, currentY + 75, { width: 505 });
+  doc.font('Helvetica-Bold').fillColor('#475569').text('AI analysis:', rightColX, currentY);
+  doc.font('Helvetica').fillColor('#0f172a').text(`${aiStatusText(project.aiAssessment?.status)}${project.aiAssessment?.model ? ` (${project.aiAssessment.model})` : ''}`, rightColX + 70, currentY, { width: 185 });
+
+  doc.font('Helvetica-Bold').fillColor('#475569').text('AI notes (advisory, not an engineering inspection):', leftColX, currentY + 60);
+  doc.font('Helvetica').fillColor('#334155').text(projectAiDone ? project.aiComparisonNotes || 'No notes.' : 'No AI notes: the comparison has not run.', leftColX, currentY + 75, { width: 505 });
 
   // 4. Side-by-Side Images (Before/After)
   drawSectionHeader(doc, 'Visual Evidence Baseline Check', 440);
@@ -190,7 +188,7 @@ export const generateProjectAuditPDF = async (project, stream) => {
      .lineTo(555, 710)
      .stroke();
 
-  doc.font('Helvetica-Oblique').fontSize(8).fillColor('#94a3b8').text('This document is electronically audited and certified using the GramSetu AI Ledger protocol.', 40, 720);
+  doc.font('Helvetica-Oblique').fontSize(8).fillColor('#94a3b8').text('Generated by GramSetu, a student demonstration project. AI findings are advisory and must be confirmed by a qualified inspector.', 40, 720, { width: 515 });
   doc.font('Helvetica-Bold').fontSize(9).fillColor('#475569').text('District Authority Representative', 400, 740);
   doc.strokeColor('#cbd5e1').lineWidth(1).moveTo(380, 780).lineTo(540, 780).stroke();
   doc.font('Helvetica').fontSize(8).fillColor('#94a3b8').text('Authorized Signatory Signature', 415, 785);
@@ -243,31 +241,33 @@ export const generateCitizenComplaintPDF = async (complaint, stream) => {
   drawSectionHeader(doc, 'AI defect analysis metrics', 270);
   currentY = 300;
 
-  doc.font('Helvetica-Bold').fontSize(9).fillColor('#475569').text('AI Severity Check:', leftColX, currentY);
-  doc.font('Helvetica-Bold').fillColor(complaint.severity === 'High' ? '#b91c1c' : '#b45309').text(`${complaint.severity || 'Low'} Severity`, leftColX + 110, currentY);
+  const complaintAiDone = complaint.aiAssessment?.status === 'completed';
+  doc.font('Helvetica-Bold').fontSize(9).fillColor('#475569').text('Severity (triage hint):', leftColX, currentY);
+  doc.font('Helvetica-Bold').fillColor(complaint.severity === 'High' ? '#b91c1c' : '#0f172a').text(complaint.severity || 'Unassessed', leftColX + 120, currentY);
 
-  doc.font('Helvetica-Bold').fillColor('#475569').text('AI Confidence:', leftColX, currentY + 20);
-  doc.font('Helvetica').fillColor('#0f172a').text(`${complaint.matchScore || '90'}%`, leftColX + 110, currentY + 20);
-
-  doc.font('Helvetica-Bold').fillColor('#475569').text('AI Defect Specs:', leftColX, currentY + 40);
-  
-  // Aggregate YOLO segmentation defects
-  const defects = complaint.segmentation?.defects || [];
-  const hasDefects = defects.length > 0;
-  const totalArea = defects.reduce((sum, d) => sum + (d.areaCm2 || 0), 0);
-  const maxWidth = defects.reduce((max, d) => Math.max(max, d.widthCm || 0), 0);
-  const maxHeight = defects.reduce((max, d) => Math.max(max, d.heightCm || 0), 0);
-  const maxDiameter = defects.reduce((max, d) => Math.max(max, d.equivalentDiameterCm || 0), 0);
-
+  doc.font('Helvetica-Bold').fillColor('#475569').text('AI image review:', leftColX, currentY + 20);
   doc.font('Helvetica').fillColor('#0f172a').text(
-    `Equivalent Diameter: ${hasDefects ? maxDiameter.toFixed(1) : 'N/A'} cm\n` +
-    `Defect Area: ${hasDefects ? totalArea.toFixed(1) : 'N/A'} cm²\n` +
-    `Defect Dimensions: ${hasDefects ? `${maxWidth.toFixed(1)} x ${maxHeight.toFixed(1)}` : 'N/A'} cm`,
-    leftColX + 110, currentY + 40
+    complaintAiDone ? `${aiStatusText('completed')}; consistency score ${complaint.matchScore}/100` : aiStatusText(complaint.aiAssessment?.status),
+    leftColX + 120, currentY + 20, { width: 380 }
   );
 
-  doc.font('Helvetica-Bold').fillColor('#475569').text('Auditor Reasoning:', leftColX, currentY + 95);
-  doc.font('Helvetica').fillColor('#334155').text(complaint.aiReport || 'No details recorded.', leftColX, currentY + 110, { width: 505 });
+  const seg = complaint.segmentation || {};
+  const defects = seg.defects || [];
+  let detectionText;
+  if (seg.status === 'completed') {
+    detectionText = defects.length
+      ? defects.map((d) => `${d.type.replaceAll('_', ' ')} (${Math.round((d.confidence || 0) * 100)}% model confidence, ${Math.round((d.areaFractionOfImage || 0) * 100)}% of photo${d.areaCm2 ? `, approx. ${d.areaCm2} cm2 from a measured scale` : ''})`).join('; ')
+      : 'Model ran and found no defects.';
+  } else if (seg.status === 'simulated') {
+    detectionText = 'DEMO SIMULATION - not a detection.';
+  } else {
+    detectionText = seg.message || 'Defect detection did not run.';
+  }
+  doc.font('Helvetica-Bold').fillColor('#475569').text('Defect detection:', leftColX, currentY + 40);
+  doc.font('Helvetica').fillColor('#0f172a').text(`${detectionText}\nDepth cannot be measured from a single photo.`, leftColX + 120, currentY + 40, { width: 380 });
+
+  doc.font('Helvetica-Bold').fillColor('#475569').text('AI notes (advisory):', leftColX, currentY + 95);
+  doc.font('Helvetica').fillColor('#334155').text(complaintAiDone ? complaint.aiReport || 'No notes.' : 'No AI notes recorded.', leftColX, currentY + 110, { width: 505 });
 
   // 4. Evidence Images (Citizen Grievance & Inspector Verification)
   drawSectionHeader(doc, 'Visual Audit Trial Evidence', 450);
@@ -317,7 +317,7 @@ export const generateCitizenComplaintPDF = async (complaint, stream) => {
      .lineTo(555, 710)
      .stroke();
 
-  doc.font('Helvetica-Oblique').fontSize(8).fillColor('#94a3b8').text('This document is electronically audited and certified using the GramSetu AI Ledger protocol.', 40, 720);
+  doc.font('Helvetica-Oblique').fontSize(8).fillColor('#94a3b8').text('Generated by GramSetu, a student demonstration project. AI findings are advisory and must be confirmed by a qualified inspector.', 40, 720, { width: 515 });
   doc.font('Helvetica-Bold').fontSize(9).fillColor('#475569').text('Assigned Inspector Signature', 400, 740);
   doc.strokeColor('#cbd5e1').lineWidth(1).moveTo(380, 780).lineTo(540, 780).stroke();
   doc.font('Helvetica').fontSize(8).fillColor('#94a3b8').text(complaint.assignedOfficer?.name || 'Authorized Inspector Signature', 405, 785);

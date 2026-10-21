@@ -6,7 +6,7 @@ import {
   isValidPhone,
   toIdentifier,
   MINIMUM_PASSWORD_LENGTH
-} from '../utils/credentials.js';
+} from '../../utils/credentials.js';
 
 describe('toIdentifier', () => {
   test('keeps a plain string, without surrounding spaces', () => {

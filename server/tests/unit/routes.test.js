@@ -18,7 +18,7 @@ const ROUTE_FILES = [
 describe('route files', () => {
   for (const name of ROUTE_FILES) {
     test(`${name} loads and exports a router`, async () => {
-      const module = await import(`../routes/${name}.js`);
+      const module = await import(`../../routes/${name}.js`);
       const router = module.default;
 
       assert.ok(router, `${name} has no default export`);
@@ -31,7 +31,7 @@ describe('route files', () => {
 
 describe('the registration endpoint stays behind an admin check', () => {
   test('POST /authority/register runs two guards before the handler', async () => {
-    const { default: router } = await import('../routes/authRoutes.js');
+    const { default: router } = await import('../../routes/authRoutes.js');
 
     const register = router.stack.find(
       (layer) => layer.route?.path === '/authority/register' && layer.route.methods.post

@@ -1,9 +1,9 @@
 import test, { describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { canViewReport, isAllowedDecision, ALLOWED_DECISIONS } from '../utils/access.js';
+import { canInspect, canViewReport, isAllowedDecision, ALLOWED_DECISIONS } from '../../utils/access.js';
 
 const citizen = (id) => ({ isCitizen: true, user: { _id: id } });
-const official = (id) => ({ isCitizen: false, user: { _id: id } });
+const official = (id, role = 'District Authority') => ({ isAuthority: true, isCitizen: false, user: { _id: id, role } });
 
 describe('canViewReport', () => {
   test('lets a citizen open their own complaint', () => {
@@ -38,6 +38,10 @@ describe('canViewReport', () => {
     assert.equal(canViewReport(citizen('abc123'), {}), false);
   });
 
+  test('refuses a request with no session at all', () => {
+    assert.equal(canViewReport({}, { citizen: 'abc123' }), false);
+  });
+
   test('refuses a citizen whose own id is missing', () => {
     assert.equal(canViewReport({ isCitizen: true, user: {} }, { citizen: 'abc123' }), false);
   });
@@ -67,5 +71,25 @@ describe('isAllowedDecision', () => {
   test('is case sensitive, so a near miss is still refused', () => {
     assert.equal(isAllowedDecision('accepted'), false);
     assert.equal(isAllowedDecision('ACCEPTED'), false);
+  });
+});
+
+describe('canInspect', () => {
+  test('lets the assigned inspector act', () => {
+    assert.equal(canInspect(official('insp1', 'Inspector'), { assignedOfficer: 'insp1' }), true);
+    assert.equal(canInspect(official('insp1', 'Inspector'), { assignedOfficer: { _id: 'insp1' } }), true);
+  });
+
+  test('refuses any other inspector', () => {
+    assert.equal(canInspect(official('insp2', 'Inspector'), { assignedOfficer: 'insp1' }), false);
+  });
+
+  test('refuses everyone when nobody is assigned, except an Admin', () => {
+    assert.equal(canInspect(official('insp1', 'Inspector'), { assignedOfficer: null }), false);
+    assert.equal(canInspect(official('admin', 'Admin'), { assignedOfficer: null }), true);
+  });
+
+  test('refuses citizens', () => {
+    assert.equal(canInspect(citizen('insp1'), { assignedOfficer: 'insp1' }), false);
   });
 });

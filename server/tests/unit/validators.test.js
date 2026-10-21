@@ -6,7 +6,7 @@ import {
   toLongitude,
   toText,
   toNumberInRange
-} from '../utils/validators.js';
+} from '../../utils/validators.js';
 
 describe('toLatitude', () => {
   it('accepts the poles and everything between', () => {

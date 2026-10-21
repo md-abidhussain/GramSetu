@@ -1,6 +1,6 @@
 import test, { describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { detectFileType, isAllowedType, IMAGE_TYPES, PDF_TYPES } from '../utils/fileType.js';
+import { detectFileType, isAllowedType, IMAGE_TYPES, PDF_TYPES } from '../../utils/fileType.js';
 
 const bytes = (...values) => Buffer.from(values);
 const jpeg = bytes(0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10);

@@ -1,9 +1,9 @@
 import express from 'express';
 import { validateIdParam } from '../middleware/validateIdParam.js';
-import { 
-  createCitizenReport, 
-  getCitizenReports, 
-  getCitizenReportById, 
+import {
+  createCitizenReport,
+  getCitizenReports,
+  getCitizenReportById,
   assignInspector,
   scheduleInspection,
   uploadInspectionVerification,
@@ -12,31 +12,22 @@ import {
 } from '../controllers/citizenController.js';
 import { protectAuthority, protectCitizen, protectAny, restrictTo } from '../middleware/authMiddleware.js';
 import { uploadImage, verifyImageContents } from '../middleware/uploadMiddleware.js';
+import { PERMISSIONS } from '../utils/roles.js';
 
 const router = express.Router();
 
-// Any authenticated user: Get details of a single report
+// Citizens see only their own complaints (enforced in the controller); officials see all.
+router.get('/', protectAny, getCitizenReports);
+router.get('/:id', validateIdParam(), protectAny, getCitizenReportById);
 router.get('/:id/report', validateIdParam(), protectAny, downloadCitizenReport);
 
-// Citizen-only: File a complaint
+// Authentication runs before multer, so an anonymous caller is refused
+// before any file is read into memory.
 router.post('/', protectCitizen, uploadImage, verifyImageContents, createCitizenReport);
 
-// Any authenticated user: Get details of a single report
-router.get('/:id', validateIdParam(), protectAny, getCitizenReportById);
-
-// Any authenticated user: Get list of reports (filtered automatically by role)
-router.get('/', protectAny, getCitizenReports);
-
-// Authorities: Assign inspector to complaint
-router.post('/assign-inspector', protectAuthority, restrictTo('District Authority', 'Admin', 'Government Officer'), assignInspector);
-
-// Inspector: Schedule inspection
-router.post('/schedule-inspection', protectAuthority, restrictTo('Inspector', 'Admin'), scheduleInspection);
-
-// Inspector: Upload inspection evidence
-router.post('/upload-verification', protectAuthority, restrictTo('Inspector', 'Admin'), uploadImage, verifyImageContents, uploadInspectionVerification);
-
-// Authority: Accept / Reject / Need More Evidence
-router.post('/resolve', protectAuthority, restrictTo('District Authority', 'Admin', 'Government Officer'), resolveComplaint);
+router.post('/assign-inspector', protectAuthority, restrictTo(...PERMISSIONS.assignInspector), assignInspector);
+router.post('/schedule-inspection', protectAuthority, restrictTo(...PERMISSIONS.inspect), scheduleInspection);
+router.post('/upload-verification', protectAuthority, restrictTo(...PERMISSIONS.inspect), uploadImage, verifyImageContents, uploadInspectionVerification);
+router.post('/resolve', protectAuthority, restrictTo(...PERMISSIONS.resolveComplaint), resolveComplaint);
 
 export default router;

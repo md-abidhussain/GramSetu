@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { aiAssessmentSchema, DATA_SOURCES } from './aiAssessmentSchema.js';
 
 const statusHistoryEntrySchema = new mongoose.Schema({
   status: { type: String, required: true },
@@ -8,7 +9,7 @@ const statusHistoryEntrySchema = new mongoose.Schema({
 }, { _id: false });
 
 const projectSchema = new mongoose.Schema({
-  title: { type: String, required: true },
+  title: { type: String, required: true, maxlength: 200 },
   tender: { type: mongoose.Schema.Types.ObjectId, ref: 'Tender', required: true },
   contractor: { type: mongoose.Schema.Types.ObjectId, ref: 'Contractor', required: true },
   location: {
@@ -18,8 +19,13 @@ const projectSchema = new mongoose.Schema({
   },
   beforeImageUrl: { type: String }, // Cloudinary URL
   afterImageUrl: { type: String },  // Cloudinary URL
-  completionScore: { type: Number, min: 0, max: 100 },
-  riskLevel: { type: String, enum: ['Low', 'Medium', 'High'], default: 'Low' },
+  beforeImagePublicId: { type: String, select: false },
+  afterImagePublicId: { type: String, select: false },
+  // AI before/after comparison. completionScore, riskLevel and
+  // aiComparisonNotes are set only when aiAssessment.status is "completed".
+  aiAssessment: { type: aiAssessmentSchema },
+  completionScore: { type: Number, min: 0, max: 100, default: null },
+  riskLevel: { type: String, enum: ['Low', 'Medium', 'High', null], default: null },
   projectHealth: { type: String, enum: ['Healthy', 'At Risk', 'Failed'], default: 'Healthy' },
   healthPercentage: { type: Number, default: 100, min: 0, max: 100 },
   complaintCount: { type: Number, default: 0 },
@@ -49,8 +55,14 @@ const projectSchema = new mongoose.Schema({
   statusHistory: [statusHistoryEntrySchema],
   budgetVariance: { type: Number, default: 0 }, // Positive values represent overruns in currency
   timelineEndDate: { type: Date },
+  verifiedComplaintCount: { type: Number, default: 0 },
+  dataSource: { type: String, enum: DATA_SOURCES, default: 'live' },
   createdAt: { type: Date, default: Date.now }
 });
+
+projectSchema.index({ createdAt: -1 });
+projectSchema.index({ contractor: 1 });
+projectSchema.index({ tender: 1 });
 
 const Project = mongoose.model('Project', projectSchema);
 export default Project;

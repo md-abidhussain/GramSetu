@@ -1,7 +1,7 @@
 import test, { describe, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import multer from 'multer';
-import { errorHandler } from '../middleware/errorMiddleware.js';
+import { errorHandler } from '../../middleware/errorMiddleware.js';
 
 const request = { method: 'POST', originalUrl: '/api/projects' };
 
@@ -44,7 +44,7 @@ describe('errorHandler', () => {
   test('still explains a file that was too large', () => {
     const err = new multer.MulterError('LIMIT_FILE_SIZE');
     const result = handle(err);
-    assert.equal(result.code, 400);
+    assert.equal(result.code, 413);
     assert.match(result.body.message, /too large/i);
   });
 
@@ -60,13 +60,14 @@ describe('errorHandler', () => {
     assert.equal(handle(err).code, 400);
   });
 
-  test('names the field that was already taken', () => {
+  test('a duplicate is a 409 that does not say which field or value matched', () => {
+    // Naming the field would let a caller test whether an email is registered.
     const err = new Error('duplicate');
     err.code = 11000;
     err.keyValue = { email: 'abid@example.com' };
     const result = handle(err);
-    assert.equal(result.code, 400);
-    assert.match(result.body.message, /email/);
+    assert.equal(result.code, 409);
+    assert.doesNotMatch(result.body.message, /email|abid/);
   });
 
   test('passes through a message a route raised deliberately', () => {
