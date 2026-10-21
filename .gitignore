@@ -55,3 +55,7 @@ server/uploads/
 # Playwright
 client/test-results/
 client/playwright-report/
+
+# Python tool caches
+.pytest_cache/
+.ruff_cache/
