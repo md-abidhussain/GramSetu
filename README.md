@@ -1,240 +1,131 @@
-# GramSetu AI — GovTech Infrastructure Verification & Audit Platform
+# GramSetu
 
-GramSetu AI is a next-generation GovTech enterprise platform designed for auditing, monitoring, and validating public infrastructure works. By combining a **Clean Architecture** codebase, **Dual-Pipeline AI Fusion (Gemini Vision + YOLOv8-Seg)**, and role-based access control, GramSetu AI connects citizens, inspectors, and administrators in a closed-loop quality assurance cycle.
+**Civic infrastructure reporting and verification.** Citizens report problems
+with public works (potholes, open manholes, broken facilities) with a photo and
+a location. Officials assign an inspector, review the evidence and publish a
+decision. Project completion is checked by comparing before/after photos.
+Contractors get a score from verified evidence only.
 
-### 🌐 Live Deployments
-* **Frontend Portal:** [https://gramsetu-india.vercel.app](https://gramsetu-india.vercel.app)
-* **Backend API Gateway:** [https://gramsetu-31ax.onrender.com](https://gramsetu-31ax.onrender.com)
+Built for the NxtWave Idea2Impact hackathon (national offline finalist), then
+hardened: see [docs/ENGINEERING_AUDIT.md](docs/ENGINEERING_AUDIT.md).
 
----
+> **This is a student demonstration project, not a government service.** The
+> hosted demo holds sample data and public demo logins.
 
-> **What is running in the hosted demo:** the React client, the Express API and
-> the Gemini vision analysis. The YOLOv8 segmentation service is a separate
-> Python service that runs locally (setup below) and is **not deployed** with
-> the demo, so complaints filed on the live site record defect measurements as
-> unavailable rather than estimating them. The backend is on Render's free
-> tier, so the first request after an idle period can take up to a minute.
+- Frontend: https://gramsetu-india.vercel.app
+- API: https://gramsetu-31ax.onrender.com (free tier: the first request after idle can take ~1 minute)
 
-## 📌 Problem Statement & Limitations
+## What it does
 
-Traditional municipal infrastructure management suffers from structural failures in quality control:
-1. **Information Asymmetry:** Citizens have no visibility into active project budgets, contractor timelines, or quality metrics.
-2. **Post-Completion Neglect:** Public works monitoring halts immediately after completion. Subsequent damages (such as road decay, water pipe leaks, or wall cracks) go unreported and unaddressed.
-3. **Audit Fraud & Subjectivity:** Manual auditing is slow, lacks objective verification, and is highly prone to human bias or documentation manipulation.
-4. **Passive Citizen Engagement:** Existing portal systems accept only text-based complaints, offering no automatic verification, duplicate checks, or quantitative validation.
+| For | Features |
+| --- | --- |
+| Citizens | Sign up with email or mobile; file a complaint with photo + map location; automated review of the photo; track status; reward points when an official verifies the complaint |
+| Officials | Dashboard (projects, risks, map, complaints); assign the inspector → inspector uploads evidence → decision; project stages; tender upload with AI summary; contractor records and scores; PDF reports |
+| AI (advisory) | Gemini reviews complaint photos, before/after project photos, inspector evidence and tender PDFs. A YOLOv8 detector (separate service) finds potholes, cracks and open manholes |
 
----
+**Every AI output is labelled with how it was produced.** If the AI did not run,
+nothing is invented: the screen says why, and severity is "Unassessed". Read
+[docs/AI_LIMITATIONS.md](docs/AI_LIMITATIONS.md) before quoting any AI capability.
+In short: the detector draws bounding boxes, its accuracy on Indian road photos
+has not been measured yet, and it never measures depth.
 
-## 💡 Proposed Solution
+## Architecture
 
-GramSetu AI addresses these issues by introducing an automated, decentralized infrastructure audit ledger:
-
-* **Dual-Pipeline AI Fusion:** Employs a parallel verification architecture. When a report or completion photo is submitted, the backend fires asynchronous requests to:
-  * **Microservice A (Semantic - Gemini Vision API):** For qualitative, context-aware visual change detection and structural reasoning.
-  * **Microservice B (Deterministic - YOLOv8-Seg):** Runs a custom-trained segmentation model to detect potholes/cracks, locate reference markers, and calculate the exact defect area ($cm^2$).
-* **Closed-Loop Workflows:** Connects PWD Engineers, District Authorities, Field Inspectors, and Citizens into a unified review funnel.
-* **Contractor Accountability Registry:** Tracks contractor delays, budget overruns, and citizen complaints to dynamically compute a **Performance Score** and **Trust Score**.
-
----
-
-### Security
-
-What is protected and what enforces it is written up in
-[docs/SECURITY.md](./docs/SECURITY.md), including the decisions taken knowingly
-and the gaps that remain. [docs/DECISIONS.md](./docs/DECISIONS.md) explains why
-the rest of the system is shaped the way it is.
-
-## 📐 Architecture & System Design
-
-### Clean Architecture Principles
-The platform is organized into distinct layer boundaries to enforce separation of concerns, loose coupling, and high testability:
-
-1. **Presentation Layer (Frontend Client):** React.js single-page application built with Vite and styled with tailwind. Manages UI states, mapping overlays, and dashboards.
-2. **Orchestration & Gateway Layer (Backend Server):** Node.js Express server acting as the central router and pipeline coordinator. It manages session states, enforces role-based endpoint permissions, and aggregates responses.
-3. **Domain & Data Access Layer (Mongoose Schemas):** Strictly defined, isolated schemas representing core business entities (Citizens, Authorities, Contractors, Projects, Tenders).
-4. **AI Microservices Layer (Python FastAPI):** Standalone, high-throughput Python FastAPI microservice housing the PyTorch-based YOLOv8 segmentation pipeline and ONNX Runtime execution engine.
-
-### 1. Dual-Pipeline AI Fusion Architecture
-This diagram outlines how the Node.js backend acts as an orchestrator, firing parallel async requests to the semantic reasoning engine and deterministic computer vision microservice before fusing the results into a single payload.
-
-![Dual-Pipeline AI Fusion Architecture](./docs/screenshots/dual-pipeline-ai-fusion.png)
-
-### 2. YOLOv8-Seg Pothole Model Pipeline
-This diagram illustrates the machine learning lifecycle: data ingestion, polygon-based CVAT labeling, model optimization (PyTorch to ONNX), and physical scale conversion logic.
-
-![YOLOv8-Seg Pothole Model Pipeline](./docs/screenshots/yolov8-pothole-pipeline.png)
-
----
-
-## 🔒 Authentication & Role-Based Security
-
-To maintain enterprise integrity, GramSetu AI implements rigid security configurations:
-
-* **Separated Collections:** 
-  * **Citizen:** Identifies users by unique email and phone numbers, managing their volunteer points and active complaint audits.
-  * **Authority:** Uses unique official Employee IDs (e.g. `AUTH-2026-9021`) and maps users to specific administrative roles.
-* **Secure Auth Sessions:** Uses `HttpOnly`, `SameSite=None`, `Secure` cookies to transmit JWT session tokens. This protects tokens from XSS attacks by keeping them inaccessible to client-side scripts.
-* **Role-Based Routing Middleware:** Endpoints are strictly guarded depending on the official role:
-  * `PWD Engineer` - Can initialize tenders and assign projects.
-  * `Inspector` - Permissions to upload before/after photos and submit site reports.
-  * `District Authority` - Approves contractor handovers, registers finalized infrastructure, and updates review status.
-  * `Government Officer` - General oversight and analytics access.
-  * `Admin` - Root-level administration.
-
----
-
-## 📸 Platform Interface
-
-### 1. Citizen Portal Login
-Secure sign-in for citizens, with a separate sign-in for officials.
-![Citizen Portal Login](./docs/screenshots/citizen-login.png)
-
-### 2. Citizen Verification Portal
-Citizens upload geotagged photos, specify physical scale references (cm/pixel), and submit evidence to trigger automated area segmentation.
-![Citizen Verification Portal](./docs/screenshots/citizen-verification.png)
-
-### 3. Official Authority Dashboard
-Provides high-level system analytics, active Leaflet maps tracking complaints, contractor trust lists, risk score metrics, and audit tables.
-![Official Authority Dashboard](./docs/screenshots/authority-dashboard.png)
-
----
-
-## 🌀 Detailed Workflows
-
-### 📢 Citizen Complaint Lifecycle
-```text
-Citizen Report (Image + GPS)
-         │
-         ▼
-Duplicate & Location Check
-         │
-         ▼
-YOLOv8-Seg Processing (Defect Segmented + Area Computed)
-         │
-         ▼
-Status: Flagged & Pushed to Map
-         │
-         ▼
-Authority Assigns Field Inspector
-         │
-         ▼
-Inspector Submits Evidence Verification
-         │
-         ▼
-Gemini Qualitative Review & Final Acceptance
-         │
-         ▼
-Contractor Score Adjusted & Resolution Published
+```
+React (Vite) on Vercel ── /api rewrite ──> Express API on Render ──> MongoDB Atlas
+                                              │──> Cloudinary (photos, PDFs)
+                                              │──> Google Gemini
+                                              └──> FastAPI + YOLOv8 ONNX detector (optional)
 ```
 
-### 📍 PWD Project Monitoring Workflow
-```text
-Tender Published (PWD Engineer)
-         │
-         ▼
-Contractor Awarded & Project Created
-         │
-         ▼
-Inspector Uploads "Before" Baseline Images
-         │
-         ▼
-Construction Completed
-         │
-         ▼
-Inspector Uploads "After" Handoff Images
-         │
-         ▼
-AI Fusion Analysis (After vs. Before Structural Match Score)
-         │
-         ▼
-District Authority Handover Approval
+Details, request lifecycle, data model and workflows: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+## Security in one paragraph
+
+HttpOnly `SameSite=Lax` session cookies, with no tokens in JavaScript. Sessions
+are revocable on logout. Role permissions live in one table and every route
+checks them on the server. Citizens can only see their own complaints, and
+inspectors only their own assignments. Complaint and project workflows are
+state machines, with idempotent, transactional rewards. Uploads are checked by
+their bytes, and EXIF/GPS metadata is stripped. Origin allowlist against CSRF.
+Rate limits per real client IP. The server refuses to start with a weak or
+published secret. Each claim is mapped to its file and test in
+[docs/SECURITY.md](docs/SECURITY.md), with the known risks.
+
+## Run it locally
+
+Prerequisites: Node 22+, Python 3.11 (only for the detector), and a MongoDB
+(Atlas free tier or local).
+
+```bash
+npm run install:all                 # root, server and client
+cp server/.env.example server/.env  # fill in MONGODB_URI and JWT_SECRET (see comments)
+# optional: STORAGE_DRIVER=local in server/.env to skip Cloudinary while developing
+# optional: SEED_DB=true to load sample data (then remove it)
+npm run dev                         # API on :5000, client on :3000
 ```
 
----
+Detector (optional):
 
-## 🛠️ Local Installation & Setup
+```bash
+cd segmentation-service
+python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\Activate.ps1
+pip install --extra-index-url https://download.pytorch.org/whl/cpu torch torchvision
+pip install -r requirements.txt
+SEGMENTATION_ENV=development uvicorn app:app --port 8001
+# then set SEGMENTATION_SERVICE_URL=http://localhost:8001 in server/.env
+```
 
-### Prerequisites
-* **Node.js** (v18 or higher)
-* **MongoDB** (Running instance or MongoDB Atlas Connection String)
-* **Python** (3.10 or higher)
-* **Gemini API Key** (from Google AI Studio)
+Demo logins (sample data only): citizen `citizen@gmail.com` / `citizen123`;
+official `authority@gramsetu.gov` / `authority123`; inspector
+`inspector@gramsetu.gov` / `inspector123`.
 
----
+## Tests
 
-### 1. Backend Setup (`server/`)
-1. Navigate to the server folder:
-   ```bash
-   cd server
-   ```
-2. Install package dependencies:
-   ```bash
-   npm install
-   ```
-3. Create a `.env` file in `server/` using the following template:
-   ```env
-   PORT=5000
-   MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/gramsetu
-   JWT_SECRET=your_jwt_secret_token
-   GEMINI_API_KEY=your_gemini_api_key
-   CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
-   CLOUDINARY_API_KEY=your_cloudinary_api_key
-   CLOUDINARY_API_SECRET=your_cloudinary_api_secret
-   SEGMENTATION_SERVICE_URL=http://localhost:8001
-   CLIENT_ORIGINS=http://localhost:3000
-   SEED_DB=true
-   ```
-   `CLIENT_ORIGINS` is a comma-separated list of front-end URLs allowed to call the API. `SEED_DB=true` seeds demo data only when the database is empty; `force` wipes and reseeds, and leaving it unset (as in production) never seeds.
-4. Start the server:
-   ```bash
-   npm run dev
-   ```
+```bash
+npm run lint && npm test                   # server (unit + HTTP vs real MongoDB) and client
+cd segmentation-service && pytest          # detector (real-model tests run if ultralytics is installed)
+cd client && E2E_MONGODB_URI=mongodb://127.0.0.1:27017/gramsetu_e2e npm run test:e2e   # browser
+```
 
----
+What each layer covers and what is faked: [docs/TESTING.md](docs/TESTING.md).
+CI runs all of it on every push and pull request.
 
-### 2. Python AI Segmentation Service Setup (`segmentation-service/`)
-1. Navigate to the segmentation service folder:
-   ```bash
-   cd segmentation-service
-   ```
-2. Create and activate a python virtual environment:
-   ```bash
-   python -m venv .venv
-   # Windows:
-   .\.venv\Scripts\Activate.ps1
-   # macOS/Linux:
-   source .venv/bin/activate
-   ```
-3. Install model requirements:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Start the FastAPI microservice:
-   ```bash
-   uvicorn app:app --port 8001 --reload
-   ```
+## Deploy
 
----
+Render + Vercel settings, environment variables, the detector's Docker image,
+the post-deploy smoke test and troubleshooting: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
-### 3. Frontend Setup (`client/`)
-1. Navigate to the client folder:
-   ```bash
-   cd client
-   ```
-2. Install client dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the Vite React app:
-   ```bash
-   npm run dev
-   ```
-4. Open your browser to the local address displayed (default is `http://localhost:3000`).
+## Screens
 
----
+| Citizen sign-in | Citizen report | Official dashboard |
+| --- | --- | --- |
+| ![Citizen sign-in](docs/screenshots/citizen-login.png) | ![Citizen report](docs/screenshots/citizen-verification.png) | ![Dashboard](docs/screenshots/authority-dashboard.png) |
 
-## 👥 Contributors
+Screenshots predate the October 2026 changes (for example, the citizen form no
+longer asks for a calibration scale). The concept diagrams in
+`docs/screenshots/` show the original hackathon design. Where they differ from
+the code (segmentation masks, reference markers), the code and
+docs/ARCHITECTURE.md are correct.
 
-* **Mohd Abid Hussain** (Lead Developer)
-* **Bibhuti Parida** (AI & ONNX Integration)
-* **Ramu1029** (Project Lifecycle Developer)
+## Docs
+
+| File | Contents |
+| --- | --- |
+| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Components, request flow, data model, workflows, decisions |
+| [SECURITY.md](docs/SECURITY.md) | Authentication, authorization, risks and mitigations |
+| [AI_LIMITATIONS.md](docs/AI_LIMITATIONS.md) | Real vs simulated output, measurement assumptions, evaluation method |
+| [TESTING.md](docs/TESTING.md) | Test layers, mocks, commands, known gaps |
+| [DEPLOYMENT.md](docs/DEPLOYMENT.md) | Environment, hosting, troubleshooting |
+| [ENGINEERING_AUDIT.md](docs/ENGINEERING_AUDIT.md) | Findings and their status |
+| [INTERVIEW_PREP.md](docs/INTERVIEW_PREP.md) | How to explain and change this system |
+| [DECISIONS.md](docs/DECISIONS.md) | Rules not to undo, and why |
+
+## Contributors
+
+- **Mohd Abid Hussain**: lead developer
+- **Bibhuti Parida**: AI and ONNX integration
+- **Ramu1029**: project lifecycle
+
+Model: trained with Ultralytics YOLOv8 (AGPL-3.0). Using it in a closed-source
+product needs an Ultralytics licence.

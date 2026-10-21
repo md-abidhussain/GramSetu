@@ -5,19 +5,22 @@ something that was wrong, and the reasoning is written down so the fix is not
 quietly undone later.
 
 Started with two teammates during a hackathon (bibhuti-parida, Ramu1029); their
-commits are in the history.
+commits are in the history. The October 2026 hardening pass is described in
+docs/ENGINEERING_AUDIT.md.
 
 ## Run it
 
 ```
 npm run install:all     # root, installs server and client
 npm run dev             # both together
-cd server && npm test   # 76 tests, Node's built-in runner
-cd client && npm test   # 15 tests, vitest with jsdom
+cd server && npm test   # unit + HTTP tests against an in-memory MongoDB
+cd client && npm test   # component tests (vitest + jsdom)
+cd client && npm run test:e2e   # browser tests, see docs/TESTING.md
 ```
 
-Server needs `server/.env`; copy `.env.example` and fill it in. The server exits
-on start if `JWT_SECRET` or `MONGODB_URI` is missing — that is deliberate, see below.
+Server needs `server/.env`; copy `server/.env.example` and fill it in. The server
+exits on start if `JWT_SECRET` or `MONGODB_URI` is missing, or the secret is short or
+a published example. That is deliberate, see below.
 
 ## Live
 
@@ -31,9 +34,10 @@ minute. The client shows a loading screen that explains this after four seconds.
 ## Demo accounts
 
 Citizen `citizen@gmail.com` / `citizen123`. Officials `authority@gramsetu.gov`,
-`inspector@gramsetu.gov`, `engineer@gramsetu.gov`, `officer@gramsetu.gov`,
-`admin@gramsetu.gov` — inspector uses `inspector123`, the rest `authority123`.
-These are public sample accounts on purpose; the login page links to two of them.
+`inspector@gramsetu.gov`, `engineer@gramsetu.gov`, `officer@gramsetu.gov`:
+inspector uses `inspector123`, the rest `authority123`. These are public sample
+accounts on purpose. **There is no public Admin**: an Admin can create officials,
+so it is seeded only from `ADMIN_PASSWORD`. Do not reintroduce a published Admin login.
 
 ## Do not reverse these
 
@@ -112,24 +116,23 @@ is exactly why it has to be unmistakable that it is not one.
 calls Gemini. Writes to those routes allow 30 per hour; reads are skipped because
 listing projects is public and cheap.
 
+**AI output says where it came from.** Every AI-derived value is stored with
+`aiAssessment.status`. When the AI did not run or answered badly, no score is
+stored. The old fallback that saved "60%, Healthy" on failure must never come
+back. See docs/AI_LIMITATIONS.md.
+
+**"AI Verified" is a system step.** Only a real comparison can move a project
+there. The title-length "mock AI" that used to do it was deleted.
+
+**A complaint counts against a contractor only after an official accepts it.**
+An unreviewed complaint is an allegation.
+
 ## Known gaps
 
-- The YOLOv8 segmentation service is **not deployed**. Without
-  `SEGMENTATION_SERVICE_URL` the app records defect measurement as unavailable and
-  says so in the report. The model is trained and runs locally. Do not describe it
-  as live.
-- No tests that go through HTTP to a real database. The suite covers the
-  authorization rules, validators, scoring and the error boundary as units, which
-  is most of the risk, but a broken route wiring would not be caught.
-- The error boundary is a single one at the top of the tree, so a crash replaces
-  the whole screen rather than just the panel that failed.
-- The session token is returned in the response body as well as in an HttpOnly
-  cookie. See docs/SECURITY.md; the cookie is the right mechanism and the body is
-  left over from the earlier client.
-- No account lockout and no second factor. Login is rate limited only.
-- Seed project photos point at Unsplash, which deletes images over time. A missing
-  photo degrades gracefully, but the fix is to upload them to the project's own
-  Cloudinary account and replace the URLs in `server/data/seedDatabase.js`.
+See the "Known risks" table in docs/SECURITY.md and the gaps in docs/TESTING.md.
+The largest: no accuracy evaluation of the detector on labelled target data;
+uploaded photos are at unguessable but public URLs; the detector is not deployed
+on the hosted demo.
 
 ## Dependency advisories
 

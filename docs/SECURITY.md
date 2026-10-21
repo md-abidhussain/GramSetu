@@ -1,62 +1,90 @@
-# Security notes
+# Security
 
-What this app protects, what it does about it, and where that is enforced. It
-is written so that a reviewer can check each claim against a file rather than
-take it on trust.
+What this app protects, how, and where. Each claim names the file that
+enforces it and the test that checks it, so a reviewer can verify rather than trust.
 
-## What is worth attacking
+## Assets, in order of harm
 
-GramSetu holds three things worth protecting, in order:
+1. **Citizens' reports**: photo, description, GPS position, name and contact details.
+2. **Official accounts**: they assign inspectors, resolve complaints and move contractor scores.
+3. **Paid operations**: uploads and AI calls cost money.
 
-1. **Citizens' reports.** Each one carries a photograph, a description and a
-   GPS location, which together say where a named person was and what they saw.
-   One citizen reading another's report is the worst outcome in the app.
-2. **Official accounts.** An official can assign inspectors, resolve complaints
-   and affect a contractor's trust score. An attacker holding one can clear
-   complaints about work that was never done.
-3. **Paid-for work.** Submitting a report or a tender stores a file and calls a
-   paid AI service, so an open endpoint is a bill as well as a mess.
+## Authentication
 
-## What is enforced, and where
-
-| Risk | What stops it | File |
+| Property | Implementation | Test |
 | --- | --- | --- |
-| Reading someone else's report | Citizens are scoped to their own; officials may read any | `server/utils/access.js` |
-| Skipping inspection to close a complaint | Only three decisions are accepted | `server/utils/access.js` |
-| Anyone becoming an administrator | Official accounts are created by an Admin | `server/routes/authRoutes.js` |
-| Forged session tokens | The server refuses to start without `JWT_SECRET` | `server/config/env.js` |
-| Query operators in a login body | Identifiers are forced to strings | `server/utils/credentials.js` |
-| A program uploaded as a photo | The file's own first bytes are read | `server/utils/fileType.js` |
-| Guessing an official's user id | `crypto.randomInt` over a billion values | `server/controllers/authController.js` |
-| Weak passwords | Minimum eight characters | `server/utils/credentials.js` |
-| Running up an AI bill | 30 writes an hour per address; reads are free | `server/server.js` |
-| A bad link reading as a server fault | Ids are checked before any query | `server/middleware/validateIdParam.js` |
-| Internal details in an error reply | Only deliberate errors keep their message | `server/middleware/errorMiddleware.js` |
-| A browser on another site calling the API | Origin allowlist | `server/server.js` |
+| Session token only in an `HttpOnly; SameSite=Lax` cookie (`Secure` in production); never in a response body | `controllers/authController.js` (`setSessionCookie`) | `tests/http/auth.test.js` |
+| No `Authorization` header fallback: JavaScript never holds a token | `middleware/authMiddleware.js` (`readSessionToken`) | auth: "a Bearer header is not accepted" |
+| JWT pinned to HS256, 24 h expiry, carries `kind` (citizen/authority) so a citizen id can never be looked up as an official | `signSession`, `resolveSession` | auth: "kind is checked" |
+| Logout revokes **all** sessions for the account (`tokenVersion` bump), so a copied token stops working | `logout` | auth: "logout revokes the token everywhere" |
+| Server refuses to start with a missing, short (<32) or published JWT secret | `config/env.js` | `tests/unit/configAndPrivacy.test.js` |
+| Passwords: bcrypt cost 12; 8–200 characters | `utils/credentials.js` | `tests/unit/credentials.test.js` |
+| Same response and similar timing for "no such account" and "wrong password" (dummy bcrypt compare) | `loginCitizen`, `loginAuthority` | auth: "same answer" |
+| Registration duplicates get one generic 409 that does not name the field | `registerCitizen` | auth |
+| Sign-in/registration rate limited (20 per 15 min per IP); `/me` is not counted | `middleware/rateLimits.js`, `routes/authRoutes.js` | `tests/http/rateLimit.test.js`, platform test |
+| Official accounts are created only by an Admin; the Admin keeps their own session | `routes/authRoutes.js` | auth: "official accounts" |
+| No public Admin credentials. An Admin is seeded only from `ADMIN_PASSWORD` | `data/seedDatabase.js` | e2e: "old public Admin password no longer works" |
 
-Every row above has tests. `cd server && npm test`.
+## CSRF
 
-## Decisions taken knowingly
+Two layers. (1) The session cookie is `SameSite=Lax`, so browsers do not send
+it on cross-site POST/PATCH. (2) Every request carrying an `Origin` header not
+in `CLIENT_ORIGINS` is refused with 403 before any route runs (`app.js`).
+State never changes on GET. Test: platform "a write from a website that is not ours is refused".
 
-**The demo accounts are public.** Their credentials are printed on the login
-page. They hold seeded data and no real person's information. This is a
-demonstration, and a reviewer who cannot get in sees nothing.
+## Authorization
 
-**The token is returned in the response body as well as in an HttpOnly
-cookie.** The cookie is the right mechanism; the body is left over from the
-earlier client and means a cross-site scripting bug could read a token that the
-cookie alone would have protected. Removing it means reworking how the client
-holds its session, which has not been done.
+The server is the authority; the client's route guards only keep screens
+consistent. Roles and permissions live in one table: `server/utils/roles.js` (`PERMISSIONS`).
 
-**There is no account lockout or second factor.** Login is rate limited, which
-slows guessing but does not stop a determined attempt against a known address.
+| Rule | Where | Test |
+| --- | --- | --- |
+| Citizens see only their own complaints (list, by id, PDF). Others' ids return 404, so ids cannot be probed | `utils/access.js` `canViewReport`, `citizenController` | complaints: "who can see a complaint" |
+| Only the **assigned** inspector (or an Admin) can schedule or upload evidence | `canInspect` | complaints workflow |
+| Only Admin / District Authority / Government Officer decide complaints and final project stages | `PERMISSIONS` | complaints + projects tests |
+| Complaint workflow is a state machine; accepting needs inspection evidence | `utils/complaintWorkflow.js` | "cannot be accepted before an inspection" |
+| Accepting is idempotent: conditional update + transaction + unique index on `Reward.complaint` | `resolveComplaint`, `models/Reward.js` | "pays the citizen once, even if sent twice at the same moment" |
+| Unreviewed complaints cannot change contractor or project scores | `createCitizenReport` | "an unreviewed complaint does not change the project or the contractor" |
+| "AI Verified" is a system-only stage | `utils/projectLifecycle.js` | "nobody can mark a project AI Verified by hand" |
+| Public project data excludes tender text/PDF/budget and contractor contacts | `projectController` `PUBLIC_FIELDS` | projects: "public project data" |
+| Tenders and PDFs of project audits: officials only | routes | projects/tenders tests |
+| Notifications: ownership is part of the query | `markNotificationRead` | platform test |
 
-**Authorisation is checked in controllers, not in the database.** A query
-written without the ownership check would return another citizen's report.
-`canViewReport` exists so there is one place to get it right, but nothing
-forces a future route to call it.
+## Input and uploads
 
-## Reporting a problem
+- Request bodies capped at 100 kB; JSON parse errors → 400.
+- Ids validated before queries; identifiers coerced to strings (blocks `$ne` operator injection); `strictQuery` on.
+- Text fields trimmed and length-limited; coordinates range-checked; numbers clamped.
+- Uploads: authentication runs **before** multer reads the file. One file only; 5 MB images and 10 MB PDFs. Type decided by the file's **bytes** (signature), not its name or claimed MIME type.
+- PDFs: parsed with a 60-page cap; unreadable files → 400 before anything is stored.
+- EXIF/GPS metadata is stripped from JPEG and PNG before storage (`utils/stripImageMetadata.js`). WebP/GIF are stored as uploaded.
+- Failed requests delete the file they already uploaded.
 
-This is a student project with no security contact. If you are reviewing it and
-find something, open an issue on the repository.
+## Errors and logging
+
+- Unexpected errors return one generic sentence plus a `requestId`; details go only to the server log.
+- Logs are JSON lines. Keys matching password/token/secret/cookie/authorization/uri are redacted. Request bodies are never logged.
+
+## Headers and transport
+
+`helmet` defaults (no `X-Powered-By`, `X-Content-Type-Options`, HSTS, etc.).
+CORS allowlist with credentials. `TRUST_PROXY` set to the number of proxies so
+rate limits apply per real client IP.
+
+## Known risks and decisions
+
+| Risk | Status |
+| --- | --- |
+| **Uploaded photos are at public, unguessable Cloudinary URLs.** Anyone holding a URL can view the photo. | Accepted for the demo. Fix: Cloudinary `authenticated` delivery with short-lived signed URLs. |
+| Demo citizen/official passwords are public by design | They hold sample data. Real people's data on the same deployment is visible to anyone using the demo official accounts. **For a real deployment, remove the demo accounts.** |
+| No MFA, no account lockout (rate limit only) | Open. |
+| Rate-limit counters are per process (in memory) | Fine for one instance. With several, use a shared store (e.g. Redis). |
+| Logout revokes all of a user's sessions, not just one device | Simplicity over per-device sessions. |
+| Prompt injection via tender PDFs | Mitigated (delimited data), not eliminated; output is advisory. |
+| The detection service has no auth unless `SEGMENTATION_SERVICE_TOKEN` is set | Set it in production, or keep the service on a private network. |
+| A JWT secret published in earlier commits of this repo | Never use it. `config/env.js` refuses it. Rotate the production secret if it was ever set to it. |
+
+## Reporting
+
+This is a student project with no security contact. Please open a GitHub issue,
+without exploit details, and the maintainer will reach out.

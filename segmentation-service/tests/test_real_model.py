@@ -47,3 +47,13 @@ def test_inference_output_is_well_formed(client, name):
         assert 0 <= defect["areaFractionOfImage"] <= 1
         assert defect["depth"] is None
         assert defect["areaCm2"] is None
+
+
+POTHOLE_PHOTOS = sorted(ASSETS.glob("pothole*.jpg"))
+
+
+@pytest.mark.skipif(not POTHOLE_PHOTOS, reason="add a real pothole photo as test-assets/pothole-*.jpg to enable")
+@pytest.mark.parametrize("photo", POTHOLE_PHOTOS, ids=lambda path: path.name)
+def test_a_real_pothole_photo_produces_a_pothole_detection(client, photo):
+    body = client.post("/segment", files={"image": (photo.name, photo.read_bytes(), "image/jpeg")}).json()
+    assert any(defect["type"] == "pothole" for defect in body["defects"]), body
