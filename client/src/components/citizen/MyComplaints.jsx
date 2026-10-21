@@ -2,14 +2,18 @@ import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card.jsx';
 import { formatDate } from '../../lib/formatDate.js';
 import { FileText, MapPin, Clock, UserCheck, Calendar, CheckCircle2, ListFilter } from 'lucide-react';
+import { defectLabel, hasAiResult } from '../../lib/aiStatus.js';
+import { apiUrl } from '../../services/api.js';
+import { AiStatusNote, SampleDataBadge } from '../ui/AiStatusNote.jsx';
+import { clickable } from '../../lib/a11y.js';
 
 // Render complaint lifecycle milestones
 const renderWorkflowMilestones = (status) => {
   const steps = [
-    { name: 'Submitted', key: ['Complaint Submitted', 'AI Analysis', 'Duplicate Detected'] },
-    { name: 'AI Verified', key: ['Severity Detected', 'Geo Verification', 'Authority Notification'] },
-    { name: 'Inspection', key: ['Inspector Assigned', 'Inspection Scheduled', 'Inspector Uploads Verification', 'Gemini Analysis', 'AI Agent Validation'] },
-    { name: 'Decision', key: ['Accepted', 'Rejected', 'Need More Evidence', 'Resolution Published'] }
+    { name: 'Submitted', key: ['Complaint Submitted'] },
+    { name: 'With officials', key: ['Authority Notification', 'Duplicate Detected', 'AI Analysis', 'Severity Detected', 'Geo Verification'] },
+    { name: 'Inspection', key: ['Inspector Assigned', 'Inspection Scheduled', 'Inspector Uploads Verification', 'Need More Evidence', 'Gemini Analysis', 'AI Agent Validation'] },
+    { name: 'Decision', key: ['Accepted', 'Rejected', 'Resolution Published'] }
   ];
 
   let currentStepIndex = 0;
@@ -72,7 +76,8 @@ export const MyComplaints = ({ complaints: myComplaints, loading: loadingComplai
                 {myComplaints.map(comp => (
                   <div
                     key={comp._id}
-                    onClick={() => setSelectedComplaint(comp)}
+                    {...clickable(() => setSelectedComplaint(comp))}
+                    aria-pressed={selectedComplaint?._id === comp._id}
                     className={`p-3.5 hover:bg-slate-50 transition-colors cursor-pointer text-left block w-full ${
                       selectedComplaint?._id === comp._id ? 'bg-slate-50 border-l-2 border-brand-500' : ''
                     }`}
@@ -111,7 +116,7 @@ export const MyComplaints = ({ complaints: myComplaints, loading: loadingComplai
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-xs text-slate-600">Complaint ID: #{selectedComplaint._id.toString().slice(-6).toUpperCase()}</span>
                     <button
-                      onClick={() => window.open(`/api/citizen-reports/${selectedComplaint._id}/report`, '_blank')}
+                      onClick={() => window.open(apiUrl(`/citizen-reports/${selectedComplaint._id}/report`), '_blank', 'noopener')}
                       className="inline-flex items-center gap-1 px-2 py-0.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-semibold rounded text-slate-700 transition-colors"
                     >
                       <FileText className="h-3 w-3 text-slate-600" /> Export PDF
@@ -178,10 +183,15 @@ export const MyComplaints = ({ complaints: myComplaints, loading: loadingComplai
                   </div>
 
                   <div>
-                    <span className="text-xs font-semibold text-slate-500 block">Defects Flagged by AI</span>
-                    <span className="font-medium text-brand-700 mt-0.5 block capitalize">
-                      {selectedComplaint.detectedIssues?.join(', ') || 'None'}
-                    </span>
+                    <span className="text-xs font-semibold text-slate-500 block">Problems seen by the AI review</span>
+                    {hasAiResult(selectedComplaint.aiAssessment) ? (
+                      <span className="font-medium text-brand-700 mt-0.5 block">
+                        {selectedComplaint.detectedIssues?.filter((issue) => issue !== 'none').map(defectLabel).join(', ') || 'None identified'}
+                      </span>
+                    ) : (
+                      <AiStatusNote assessment={selectedComplaint.aiAssessment} className="mt-1" />
+                    )}
+                    <SampleDataBadge record={selectedComplaint} />
                   </div>
                 </div>
               </div>

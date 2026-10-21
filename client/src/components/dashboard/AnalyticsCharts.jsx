@@ -8,7 +8,8 @@ export const AnalyticsCharts = ({ summary }) => {
   const {
     totalProjects = 0,
     completedProjects = 0,
-    averageCompletionScore = 100,
+    averageCompletionScore = null,
+    aiAssessedProjects = 0,
     flaggedProjects = 0,
     totalComplaints = 0,
     activeTendersCount = 0
@@ -30,9 +31,9 @@ export const AnalyticsCharts = ({ summary }) => {
       iconColor: 'text-emerald-600 bg-emerald-50 border-emerald-100',
     },
     {
-      title: 'Average progress',
-      value: `${averageCompletionScore}%`,
-      desc: 'Across projects still running',
+      title: 'Average AI completion score',
+      value: averageCompletionScore === null ? 'No data' : `${averageCompletionScore}%`,
+      desc: averageCompletionScore === null ? 'No project has a real AI comparison yet' : `From ${aiAssessedProjects} AI-compared project${aiAssessedProjects === 1 ? '' : 's'}`,
       icon: TrendingUp,
       iconColor: 'text-slate-700 bg-slate-50 border-slate-200',
     },

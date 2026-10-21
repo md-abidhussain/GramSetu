@@ -1,0 +1,11 @@
+[tool.ruff]
+line-length = 130
+
+[tool.ruff.lint]
+select = ["E", "F", "B", "I"]
+# B008: FastAPI declares request parameters with File()/Form() defaults by design.
+ignore = ["B008", "E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = ["ignore::DeprecationWarning"]

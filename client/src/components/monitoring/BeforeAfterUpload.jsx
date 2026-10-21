@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card.jsx';
+import { Card, CardHeader, CardContent } from '../ui/Card.jsx';
 import { Input } from '../ui/Input.jsx';
 import { Select } from '../ui/Select.jsx';
 import { Button } from '../ui/Button.jsx';
 import { getTenders } from '../../services/tenderService.js';
-import { Camera, HelpCircle, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Camera, AlertTriangle } from 'lucide-react';
 import GpsPicker from '../citizen/GpsPicker.jsx';
 
 export const BeforeAfterUpload = ({ projects, onProjectCreated, onProjectCompleted }) => {
@@ -82,7 +82,7 @@ export const BeforeAfterUpload = ({ projects, onProjectCreated, onProjectComplet
       formData.append('address', address);
       formData.append('image', beforeImage);
 
-      const newProj = await onProjectCreated(formData);
+      await onProjectCreated(formData);
       // Reset form
       setTitle('');
       setTenderId('');
@@ -100,6 +100,7 @@ export const BeforeAfterUpload = ({ projects, onProjectCreated, onProjectComplet
 
   const handleCompleteSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return;
     if (!completeProjectId || !afterImage) {
       setError('Project selection and an "after" image are required');
       return;
@@ -123,7 +124,8 @@ export const BeforeAfterUpload = ({ projects, onProjectCreated, onProjectComplet
     }
   };
 
-  const pendingProjects = projects.filter(p => !p.afterImageUrl);
+  // Completion photos are accepted once construction has started (the server enforces this too).
+  const pendingProjects = projects.filter(p => !p.afterImageUrl && p.lifecycleStatus === 'Construction Started');
 
   return (
     <Card>
@@ -202,15 +204,16 @@ export const BeforeAfterUpload = ({ projects, onProjectCreated, onProjectComplet
             />
 
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5">
-                Before Construction Photo <span className="text-red-500">*</span>
+              <label htmlFor="before-photo" className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Before construction photo <span className="text-red-600" aria-hidden="true">*</span>
               </label>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
                 <div className="border-2 border-dashed border-slate-200 hover:border-brand-500 transition-colors rounded-md p-5 text-center cursor-pointer bg-white hover:bg-slate-50/50 relative h-32 flex flex-col justify-center items-center">
                   <input
+                    id="before-photo"
                     type="file"
-                    accept="image/*"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
                     onChange={(e) => handleImageChange(e, 'before')}
                     className="absolute inset-0 opacity-0 cursor-pointer"
                     disabled={loading}
@@ -238,8 +241,13 @@ export const BeforeAfterUpload = ({ projects, onProjectCreated, onProjectComplet
           </form>
         ) : (
           <form onSubmit={handleCompleteSubmit} className="space-y-4">
+            {pendingProjects.length === 0 && (
+              <p className="rounded-md border border-slate-200 bg-slate-50 p-3 text-xs text-slate-700">
+                No project is in &ldquo;Construction Started&rdquo;. Move a project to that stage first (Project stages panel).
+              </p>
+            )}
             <Select
-              label="Select Pending Project"
+              label="Project under construction"
               id="complete-project-select"
               placeholder="Select project..."
               options={pendingProjects.map(p => ({ value: p._id, label: p.title }))}
@@ -250,15 +258,16 @@ export const BeforeAfterUpload = ({ projects, onProjectCreated, onProjectComplet
             />
 
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5">
-                Completed Project Photo <span className="text-red-500">*</span>
+              <label htmlFor="after-photo" className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Completed project photo <span className="text-red-600" aria-hidden="true">*</span>
               </label>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
                 <div className="border-2 border-dashed border-slate-200 hover:border-brand-500 transition-colors rounded-md p-5 text-center cursor-pointer bg-white hover:bg-slate-50/50 relative h-32 flex flex-col justify-center items-center">
                   <input
                     type="file"
-                    accept="image/*"
+                    id="after-photo"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
                     onChange={(e) => handleImageChange(e, 'after')}
                     className="absolute inset-0 opacity-0 cursor-pointer"
                     disabled={loading}

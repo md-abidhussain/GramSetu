@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Bell, CheckCircle, Info, AlertTriangle, AlertCircle } from 'lucide-react';
 import { useNotifications } from '../../hooks/useNotifications.js';
+import { clickable } from '../../lib/a11y.js';
 
 export const NotificationBell = () => {
   const { notifications, unreadCount, markAsRead } = useNotifications();
@@ -37,7 +38,8 @@ export const NotificationBell = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={toggleDropdown}
-        className="p-2 text-slate-600 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-all duration-200 focus:outline-none relative"
+        aria-label="Notifications"
+        className="p-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-all duration-200 focus:outline-none relative"
       >
         <Bell className="h-5 w-5" />
         {unreadCount > 0 && (
@@ -65,7 +67,7 @@ export const NotificationBell = () => {
               notifications.map((n) => (
                 <div
                   key={n._id}
-                  onClick={() => !n.read && markAsRead(n._id)}
+                  {...clickable(() => !n.read && markAsRead(n._id))}
                   className={`p-3.5 flex gap-3 cursor-pointer transition-colors ${
                     n.read ? 'bg-white hover:bg-slate-50' : 'bg-brand-50/30 hover:bg-brand-50/50'
                   }`}

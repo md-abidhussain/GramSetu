@@ -61,6 +61,9 @@ const publicCitizen = (citizen) => ({
   name: citizen.name,
   email: citizen.email,
   phone: citizen.phone,
+  points: citizen.points ?? 0,
+  volunteerScore: citizen.volunteerScore ?? 0,
+  badges: citizen.badges ?? [],
   role: 'citizen',
   isCitizen: true
 });

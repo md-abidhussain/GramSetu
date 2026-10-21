@@ -9,7 +9,6 @@ import NotificationsPanel from '../components/citizen/NotificationsPanel.jsx';
 import { useAuth } from '../hooks/useAuth.js';
 import { getCitizenReports, getMyRewards } from '../services/citizenService.js';
 import { getNotifications, markNotificationAsRead } from '../services/dashboardService.js';
-import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card.jsx';
 import { User } from 'lucide-react';
 
 export const CitizenVerificationPage = () => {
@@ -21,8 +20,8 @@ export const CitizenVerificationPage = () => {
 
   // Track complaints
   const [myComplaints, setMyComplaints] = useState([]);
-  const [selectedComplaint, setSelectedComplaint] = useState(null);
   const [loadingComplaints, setLoadingComplaints] = useState(false);
+  const [complaintsError, setComplaintsError] = useState(null);
 
   // Rewards
   const [rewards, setRewards] = useState([]);
@@ -43,20 +42,18 @@ export const CitizenVerificationPage = () => {
     } else if (activeSubTab === 'notifications') {
       loadNotifications();
     }
+    // Reloads only when the tab changes; the loaders are recreated each render.
+     
   }, [activeSubTab]);
 
   const loadComplaints = async () => {
     setLoadingComplaints(true);
     try {
-      const data = await getCitizenReports();
-      // Filter only complaints submitted by the logged in citizen
-      const filtered = data.filter(c => c.citizen?._id === user?._id || c.citizen === user?._id);
-      setMyComplaints(filtered);
-      if (filtered.length > 0) {
-        setSelectedComplaint(filtered[0]);
-      }
+      // The server returns only this citizen's own complaints.
+      setMyComplaints(await getCitizenReports());
+      setComplaintsError(null);
     } catch (err) {
-      console.error('Failed to load complaints', err);
+      setComplaintsError(err.message || 'Your reports could not be loaded.');
     } finally {
       setLoadingComplaints(false);
     }
@@ -122,7 +119,7 @@ export const CitizenVerificationPage = () => {
           <div className="flex items-center gap-4">
             <div className="bg-emerald-50 border border-emerald-100 rounded px-4 py-2 text-center">
               <p className="text-sm font-medium text-slate-700">Points earned</p>
-              <p className="text-lg font-black text-emerald-600">{user?.points || 0}</p>
+              <p className="text-lg font-black text-emerald-800">{user?.points || 0}</p>
             </div>
             <div className="bg-brand-50 border border-brand-100 rounded px-4 py-2 text-center">
               <p className="text-sm font-medium text-slate-700">Reports accepted</p>
@@ -143,7 +140,15 @@ export const CitizenVerificationPage = () => {
           )}
 
           {activeSubTab === 'track' && (
+            <div>
+            {complaintsError && (
+              <p role="alert" className="mb-4 rounded-md border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">
+                {complaintsError}{' '}
+                <button type="button" onClick={loadComplaints} className="font-semibold underline">Try again</button>
+              </p>
+            )}
             <MyComplaints complaints={myComplaints} loading={loadingComplaints} />
+            </div>
           )}
 
           {activeSubTab === 'rewards' && (

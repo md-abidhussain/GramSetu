@@ -16,7 +16,7 @@ describe('platform behaviour', () => {
     const ready = await request(app).get('/health/ready');
     assert.equal(ready.status, 200);
     assert.equal(ready.body.database, 'connected');
-    assert.deepEqual(Object.keys(ready.body.features).sort(), ['cloudinaryConfigured', 'geminiConfigured', 'segmentationConfigured']);
+    assert.deepEqual(Object.keys(ready.body.features).sort(), ["cloudinaryConfigured", "geminiConfigured", "localFileStorage", "segmentationConfigured"]);
     for (const value of Object.values(ready.body.features)) assert.equal(typeof value, 'boolean');
   });
 

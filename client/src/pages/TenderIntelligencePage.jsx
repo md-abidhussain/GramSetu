@@ -4,7 +4,8 @@ import TenderUploadForm from '../components/tender/TenderUploadForm.jsx';
 import TenderSummaryCard from '../components/tender/TenderSummaryCard.jsx';
 import ContractorScoreCard from '../components/tender/ContractorScoreCard.jsx';
 import { getTenders } from '../services/tenderService.js';
-import { FileSpreadsheet, Eye, ChevronRight, HelpCircle } from 'lucide-react';
+import { FileSpreadsheet, ChevronRight } from 'lucide-react';
+import { clickable } from '../lib/a11y.js';
 
 export const TenderIntelligencePage = () => {
   const [tenders, setTenders] = useState([]);
@@ -28,6 +29,8 @@ export const TenderIntelligencePage = () => {
 
   useEffect(() => {
     fetchTenders();
+    // Loads once on mount; fetchTenders is recreated each render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleUploadSuccess = (newTender) => {
@@ -57,7 +60,7 @@ export const TenderIntelligencePage = () => {
                 {tenders.map((item) => (
                   <div
                     key={item._id}
-                    onClick={() => setSelectedTender(item)}
+                    {...clickable(() => setSelectedTender(item))}
                     className={`flex items-center justify-between p-3 rounded-xl border text-xs cursor-pointer transition-colors ${
                       selectedTender?._id === item._id
                         ? 'border-brand-500 bg-brand-50/15 font-medium'

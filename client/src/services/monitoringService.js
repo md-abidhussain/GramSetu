@@ -26,3 +26,5 @@ export const updateProjectLifecycle = (id, payload) => {
     body: JSON.stringify(payload),
   });
 };
+
+export const retryAiVerification = (id) => request(`/projects/${id}/ai-verification`, { method: 'POST' });

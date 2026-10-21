@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card.jsx';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
-import { X, MapPin, TrendingUp, UserCheck, AlertTriangle, Calendar, ShieldCheck } from 'lucide-react';
+import { X, MapPin, ShieldCheck } from 'lucide-react';
 
 // Create styled circular divIcons
 const createMarkerIcon = (project) => {
@@ -149,16 +149,16 @@ export const MapView = ({ mapData = [] }) => {
                     <span className="text-xs font-semibold text-slate-800 block mt-0.5">
                       {selectedProject.completionScore !== null && selectedProject.completionScore !== undefined 
                         ? `${selectedProject.completionScore}%` 
-                        : 'Unverified'}
+                        : 'Not scored'}
                     </span>
                   </div>
 
                   <div className="bg-slate-50 border border-slate-100 rounded p-2">
                     <span className="block text-xs font-semibold text-slate-600 uppercase">Risk Level</span>
                     <span className={`text-xs font-semibold block mt-0.5 ${
-                      selectedProject.riskLevel === 'Low' ? 'text-emerald-600' : selectedProject.riskLevel === 'Medium' ? 'text-amber-500' : 'text-rose-600'
+                      !selectedProject.riskLevel ? 'text-slate-700' : selectedProject.riskLevel === 'Low' ? 'text-emerald-700' : selectedProject.riskLevel === 'Medium' ? 'text-amber-700' : 'text-rose-700'
                     }`}>
-                      {selectedProject.riskLevel}
+                      {selectedProject.riskLevel || 'Not assessed'}
                     </span>
                   </div>
                 </div>
@@ -169,8 +169,8 @@ export const MapView = ({ mapData = [] }) => {
                     <span className="font-semibold text-dark-800">{selectedProject.contractor?.name || 'N/A'}</span>
                   </p>
                   <p className="flex items-center justify-between">
-                    <span className="text-slate-500 font-medium">Contractor AI Trust:</span>
-                    <span className="font-semibold text-emerald-600">{selectedProject.contractor?.trustScore || 85}%</span>
+                    <span className="text-slate-600 font-medium">Contractor trust score:</span>
+                    <span className="font-semibold text-dark-800">{typeof selectedProject.contractor?.trustScore === 'number' ? `${selectedProject.contractor.trustScore}/100` : 'Not available'}</span>
                   </p>
                   <p className="flex items-center justify-between">
                     <span className="text-slate-500 font-medium">Lifecycle Status:</span>

@@ -58,12 +58,12 @@ export const Sidebar = () => {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-semibold text-white truncate">{user.name}</p>
-                <p className="text-xs text-slate-600 capitalize">{user.role}</p>
+                <p className="text-xs text-brand-100 capitalize">{user.role}</p>
               </div>
             </div>
             <button
               onClick={handleLogout}
-              className="flex items-center justify-center gap-2 w-full px-3 py-2 bg-brand-900 hover:bg-red-950/40 hover:text-red-400 text-slate-600 text-xs font-medium rounded-md transition-colors"
+              className="flex items-center justify-center gap-2 w-full px-3 py-2 bg-brand-900 hover:bg-red-950/40 hover:text-red-200 text-brand-100 text-xs font-medium rounded-md transition-colors"
             >
               <LogOut className="h-3.5 w-3.5" />
               <span>Log Out</span>

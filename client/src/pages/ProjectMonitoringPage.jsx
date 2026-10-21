@@ -6,9 +6,12 @@ import ProjectHealthCard from '../components/monitoring/ProjectHealthCard.jsx';
 import { useProjects } from '../hooks/useProjects.js';
 import ProjectLifecycleSection from '../components/monitoring/ProjectLifecycleSection.jsx';
 import { Eye, Activity, MapPin, FileText } from 'lucide-react';
+import { apiUrl } from '../services/api.js';
+import { SampleDataBadge } from '../components/ui/AiStatusNote.jsx';
+import { clickable } from '../lib/a11y.js';
 
 export const ProjectMonitoringPage = () => {
-  const { projects, loading, addNewProject, completeExistingProject } = useProjects();
+  const { projects, loading, error, addNewProject, completeExistingProject, refetchProjects } = useProjects();
   const [selectedProject, setSelectedProject] = useState(null);
 
   const handleCreated = async (formData) => {
@@ -38,7 +41,12 @@ export const ProjectMonitoringPage = () => {
               <Activity className="h-4.5 w-4.5 text-slate-600" /> Infrastructure Projects
             </h3>
             
-            {loading && projects.length === 0 ? (
+            {error && projects.length === 0 ? (
+              <div role="alert" className="py-4 text-sm text-rose-800">
+                {error}{' '}
+                <button type="button" onClick={refetchProjects} className="font-semibold underline focus:outline-none focus:ring-2 focus:ring-brand-600">Try again</button>
+              </div>
+            ) : loading && projects.length === 0 ? (
               <p className="text-sm text-slate-600 py-4">Loading projects…</p>
             ) : projects.length === 0 ? (
               <p className="text-sm text-slate-600 py-4">No projects yet.</p>
@@ -47,7 +55,8 @@ export const ProjectMonitoringPage = () => {
                 {projects.map((item) => (
                   <div
                     key={item._id}
-                    onClick={() => setSelectedProject(item)}
+                    {...clickable(() => setSelectedProject(item))}
+                    aria-pressed={selectedProject?._id === item._id}
                     className={`flex items-center justify-between p-3 rounded-xl border text-xs cursor-pointer transition-colors ${
                       selectedProject?._id === item._id
                         ? 'border-brand-500 bg-brand-50/15 font-medium'
@@ -65,7 +74,7 @@ export const ProjectMonitoringPage = () => {
                         {item.lifecycleStatus || 'Project Created'}
                       </div>
                       <div className="text-xs text-slate-600 mt-1">
-                        {item.riskLevel || 'Low'}
+                        {item.riskLevel ? `Risk: ${item.riskLevel}` : 'Risk: not assessed'}
                       </div>
                     </div>
                   </div>
@@ -82,14 +91,14 @@ export const ProjectMonitoringPage = () => {
               {/* Title & Metadata */}
               <div className="bg-white border border-slate-100 p-5 rounded-2xl shadow-sm flex items-center justify-between">
                 <div>
-                  <h3 className="text-base font-bold text-dark-800 leading-tight">{selectedProject.title}</h3>
+                  <h3 className="text-base font-bold text-dark-800 leading-tight flex items-center gap-2">{selectedProject.title} <SampleDataBadge record={selectedProject} /></h3>
                   <p className="text-xs text-slate-600 mt-1 flex items-center gap-1">
                     <MapPin className="h-3.5 w-3.5" /> {selectedProject.location.address || 'N/A'} (GPS: {selectedProject.location.lat}, {selectedProject.location.lng})
                   </p>
                 </div>
                 <div className="flex items-center gap-4">
                   <button
-                    onClick={() => window.open(`/api/projects/${selectedProject._id}/report`, '_blank')}
+                    onClick={() => window.open(apiUrl(`/projects/${selectedProject._id}/report`), '_blank', 'noopener')}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-semibold rounded-lg text-slate-700 transition-colors"
                   >
                     <FileText className="h-3.5 w-3.5 text-slate-600" /> Export Audit PDF
@@ -106,6 +115,8 @@ export const ProjectMonitoringPage = () => {
                 <CompletionScoreCard
                   score={selectedProject.completionScore}
                   status={selectedProject.status}
+                  assessment={selectedProject.aiAssessment}
+                  isSampleData={selectedProject.dataSource === 'sample'}
                 />
                 <ProjectHealthCard
                   health={selectedProject.projectHealth}
@@ -113,7 +124,11 @@ export const ProjectMonitoringPage = () => {
                 />
               </div>
 
-              <ProjectLifecycleSection projectId={selectedProject._id} project={selectedProject} />
+              <ProjectLifecycleSection
+                projectId={selectedProject._id}
+                project={selectedProject}
+                onProjectUpdated={(updated) => { setSelectedProject(updated); refetchProjects(); }}
+              />
 
               {/* Image Comparison Box */}
               <div className="bg-white border border-slate-100 p-5 rounded-2xl shadow-sm">

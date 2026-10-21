@@ -7,6 +7,7 @@ import { errorHandler, notFoundHandler } from './middleware/errorMiddleware.js';
 import { createExpensiveWriteLimiter, createGlobalLimiter } from './middleware/rateLimits.js';
 import { requestLogger } from './utils/logger.js';
 import { describeOptionalConfig } from './config/env.js';
+import { LOCAL_UPLOAD_DIR, usingLocalStorage } from './services/cloudinaryService.js';
 
 import authRoutes from './routes/authRoutes.js';
 import tenderRoutes from './routes/tenderRoutes.js';
@@ -66,9 +67,14 @@ export const createApp = () => {
       status: databaseReady ? 'ready' : 'not_ready',
       database: databaseReady ? 'connected' : 'disconnected',
       // Booleans only: which optional features are configured, never values.
-      features: describeOptionalConfig()
+      features: { ...describeOptionalConfig(), localFileStorage: usingLocalStorage() }
     });
   });
+
+  if (usingLocalStorage()) {
+    // Development only (see services/cloudinaryService.js).
+    app.use('/uploads', helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }), express.static(LOCAL_UPLOAD_DIR, { fallthrough: false }));
+  }
 
   const apiLimiter = createGlobalLimiter();
   const expensiveWrites = createExpensiveWriteLimiter();

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card.jsx';
-import { Award, CalendarCheck, Clock, TrendingUp } from 'lucide-react';
+import { CalendarCheck, Clock, TrendingUp } from 'lucide-react';
 
 export const ContractorScoreCard = ({ contractor }) => {
   if (!contractor) return null;

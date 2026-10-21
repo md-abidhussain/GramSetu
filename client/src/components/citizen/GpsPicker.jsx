@@ -84,16 +84,16 @@ export const GpsPicker = ({ lat, lng, onChange }) => {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <label className="block text-sm font-medium text-slate-700">
-          Where is it? <span className="text-red-500">*</span>
-        </label>
+        <span id="gps-picker-label" className="block text-sm font-medium text-slate-700">
+          Where is it? <span className="text-red-600" aria-hidden="true">*</span>
+        </span>
         <button
           type="button"
           onClick={useMyLocation}
           disabled={finding}
           className="inline-flex items-center gap-1 text-sm font-medium text-brand-600 transition-colors hover:text-brand-700 disabled:opacity-60"
         >
-          <Navigation className={`h-4 w-4 ${finding ? 'animate-spin' : ''}`} />
+          <Navigation className={`h-4 w-4 ${finding ? 'animate-spin' : ''}`} aria-hidden="true" />
           {finding ? 'Finding you...' : 'Use my location'}
         </button>
       </div>
@@ -142,17 +142,25 @@ export const GpsPicker = ({ lat, lng, onChange }) => {
         <summary className="cursor-pointer select-none">Enter coordinates instead</summary>
         <div className="mt-2 grid grid-cols-2 gap-4">
           <Input
+            id="gps-latitude"
+            label="Latitude"
             type="number"
             step="any"
-            placeholder="Latitude"
+            min="-90"
+            max="90"
+            placeholder="e.g. 25.3176"
             value={lat}
             onChange={(e) => onChange({ lat: e.target.value, lng })}
             required
           />
           <Input
+            id="gps-longitude"
+            label="Longitude"
             type="number"
             step="any"
-            placeholder="Longitude"
+            min="-180"
+            max="180"
+            placeholder="e.g. 82.9739"
             value={lng}
             onChange={(e) => onChange({ lat, lng: e.target.value })}
             required

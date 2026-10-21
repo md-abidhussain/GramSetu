@@ -1,98 +1,58 @@
-import React, { createContext, useState, useEffect } from 'react';
-import { request, setInMemoryToken } from '../services/api.js';
+import React, { createContext, useCallback, useEffect, useState } from 'react';
+import { request, SESSION_EXPIRED_EVENT } from '../services/api.js';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [sessionExpired, setSessionExpired] = useState(false);
 
-  // Check if session is alive on mount
+  // Is there a live session (HttpOnly cookie) already?
   useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        const profile = await request('/auth/me');
-        if (profile && profile._id) {
-          setUser(profile);
-        } else {
-          setUser(null);
-        }
-      } catch (error) {
-        setUser(null);
-      }
-      setLoading(false);
-    };
-
-    initializeAuth();
+    let cancelled = false;
+    request('/auth/me')
+      .then((profile) => { if (!cancelled) setUser(profile?._id ? profile : null); })
+      .catch(() => { if (!cancelled) setUser(null); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, []);
 
-  const loginCitizen = async (identifier, password) => {
-    try {
-      const data = await request('/auth/citizen/login', {
-        method: 'POST',
-        body: JSON.stringify({ identifier, password }),
+  // Any API call that comes back 401 means the session ended (expired, or
+  // signed out elsewhere). Drop the user so route guards send them to sign in.
+  useEffect(() => {
+    const onExpired = () => {
+      setUser((current) => {
+        if (current) setSessionExpired(true);
+        return null;
       });
-      
-      setInMemoryToken(data.token);
-      setUser(data);
-      return data;
-    } catch (error) {
-      console.error('Citizen Login error:', error);
-      throw error;
-    }
-  };
+    };
+    window.addEventListener(SESSION_EXPIRED_EVENT, onExpired);
+    return () => window.removeEventListener(SESSION_EXPIRED_EVENT, onExpired);
+  }, []);
 
-  const registerCitizen = async (name, email, phone, password) => {
-    try {
-      const data = await request('/auth/citizen/register', {
-        method: 'POST',
-        body: JSON.stringify({ name, email, phone, password }),
-      });
-      
-      setInMemoryToken(data.token);
-      setUser(data);
-      return data;
-    } catch (error) {
-      console.error('Citizen Register error:', error);
-      throw error;
-    }
-  };
+  const signIn = useCallback(async (endpoint, body) => {
+    const data = await request(endpoint, { method: 'POST', body: JSON.stringify(body) });
+    setSessionExpired(false);
+    setUser(data);
+    return data;
+  }, []);
 
-  const loginAuthority = async (identifier, password) => {
-    try {
-      const data = await request('/auth/authority/login', {
-        method: 'POST',
-        body: JSON.stringify({ identifier, password }),
-      });
-      
-      setInMemoryToken(data.token);
-      setUser(data);
-      return data;
-    } catch (error) {
-      console.error('Official Login error:', error);
-      throw error;
-    }
-  };
+  const loginCitizen = (identifier, password) => signIn('/auth/citizen/login', { identifier, password });
+  const registerCitizen = (name, email, phone, password) => signIn('/auth/citizen/register', { name, email, phone, password });
+  const loginAuthority = (identifier, password) => signIn('/auth/authority/login', { identifier, password });
 
   const logoutUser = async () => {
     try {
       await request('/auth/logout', { method: 'POST' });
-    } catch (err) {
-      console.warn('Logout endpoint error:', err.message);
+    } catch {
+      // Signing out locally still happens if the server cannot be reached.
     }
-    setInMemoryToken(null);
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      loading, 
-      loginCitizen, 
-      registerCitizen, 
-      loginAuthority, 
-      logoutUser 
-    }}>
+    <AuthContext.Provider value={{ user, loading, sessionExpired, loginCitizen, registerCitizen, loginAuthority, logoutUser }}>
       {children}
     </AuthContext.Provider>
   );

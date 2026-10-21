@@ -5,10 +5,7 @@ import {
   X, 
   TrendingUp, 
   ShieldCheck, 
-  AlertTriangle, 
-  Activity, 
   Calendar,
-  CheckCircle,
   FileSpreadsheet
 } from 'lucide-react';
 

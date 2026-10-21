@@ -12,7 +12,6 @@ import {
 import { 
   MessageSquare, 
   MapPin, 
-  Eye, 
   ShieldAlert, 
   Image as ImageIcon, 
   UserCheck, 
@@ -20,6 +19,14 @@ import {
   FileText,
   AlertCircle
 } from 'lucide-react';
+import { DetectionSection } from '../citizen/DiscrepancyReport.jsx';
+import { AiStatusNote, SampleDataBadge } from '../ui/AiStatusNote.jsx';
+import { defectLabel, hasAiResult } from '../../lib/aiStatus.js';
+
+const DECIDING_ROLES = ['District Authority', 'Admin', 'Government Officer'];
+const ASSIGNABLE = ['Authority Notification', 'Complaint Submitted', 'Duplicate Detected', 'Need More Evidence'];
+const AWAITING_EVIDENCE = ['Inspector Assigned', 'Inspection Scheduled', 'Need More Evidence'];
+const REJECTABLE_EARLY = ['Authority Notification', 'Complaint Submitted', 'Duplicate Detected'];
 
 export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
   const { user } = useAuth(); // Logged-in authority official
@@ -72,12 +79,7 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
 
   // Update selected report details when complaints feed updates
   useEffect(() => {
-    if (selectedReport) {
-      const updated = complaints.find(c => c._id === selectedReport._id);
-      if (updated) {
-        setSelectedReport(updated);
-      }
-    }
+    setSelectedReport((current) => (current ? complaints.find((c) => c._id === current._id) || current : current));
   }, [complaints]);
 
   // Handler: Assign Inspector
@@ -90,6 +92,8 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
       if (onStatusUpdated) onStatusUpdated();
     } catch (err) {
       setActionError(err.message || 'Inspector assignment failed.');
+      // Someone else changed this complaint first: show its current state.
+      if (err.status === 409 && onStatusUpdated) onStatusUpdated();
     } finally {
       setLoadingAction(false);
     }
@@ -105,6 +109,8 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
       if (onStatusUpdated) onStatusUpdated();
     } catch (err) {
       setActionError(err.message || 'Failed to schedule inspection.');
+      // Someone else changed this complaint first: show its current state.
+      if (err.status === 409 && onStatusUpdated) onStatusUpdated();
     } finally {
       setLoadingAction(false);
     }
@@ -131,6 +137,8 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
       if (onStatusUpdated) onStatusUpdated();
     } catch (err) {
       setActionError(err.message || 'Failed to upload verification evidence.');
+      // Someone else changed this complaint first: show its current state.
+      if (err.status === 409 && onStatusUpdated) onStatusUpdated();
     } finally {
       setLoadingAction(false);
     }
@@ -138,8 +146,9 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
 
   // Handler: Resolve Complaint
   const handleResolveComplaint = async (decision) => {
-    if (!selectedReport || !resolutionSummary) {
-      setActionError('Resolution summary remarks are required before finalizing decision.');
+    if (loadingAction) return;
+    if (!selectedReport || !resolutionSummary.trim()) {
+      setActionError('Write a short summary of the decision first.');
       return;
     }
     setLoadingAction(true);
@@ -150,6 +159,8 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
       if (onStatusUpdated) onStatusUpdated();
     } catch (err) {
       setActionError(err.message || 'Failed to record decision.');
+      // Someone else changed this complaint first: show its current state.
+      if (err.status === 409 && onStatusUpdated) onStatusUpdated();
     } finally {
       setLoadingAction(false);
     }
@@ -226,7 +237,9 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                         record. A low number means they differ, which is the
                         interesting case, so it is not coloured as an alarm. */}
                     <span className="text-sm font-medium text-slate-700">
-                      Photo match {item.matchScore}%
+                      {hasAiResult(item.aiAssessment) && typeof item.matchScore === 'number'
+                        ? `Photo match ${item.matchScore}/100`
+                        : `Severity: ${item.severity || 'Unassessed'}`}
                     </span>
                     <span className={`rounded border px-2 py-0.5 text-xs font-medium ${getStatusBadgeColor(item.status)}`}>
                       {item.status}
@@ -308,7 +321,9 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                   </div>
                   <div className="space-y-1">
                     <p><span className="text-slate-600 font-medium">Duplicate Check:</span> <span className="font-semibold text-amber-600">{selectedReport.duplicateFound ? 'Duplicate Found' : 'Clean'}</span></p>
-                    <p><span className="text-slate-600 font-medium">Detected Anomalies:</span> <span className="font-semibold text-rose-600 capitalize">{selectedReport.detectedIssues?.join(', ') || 'None'}</span></p>
+                    <p><span className="text-slate-600 font-medium">Problems seen by AI:</span> <span className="font-semibold text-rose-700">{hasAiResult(selectedReport.aiAssessment) ? (selectedReport.detectedIssues?.filter((issue) => issue !== 'none').map(defectLabel).join(', ') || 'None identified') : 'Not assessed'}</span></p>
+                    <p><span className="text-slate-600 font-medium">At the project site:</span> <span className="font-semibold">{selectedReport.geoVerified === true ? 'Yes' : selectedReport.geoVerified === false ? `No (${selectedReport.distanceFromProjectMeters} m away)` : 'Not checked'}</span></p>
+                    <SampleDataBadge record={selectedReport} />
                   </div>
                 </div>
 
@@ -317,15 +332,32 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                   <p className="text-slate-700 mt-1 leading-relaxed">{selectedReport.description}</p>
                 </div>
 
-                {/* Gemini comparative report analysis if discrepancies exist */}
-                {selectedReport.aiReport && (
+                <AiStatusNote assessment={selectedReport.aiAssessment} />
+                <DetectionSection segmentation={selectedReport.segmentation} />
+
+                {/* AI image review notes: shown only when the review really ran */}
+                {hasAiResult(selectedReport.aiAssessment) && selectedReport.aiReport && (
                   <div className="border-t border-slate-100 pt-3">
                     <span className="block text-sm text-slate-600 font-bold flex items-center gap-1">
-                      <ShieldAlert className="h-3.5 w-3.5 text-brand-600" /> AI Discrepancy Assessment
+                      <ShieldAlert className="h-3.5 w-3.5 text-brand-600" aria-hidden="true" /> AI notes (advisory)
                     </span>
                     <p className="text-slate-700 bg-brand-50/15 border border-brand-100 p-2.5 rounded mt-1.5 leading-relaxed">
                       {selectedReport.aiReport}
                     </p>
+                  </div>
+                )}
+
+                {selectedReport.repairAssessment?.status && (
+                  <div className="border-t border-slate-100 pt-3">
+                    <span className="block text-sm text-slate-600 font-bold">AI check of the inspector&rsquo;s photo</span>
+                    {selectedReport.repairAssessment.status === 'completed' ? (
+                      <p className="mt-1.5 text-slate-700">
+                        <strong>{selectedReport.repairAssessment.repairVisible ? 'Repair visible.' : 'Repair not clearly visible.'}</strong>{' '}
+                        {selectedReport.repairAssessment.notes}
+                      </p>
+                    ) : (
+                      <AiStatusNote assessment={selectedReport.repairAssessment} className="mt-1.5" />
+                    )}
                   </div>
                 )}
 
@@ -343,14 +375,15 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                 <div className="border-t border-slate-200 pt-4 mt-6">
                   
                   {/* Step 1: Assign Inspector (District Authority / Admin only) */}
-                  {(selectedReport.status === 'Authority Notification' || selectedReport.status === 'Complaint Submitted' || selectedReport.status === 'Duplicate Detected') && 
-                   (user.role === 'District Authority' || user.role === 'Admin' || user.role === 'Government Officer') && (
+                  {ASSIGNABLE.includes(selectedReport.status) && DECIDING_ROLES.includes(user.role) && (
                     <div className="space-y-2.5">
                       <h4 className="font-bold text-slate-500 flex items-center gap-1">
                         <UserCheck className="h-4 w-4" /> 1. Assign Site Inspector
                       </h4>
                       <div className="flex gap-2">
+                        <label htmlFor="assign-inspector" className="sr-only">Inspector</label>
                         <select
+                          id="assign-inspector"
                           value={selectedInspectorId}
                           onChange={(e) => setSelectedInspectorId(e.target.value)}
                           className="flex-1 bg-white border border-slate-200 rounded px-2.5 py-1.5 focus:outline-none focus:border-brand-500"
@@ -367,9 +400,29 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                           disabled={loadingAction || !selectedInspectorId}
                           className="px-4 py-1.5"
                         >
-                          Assign Official
+                          Assign inspector
                         </Button>
                       </div>
+                      {REJECTABLE_EARLY.includes(selectedReport.status) && (
+                        <div className="space-y-2 pt-2">
+                          <label htmlFor="early-reject-summary" className="block text-xs font-semibold text-slate-600">Or turn it down without an inspection (reason required)</label>
+                          <textarea
+                            id="early-reject-summary"
+                            value={resolutionSummary}
+                            onChange={(e) => setResolutionSummary(e.target.value)}
+                            rows={2}
+                            className="w-full bg-white border border-slate-200 rounded px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-brand-600"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleResolveComplaint('Rejected')}
+                            disabled={loadingAction}
+                            className="px-4 py-1.5 bg-rose-50 border border-rose-200 text-rose-800 hover:bg-rose-100 rounded font-semibold focus:outline-none focus:ring-2 focus:ring-rose-600"
+                          >
+                            Reject complaint
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -381,8 +434,11 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                         <Calendar className="h-4 w-4" /> 2. Schedule Inspection Visit
                       </h4>
                       <div className="flex gap-2">
+                        <label htmlFor="inspection-date" className="sr-only">Inspection date</label>
                         <input
+                          id="inspection-date"
                           type="date"
+                          min={new Date().toISOString().slice(0, 10)}
                           value={scheduleDate}
                           onChange={(e) => setScheduleDate(e.target.value)}
                           className="flex-1 bg-white border border-slate-200 rounded px-2.5 py-1.5 focus:outline-none"
@@ -400,7 +456,7 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                   )}
 
                   {/* Step 3: Upload Inspector Evidence Photos (Assigned Inspector only) */}
-                  {selectedReport.status === 'Inspection Scheduled' && 
+                  {AWAITING_EVIDENCE.includes(selectedReport.status) &&
                    (selectedReport.assignedOfficer?._id === user._id || user.role === 'Admin') && (
                     <form onSubmit={handleUploadVerification} className="space-y-3">
                       <h4 className="font-bold text-slate-500 flex items-center gap-1">
@@ -408,15 +464,20 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                       </h4>
                       
                       <div className="space-y-2">
+                        <label htmlFor="inspector-photo" className="block text-xs font-semibold text-slate-600">Site photo</label>
                         <input
+                          id="inspector-photo"
                           type="file"
-                          accept="image/*"
+                          accept="image/jpeg,image/png,image/webp,image/gif"
                           onChange={(e) => setInspectorFile(e.target.files[0])}
                           required
                           className="w-full bg-white border border-slate-200 rounded px-2.5 py-1.5"
                         />
+                        <label htmlFor="inspector-notes" className="block text-xs font-semibold text-slate-600">Inspection notes</label>
                         <textarea
-                          placeholder="Provide Inspector comments / defect remarks..."
+                          id="inspector-notes"
+                          maxLength={2000}
+                          placeholder="What you found on site and what was done"
                           value={inspectorNotes}
                           onChange={(e) => setInspectorNotes(e.target.value)}
                           rows={2}
@@ -435,17 +496,20 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                   )}
 
                   {/* Step 4: Authority Review Decision (District Authority / Officer only) */}
-                  {(selectedReport.status === 'Inspector Uploads Verification' || 
-                    selectedReport.status === 'Gemini Analysis' || 
-                    selectedReport.status === 'AI Agent Validation') && 
-                   (user.role === 'District Authority' || user.role === 'Admin' || user.role === 'Government Officer') && (
+                  {(selectedReport.status === 'Inspector Uploads Verification' ||
+                    selectedReport.status === 'Gemini Analysis' ||
+                    selectedReport.status === 'AI Agent Validation') &&
+                   DECIDING_ROLES.includes(user.role) && (
                     <div className="space-y-3">
                       <h4 className="font-bold text-slate-500 flex items-center gap-1">
                         <FileText className="h-4 w-4" /> 4. Final Official Resolution Decision
                       </h4>
                       
+                      <label htmlFor="decision-summary" className="block text-xs font-semibold text-slate-600">Decision summary (shown to the citizen)</label>
                       <textarea
-                        placeholder="Provide details on resolution work completed, repairs initialized, or justifications..."
+                        id="decision-summary"
+                        maxLength={2000}
+                        placeholder="What was found and what was done"
                         value={resolutionSummary}
                         onChange={(e) => setResolutionSummary(e.target.value)}
                         required
@@ -455,6 +519,7 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                       
                       <div className="flex gap-2 justify-end pt-1">
                         <button
+                          type="button"
                           onClick={() => handleResolveComplaint('Need More Evidence')}
                           disabled={loadingAction}
                           className="px-4 py-2 border border-slate-200 rounded hover:bg-slate-50 font-bold"
@@ -462,6 +527,7 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                           Need More Evidence
                         </button>
                         <button
+                          type="button"
                           onClick={() => handleResolveComplaint('Rejected')}
                           disabled={loadingAction}
                           className="px-4 py-2 bg-rose-50 border border-rose-100 text-rose-700 hover:bg-rose-100 rounded font-bold"
@@ -469,6 +535,7 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                           Reject Complaint
                         </button>
                         <button
+                          type="button"
                           onClick={() => handleResolveComplaint('Accepted')}
                           disabled={loadingAction}
                           className="px-5 py-2 bg-emerald-600 text-white hover:bg-emerald-700 rounded font-bold shadow"
@@ -481,19 +548,19 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
 
                   {selectedReport.status === 'Resolution Published' && (
                     <div className="bg-emerald-50/20 border border-emerald-100 p-3 rounded text-emerald-800 text-center font-bold">
-                      ✔️ Issue Resolution Published & Citizen Rewarded.
+                      Resolution published. The citizen received their points.
                     </div>
                   )}
 
                   {selectedReport.status === 'Rejected' && (
                     <div className="bg-rose-50/20 border border-rose-100 p-3 rounded text-rose-800 text-center font-bold">
-                      ❌ Complaint was Rejected by Authority.
+                      This complaint was rejected.
                     </div>
                   )}
 
                   {selectedReport.status === 'Need More Evidence' && (
                     <div className="bg-amber-50/20 border border-amber-100 p-3 rounded text-amber-800 text-center font-bold">
-                      ⚠️ Authority requires additional evidence. Awaiting Citizen Update.
+                      More evidence was requested. Waiting for the assigned inspector to upload it.
                     </div>
                   )}
 

@@ -1,0 +1,7 @@
+# Tests that do not need the model (CI installs only these plus the runtime minus ultralytics).
+fastapi>=0.115,<1.0
+python-multipart>=0.0.9,<1.0
+numpy>=1.26,<3
+opencv-python-headless>=4.10,<5.0
+pytest>=8,<9
+httpx>=0.27,<1.0

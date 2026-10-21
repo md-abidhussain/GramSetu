@@ -1,6 +1,8 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card.jsx';
 import RiskBadge from './RiskBadge.jsx';
+import { AiStatusNote, SampleDataBadge } from '../ui/AiStatusNote.jsx';
+import { hasAiResult } from '../../lib/aiStatus.js';
 import { FileText, AlertTriangle, CheckCircle, Calendar, DollarSign, ListTodo } from 'lucide-react';
 
 export const TenderSummaryCard = ({ tender }) => {
@@ -17,8 +19,10 @@ export const TenderSummaryCard = ({ tender }) => {
     riskScore,
     riskLevel,
     recommendation,
-    fileUrl
+    fileUrl,
+    aiAssessment
   } = tender;
+  const aiRan = hasAiResult(aiAssessment);
 
   return (
     <Card className="h-full">
@@ -29,7 +33,8 @@ export const TenderSummaryCard = ({ tender }) => {
             <CardTitle className="text-xl mt-0.5">{title}</CardTitle>
           </div>
           <div className="mt-2 md:mt-0 flex gap-2 shrink-0">
-            <RiskBadge level={riskLevel} score={riskScore} />
+            <SampleDataBadge record={tender} />
+            <RiskBadge level={aiRan ? riskLevel : null} score={riskScore} />
             {fileUrl && (
               <a
                 href={fileUrl}
@@ -45,9 +50,13 @@ export const TenderSummaryCard = ({ tender }) => {
       </CardHeader>
       
       <CardContent className="space-y-6">
+        <AiStatusNote assessment={aiAssessment} />
+
+        {aiRan && (
+        <>
         {/* Executive Summary */}
         <div>
-          <h4 className="text-xs font-semibold text-slate-500 mb-2">Executive Summary</h4>
+          <h4 className="text-xs font-semibold text-slate-600 mb-2">AI summary (advisory)</h4>
           <p className="text-sm text-dark-800 leading-relaxed bg-slate-50 p-4 rounded-md border border-slate-200">
             {aiSummary}
           </p>
@@ -125,6 +134,8 @@ export const TenderSummaryCard = ({ tender }) => {
               {recommendation}
             </p>
           </div>
+        )}
+        </>
         )}
       </CardContent>
     </Card>

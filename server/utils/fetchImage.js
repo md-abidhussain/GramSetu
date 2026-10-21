@@ -15,7 +15,9 @@ export const fetchImage = async (url, { timeoutMs = 15_000 } = {}) => {
     return error;
   };
 
-  if (typeof url !== 'string' || !/^https:\/\//i.test(url)) throw fail('not an https url');
+  // https only, except plain-http localhost while developing with local file storage.
+  const localDevUrl = process.env.NODE_ENV !== 'production' && /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?\//i.test(url ?? '');
+  if (typeof url !== 'string' || (!/^https:\/\//i.test(url) && !localDevUrl)) throw fail('not an https url');
 
   let response;
   try {

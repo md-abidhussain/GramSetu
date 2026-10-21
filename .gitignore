@@ -47,3 +47,11 @@ __pycache__/
 .venv/
 venv/
 env/
+
+# Local development uploads (STORAGE_DRIVER=local)
+uploads/
+server/uploads/
+
+# Playwright
+client/test-results/
+client/playwright-report/

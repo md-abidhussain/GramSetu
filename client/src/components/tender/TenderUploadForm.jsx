@@ -144,14 +144,14 @@ export const TenderUploadForm = ({ onUploadSuccess }) => {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-500 mb-1.5">
-              Tender Document (PDF only) <span className="text-red-500">*</span>
+            <label htmlFor="tender-pdf" className="block text-xs font-semibold text-slate-700 mb-1.5">
+              Tender document (PDF only) <span className="text-red-600" aria-hidden="true">*</span>
             </label>
             <div className="border-2 border-dashed border-slate-200 rounded-md p-6 text-center hover:border-brand-500 transition-colors cursor-pointer bg-white hover:bg-slate-50/50 relative">
               <input
+                id="tender-pdf"
                 type="file"
-                id="tender-file"
-                accept=".pdf"
+                accept="application/pdf,.pdf"
                 onChange={handleFileChange}
                 required
                 disabled={loading}

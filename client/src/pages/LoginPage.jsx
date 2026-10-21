@@ -20,7 +20,7 @@ const fieldStyle =
 const labelStyle = 'block text-sm font-medium text-slate-800';
 
 export const LoginPage = () => {
-  const { loginCitizen, registerCitizen, loginAuthority, user } = useAuth();
+  const { loginCitizen, registerCitizen, loginAuthority, user, sessionExpired } = useAuth();
   const navigate = useNavigate();
 
   const [audience, setAudience] = useState('citizen');
@@ -111,6 +111,12 @@ export const LoginPage = () => {
               happens to each report, and check completed projects.
             </p>
           </div>
+
+          {sessionExpired && (
+            <p role="status" className="mt-6 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+              Your session ended. Please sign in again.
+            </p>
+          )}
 
           <div className="mt-8 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
             {/* Two audiences, two different jobs: the public files and follows

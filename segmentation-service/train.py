@@ -1,7 +1,10 @@
-"""Fine-tune YOLOv8-Seg for GramSetu pothole and crack masks.
+"""Fine-tune a YOLOv8 model for GramSetu road defects (pothole, crack, open manhole).
+
+The shipped models/model.onnx is a DETECTION model (bounding boxes). Training a
+segmentation model instead needs polygon labels and a -seg base checkpoint.
 
 The script deliberately validates the local annotated dataset before starting a
-training run. It expects YOLO segmentation labels, not bounding-box labels.
+training run. It accepts YOLO box labels (detection) or polygon labels (segmentation).
 """
 from __future__ import annotations
 
@@ -11,14 +14,14 @@ from pathlib import Path
 import yaml
 from ultralytics import YOLO
 
-VALID_CLASSES = {0, 1}
+VALID_CLASSES = {0, 1, 2}
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Fine-tune YOLOv8-Seg on pothole and crack masks.")
     parser.add_argument("--data", default="data/road_defects.yaml", help="YOLO dataset YAML file")
-    parser.add_argument("--model", default="yolov8n-seg.pt", help="Pretrained YOLOv8 segmentation checkpoint")
+    parser.add_argument("--model", default="yolov8n.pt", help="Base checkpoint: yolov8n.pt (detection) or yolov8n-seg.pt (segmentation)")
     parser.add_argument("--epochs", type=int, default=150)
     parser.add_argument("--imgsz", type=int, default=640)
     parser.add_argument("--batch", type=int, default=-1, help="-1 automatically sizes batch for available VRAM")
@@ -70,13 +73,14 @@ def validate_dataset(data_file: Path) -> None:
                     errors.append(f"Invalid numeric value in {label_file}:{line_number}")
                     continue
                 if class_id not in VALID_CLASSES:
-                    errors.append(f"Unsupported class {class_id} in {label_file}:{line_number}; use 0=pothole or 1=crack")
-                if len(polygon) < 6 or len(polygon) % 2:
-                    errors.append(f"Invalid polygon in {label_file}:{line_number}; expected at least 3 x/y points")
+                    errors.append(f"Unsupported class {class_id} in {label_file}:{line_number}; use 0=pothole, 1=crack or 2=openmanhole")
+                # Detection labels are "class cx cy w h"; segmentation labels are polygons.
+                if len(polygon) != 4 and (len(polygon) < 6 or len(polygon) % 2):
+                    errors.append(f"Invalid label in {label_file}:{line_number}; expected a box (4 values) or a polygon (3+ x/y points)")
                 elif any(value < 0 or value > 1 for value in polygon):
                     errors.append(f"Polygon coordinates must be normalized to 0..1 in {label_file}:{line_number}")
                 annotation_count += 1
-        summaries.append(f"{split}: {len(images)} images, {annotation_count} mask annotations")
+        summaries.append(f"{split}: {len(images)} images, {annotation_count} annotations")
 
     if errors:
         raise ValueError("Dataset validation failed:\n- " + "\n- ".join(errors[:30]))

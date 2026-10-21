@@ -112,12 +112,13 @@ export const ContractorAnalysisPage = () => {
                       <p className="mt-2 text-2xl font-semibold text-dark-800">{analysis.metrics.totalProjects}</p>
                     </div>
                     <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-                      <p className="text-sm text-slate-600">Average progress</p>
-                      <p className="mt-2 text-2xl font-semibold text-dark-800">{analysis.metrics.averageCompletionScore}%</p>
+                      <p className="text-sm text-slate-600">Average AI completion score</p>
+                      <p className="mt-2 text-2xl font-semibold text-dark-800">{analysis.metrics.averageCompletionScore === null ? 'No data' : `${analysis.metrics.averageCompletionScore}%`}</p>
+                      <p className="text-xs text-slate-600">{analysis.metrics.aiAssessedProjects} AI-compared</p>
                     </div>
                     <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-                      <p className="text-sm text-slate-600">Finished on time</p>
-                      <p className="mt-2 text-2xl font-semibold text-dark-800">{analysis.metrics.onTimeRate}%</p>
+                      <p className="text-sm text-slate-600">Verified complaints</p>
+                      <p className="mt-2 text-2xl font-semibold text-dark-800">{analysis.metrics.acceptedComplaints}</p>
                     </div>
                     <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
                       <p className="text-sm text-slate-600">Trust score</p>
@@ -147,7 +148,7 @@ export const ContractorAnalysisPage = () => {
                       </span>
                     </div>
                     <p className="mt-3 text-sm text-slate-600">
-                      {analysis.metrics.trustScore >= 80 ? 'High reliability profile with strong delivery consistency.' : analysis.metrics.trustScore >= 60 ? 'Moderate confidence level with some follow-up needed.' : 'Needs closer monitoring and corrective action.'}
+                      Trust score = performance (average of real AI completion scores, or the registered baseline if none) minus 8 per verified complaint, minus 5 per flagged project. See docs/ARCHITECTURE.md.
                     </p>
                   </div>
 
@@ -184,7 +185,7 @@ export const ContractorAnalysisPage = () => {
                             <p className="text-sm text-slate-600">{entry.lifecycleStatus}</p>
                           </div>
                           <div className="text-right">
-                            <p className="font-semibold text-dark-800">{entry.completionScore}%</p>
+                            <p className="font-semibold text-dark-800">{typeof entry.completionScore === 'number' ? `${entry.completionScore}%` : 'Not scored'}</p>
                             <span className={`mt-1 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-wide ${entry.status === 'Verified' ? 'bg-emerald-50 text-emerald-700' : entry.status === 'Flagged' ? 'bg-rose-50 text-rose-700' : 'bg-amber-50 text-amber-700'}`}>
                               {entry.status}
                             </span>

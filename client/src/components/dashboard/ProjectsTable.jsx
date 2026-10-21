@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card.jsx';
-import { Input } from '../ui/Input.jsx';
 import { Select } from '../ui/Select.jsx';
-import { Search, CheckCircle, AlertTriangle, AlertCircle, Clock3 } from 'lucide-react';
+import { Search, CheckCircle, AlertTriangle, AlertCircle } from 'lucide-react';
 import RiskBadge from '../tender/RiskBadge.jsx';
+import { clickable } from '../../lib/a11y.js';
 
 export const ProjectsTable = ({ projects = [], onSelectProject }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -66,6 +66,7 @@ export const ProjectsTable = ({ projects = [], onSelectProject }) => {
 
             <Select
               id="filter-status"
+              aria-label="Filter by status"
               placeholder="All Statuses"
               options={[
                 { value: 'Pending', label: 'Pending' },
@@ -79,6 +80,7 @@ export const ProjectsTable = ({ projects = [], onSelectProject }) => {
 
             <Select
               id="filter-risk"
+              aria-label="Filter by risk"
               placeholder="All Risks"
               options={[
                 { value: 'Low', label: 'Low' },
@@ -117,7 +119,7 @@ export const ProjectsTable = ({ projects = [], onSelectProject }) => {
                 filteredProjects.map((proj) => (
                   <tr
                     key={proj._id}
-                    onClick={() => onSelectProject && onSelectProject(proj)}
+                    {...clickable(() => onSelectProject && onSelectProject(proj))}
                     className="hover:bg-slate-50/60 transition-colors cursor-pointer group"
                   >
                     <td className="px-6 py-4.5">
@@ -133,19 +135,19 @@ export const ProjectsTable = ({ projects = [], onSelectProject }) => {
                     <td className="px-6 py-4.5 text-center">
                       <div className="flex flex-col items-center gap-1">
                         <span className="text-sm text-slate-600 font-semibold">{proj.lifecycleStatus || 'Project Created'}</span>
-                        {proj.completionScore !== undefined ? (
+                        {typeof proj.completionScore === 'number' ? (
                           <span className={`inline-flex font-bold text-sm ${
-                            proj.completionScore >= 80 ? 'text-emerald-600' : proj.completionScore >= 50 ? 'text-amber-500' : 'text-rose-500'
+                            proj.completionScore >= 80 ? 'text-emerald-700' : proj.completionScore >= 50 ? 'text-amber-700' : 'text-rose-700'
                           }`}>
                             {proj.completionScore}%
                           </span>
                         ) : (
-                          <span className="text-xs text-slate-600">Not yet inspected</span>
+                          <span className="text-xs text-slate-600">Not scored</span>
                         )}
                       </div>
                     </td>
                     <td className="px-6 py-4.5">
-                      <RiskBadge level={proj.riskLevel || 'Low'} />
+                      <RiskBadge level={proj.riskLevel} />
                     </td>
                     <td className="px-6 py-4.5">
                       {getStatusBadge(proj.status)}
