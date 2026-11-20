@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40" fill="none">
+  <!-- Shallow Bridge Arch Mark -->
+  <path d="M 10 28 C 25 18, 45 18, 60 28" stroke="#1b4f91" stroke-width="4" stroke-linecap="round"/>
+  <line x1="8" y1="28" x2="62" y2="28" stroke="#e07b00" stroke-width="3" stroke-linecap="round"/>
+  <line x1="20" y1="28" x2="20" y2="23" stroke="#1b4f91" stroke-width="2"/>
+  <line x1="35" y1="28" x2="35" y2="20" stroke="#1b4f91" stroke-width="2"/>
+  <line x1="50" y1="28" x2="50" y2="23" stroke="#1b4f91" stroke-width="2"/>
+  <!-- Typography -->
+  <text x="70" y="27" font-family="Inter, sans-serif" font-weight="700" font-size="16" fill="#0e2c53">GramSetu</text>
+</svg>
