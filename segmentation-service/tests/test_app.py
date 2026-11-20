@@ -10,6 +10,8 @@ from app import create_app
 from inference import measure, normalize_label
 from settings import Settings
 
+pytestmark = pytest.mark.unit
+
 PHOTO = (ASSETS / "road-after.jpg").read_bytes()
 
 

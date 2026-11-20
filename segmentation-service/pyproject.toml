@@ -9,3 +9,8 @@ ignore = ["B008", "E501"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 filterwarnings = ["ignore::DeprecationWarning"]
+addopts = "-p no:langsmith"
+markers = [
+    "unit: Lightweight unit and mock-based tests with zero external or heavy dependencies",
+    "integration: Integration tests requiring local ONNX weights and model inference",
+]

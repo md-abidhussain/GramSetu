@@ -12,6 +12,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 pytest.importorskip("ultralytics")
+pytestmark = pytest.mark.integration
 
 from conftest import ASSETS  # noqa: E402
 
