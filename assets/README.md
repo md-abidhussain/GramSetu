@@ -1,27 +1,27 @@
 # Demonstration Asset Library
 
-This directory contains legally safe, synthetic, or openly licensed demonstration assets designed for testing, evaluating, and demonstrating the GramSetu platform.
+This directory contains legally safe, synthetic, and purpose-built demonstration assets for the GramSetu GovTech platform.
 
-## Asset Directory Structure
+## Directory Structure & Asset Inventory
 
 ```
 assets/
   branding/
-    gramsetu-logo.svg          # Official vector brand mark
+    gramsetu-logo.svg               # Minimalist vector brand mark (road perspective & bridge deck)
   samples/
-    roadDamage/
-      before/
-        road-damage-pothole-01.jpg   # Road surface before repair (defects present)
-      after/
-        road-repaired-surface-01.jpg # Road surface after civil works completion
-    tenderDocuments/
-      sample-road-repair-tender.pdf  # Fictional demonstration public works tender PDF
     companies/
-      synthetic_contractors.json    # Synthetic contractor performance profiles
-  screenshots/                       # Running application captures and diagrams
+      synthetic_contractors.json     # Synthetic contractor performance profiles & audit records
+    roadDamage/
+      pothole-severe.jpg             # High-resolution ground view of severe pothole on damaged road
+      surface-cracking.jpg           # Macro view of extensive bituminous alligator pavement fractures
+      road-repair-before.jpg         # Rural/semi-urban damaged road prior to municipal intervention
+      road-repair-after.jpg          # Matching road segment freshly paved with dark asphalt and road markings
+      construction-progress.jpg      # Active civil works: asphalt paver, compactor, gravel layers, and barriers
+    tenderDocuments/
+      sample-road-repair-tender.pdf  # Fictional public works procurement tender PDF for AI extraction
 ```
 
-## Legal & Compliance Notes
-1. **Fictional Data**: All contractor profiles, tender documents, and citizen IDs in these demo samples are completely synthetic. They do not represent real proprietary corporate data, active government procurement bids, or personal citizen records.
-2. **Deterministic Seeding**: Demonstration assets are mirrored in `server/data/seedDatabase.js` for seeding local development environments cleanly.
-3. **Image Privacy**: Real images uploaded through the citizen portal have EXIF metadata stripped (`stripImageMetadata.js`) prior to processing.
+## Asset Compliance & Separation
+- **Separation of Concerns**: Test fixtures for unit/E2E tests reside strictly in `test-assets/` and `client/test-results/`. Documentation captures reside strictly in `docs/screenshots/`.
+- **Privacy & Safety**: No real personal citizen data, confidential procurement documents, or proprietary company records are included.
+- **Before/After Pairing**: `road-repair-before.jpg` and `road-repair-after.jpg` represent visually meaningful paired states for civic verification audits.

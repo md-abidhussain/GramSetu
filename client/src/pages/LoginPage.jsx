@@ -7,17 +7,10 @@ import Logo from '../components/ui/Logo.jsx';
 import SiteFooter from '../components/layout/SiteFooter.jsx';
 import { AlertCircle, Info, Lock } from 'lucide-react';
 
-// Public sample accounts so anyone reviewing the project can look around
-// without signing up. They only ever see seeded demonstration data.
-const DEMO_ACCOUNTS = {
-  citizen: { identifier: 'citizen@gmail.com', password: 'citizen123', landingPage: '/verify' },
-  authority: { identifier: 'authority@gramsetu.gov', password: 'authority123', landingPage: '/dashboard' }
-};
-
 const fieldStyle =
-  'w-full rounded-md border border-slate-300 bg-white px-3 py-2.5 text-base text-slate-900 placeholder-slate-400 focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600 disabled:bg-slate-50';
+  'w-full rounded-md border border-surface-border bg-white px-3.5 py-2.5 text-base text-brand-900 placeholder-stone-400 focus:border-brand-700 focus:outline-none focus:ring-1 focus:ring-brand-700 disabled:bg-stone-50 transition-colors';
 
-const labelStyle = 'block text-sm font-medium text-slate-800';
+const labelStyle = 'block text-sm font-medium text-brand-900';
 
 export const LoginPage = () => {
   const { loginCitizen, registerCitizen, loginAuthority, user, sessionExpired } = useAuth();
@@ -78,21 +71,6 @@ export const LoginPage = () => {
     }
   };
 
-  const openDemo = async (accountType) => {
-    const account = DEMO_ACCOUNTS[accountType];
-    setError(null);
-    setLoading(true);
-    try {
-      const signIn = accountType === 'citizen' ? loginCitizen : loginAuthority;
-      await signIn(account.identifier, account.password);
-      navigate(account.landingPage);
-    } catch (err) {
-      setError(`Could not open the demo account: ${err.message}`);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const registering = audience === 'citizen' && mode === 'register';
 
   return (
@@ -103,28 +81,25 @@ export const LoginPage = () => {
         <div className="w-full max-w-lg">
           <div className="text-center">
             <Logo className="mx-auto h-12 w-12" title="GramSetu" />
-            <h1 className="mt-3 text-2xl font-semibold tracking-tight text-slate-900">
+            <h1 className="mt-3 text-2xl font-bold tracking-tight text-brand-900">
               GramSetu
             </h1>
-            <p className="mx-auto mt-2 max-w-md text-base text-slate-600">
-              Report problems with public infrastructure work, follow what
-              happens to each report, and check completed projects.
+            <p className="mx-auto mt-2 max-w-md text-sm text-stone-600">
+              Public civil infrastructure transparency, grievance tracking, and project monitoring portal.
             </p>
           </div>
 
           {sessionExpired && (
-            <p role="status" className="mt-6 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+            <p role="status" className="mt-6 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
               Your session ended. Please sign in again.
             </p>
           )}
 
-          <div className="mt-8 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-            {/* Two audiences, two different jobs: the public files and follows
-                reports, officials review them. */}
-            <div role="tablist" aria-label="Who is signing in" className="flex border-b border-slate-200">
+          <div className="mt-8 overflow-hidden rounded-lg border border-surface-border bg-white shadow-sm">
+            <div role="tablist" aria-label="Audience sign-in selection" className="flex border-b border-surface-border bg-stone-50/70">
               {[
                 { id: 'citizen', label: 'Public' },
-                { id: 'authority', label: 'Government official' }
+                { id: 'authority', label: 'Government Official' }
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -134,8 +109,8 @@ export const LoginPage = () => {
                   onClick={() => switchAudience(tab.id)}
                   className={`flex-1 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${
                     audience === tab.id
-                      ? 'border-brand-600 bg-white text-brand-800'
-                      : 'border-transparent bg-slate-50 text-slate-600 hover:text-slate-900'
+                      ? 'border-brand-800 bg-white text-brand-900 font-semibold'
+                      : 'border-transparent text-stone-600 hover:text-brand-900'
                   }`}
                 >
                   {tab.label}
@@ -144,12 +119,12 @@ export const LoginPage = () => {
             </div>
 
             <div className="px-5 py-6 sm:px-6">
-              <h2 className="text-lg font-semibold tracking-tight text-slate-900">
+              <h2 className="text-lg font-semibold tracking-tight text-brand-900">
                 {audience === 'authority'
-                  ? 'Sign in with your official account'
+                  ? 'Sign in with your official ID'
                   : registering
-                    ? 'Create an account'
-                    : 'Sign in'}
+                    ? 'Create citizen account'
+                    : 'Sign in to report or track'}
               </h2>
 
               <form onSubmit={handleSubmit} className="mt-5 space-y-4">
@@ -176,7 +151,7 @@ export const LoginPage = () => {
                       <label htmlFor="phone" className={labelStyle}>Mobile number</label>
                       <input id="phone" type="tel" inputMode="numeric" autoComplete="tel" value={phone} disabled={loading}
                         onChange={(e) => setPhone(e.target.value)} className={fieldStyle} />
-                      <p className="text-sm text-slate-600">Give an email address or a mobile number. Either one works.</p>
+                      <p className="text-xs text-stone-500">Provide an email address or mobile number.</p>
                     </div>
                   </>
                 )}
@@ -197,7 +172,7 @@ export const LoginPage = () => {
                     autoComplete={registering ? 'new-password' : 'current-password'}
                     onChange={(e) => setPassword(e.target.value)} className={fieldStyle} />
                   {registering && (
-                    <p className="text-sm text-slate-600">At least 8 characters.</p>
+                    <p className="text-xs text-stone-500">Must be at least 8 characters.</p>
                   )}
                 </div>
 
@@ -210,43 +185,21 @@ export const LoginPage = () => {
                   <button
                     type="button"
                     onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError(null); }}
-                    className="w-full text-sm font-medium text-brand-700 underline underline-offset-4 hover:text-brand-800"
+                    className="w-full text-sm font-medium text-brand-700 underline underline-offset-4 hover:text-brand-900 transition-colors"
                   >
-                    {mode === 'login' ? 'Create an account' : 'I already have an account'}
+                    {mode === 'login' ? 'Need an account? Register here' : 'Already registered? Sign in'}
                   </button>
                 )}
               </form>
 
               {audience === 'authority' && (
-                // Officials no longer sign themselves up. The registration
-                // endpoint used to be open and accepted any role in the body,
-                // Admin included, so anyone could make themselves an
-                // administrator. Accounts are issued by an administrator now.
-                <div className="mt-5 flex items-start gap-2 rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700">
+                <div className="mt-5 flex items-start gap-2 rounded-md border border-surface-border bg-surface-subtle p-3 text-xs text-stone-700">
                   <Info className="mt-0.5 h-4 w-4 shrink-0 text-brand-700" aria-hidden="true" />
                   <span>
-                    Official accounts are issued by your department
-                    administrator. There is no sign-up here.
+                    Official authority credentials are created and managed by department administrators.
                   </span>
                 </div>
               )}
-            </div>
-
-            <div className="border-t border-slate-200 bg-slate-50 px-5 py-5 sm:px-6">
-              <p className="text-sm font-medium text-slate-800">Look around without an account</p>
-              <p className="mt-1 text-sm text-slate-600">
-                These are public sample accounts holding demonstration data only.
-              </p>
-              <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-                <button type="button" onClick={() => openDemo('citizen')} disabled={loading}
-                  className="flex-1 rounded-md border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-800 shadow-sm transition-colors hover:bg-slate-100 disabled:opacity-60">
-                  Open as a member of the public
-                </button>
-                <button type="button" onClick={() => openDemo('authority')} disabled={loading}
-                  className="flex-1 rounded-md border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-800 shadow-sm transition-colors hover:bg-slate-100 disabled:opacity-60">
-                  Open as an official
-                </button>
-              </div>
             </div>
           </div>
         </div>

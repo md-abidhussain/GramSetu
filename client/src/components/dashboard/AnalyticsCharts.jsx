@@ -21,42 +21,42 @@ export const AnalyticsCharts = ({ summary }) => {
       value: totalProjects,
       desc: 'Being tracked right now',
       icon: Activity,
-      iconColor: 'text-blue-600 bg-blue-50 border-blue-100',
+      iconColor: 'text-brand-800 bg-brand-50 border-brand-200',
     },
     {
       title: 'Completed',
       value: completedProjects,
       desc: 'Projects finished and signed off',
       icon: ShieldCheck,
-      iconColor: 'text-emerald-600 bg-emerald-50 border-emerald-100',
+      iconColor: 'text-emerald-700 bg-emerald-50 border-emerald-200',
     },
     {
       title: 'Average AI completion score',
       value: averageCompletionScore === null ? 'No data' : `${averageCompletionScore}%`,
       desc: averageCompletionScore === null ? 'No project has a real AI comparison yet' : `From ${aiAssessedProjects} AI-compared project${aiAssessedProjects === 1 ? '' : 's'}`,
       icon: TrendingUp,
-      iconColor: 'text-slate-700 bg-slate-50 border-slate-200',
+      iconColor: 'text-dark-800 bg-surface-50 border-surface-200',
     },
     {
       title: 'Flagged',
       value: flaggedProjects,
       desc: 'Projects needing a look',
       icon: AlertCircle,
-      iconColor: 'text-rose-600 bg-rose-50 border-rose-100',
+      iconColor: 'text-rose-700 bg-rose-50 border-rose-200',
     },
     {
       title: 'Active Tenders',
       value: activeTendersCount,
       desc: 'Open for review',
       icon: FileSpreadsheet,
-      iconColor: 'text-purple-600 bg-purple-50 border-purple-100',
+      iconColor: 'text-accent-700 bg-accent-50 border-accent-200',
     },
     {
       title: 'Reports from the public',
       value: totalComplaints,
       desc: 'Filed by members of the public',
       icon: MessageSquare,
-      iconColor: 'text-amber-600 bg-amber-50 border-amber-100',
+      iconColor: 'text-brand-700 bg-brand-50/60 border-brand-200',
     }
   ];
 

@@ -4,10 +4,8 @@ import { useAuth } from '../../hooks/useAuth.js';
 import { makeIsCurrent, navItemsFor } from './navItems.js';
 
 /**
- * The navigation on a narrow screen, where the sidebar is hidden.
- *
- * A row that scrolls sideways rather than a menu behind a button: there are
- * only four or five places to go, and a visible link is one tap instead of two.
+ * Mobile-first horizontal scrolling navigation.
+ * Touch-friendly (min 44px height), clean borders, zero horizontal page overflow.
  */
 const MobileNav = () => {
   const { user } = useAuth();
@@ -20,20 +18,23 @@ const MobileNav = () => {
   }
 
   return (
-    <nav aria-label="Sections" className="border-b border-slate-200 bg-white md:hidden">
-      <ul className="flex gap-1 overflow-x-auto px-2 py-2">
+    <nav aria-label="Portal sections" className="border-b border-surface-border bg-white md:hidden">
+      <ul className="flex gap-1.5 overflow-x-auto px-3 py-2 no-scrollbar">
         {items.map((item) => {
           const current = isCurrent(item.path);
           return (
-            <li key={item.path}>
+            <li key={item.path} className="shrink-0">
               <NavLink
                 to={item.path}
                 aria-current={current ? 'page' : undefined}
-                className={`block whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                  current ? 'bg-brand-50 text-brand-800' : 'text-slate-700 hover:bg-slate-100'
+                className={`flex items-center gap-2 whitespace-nowrap rounded-md px-3.5 py-2 text-sm font-medium transition-colors min-h-[40px] touch-manipulation ${
+                  current
+                    ? 'bg-brand-100 text-brand-900 font-semibold'
+                    : 'text-stone-700 hover:bg-surface-subtle'
                 }`}
               >
-                {item.name}
+                <item.icon className="h-4 w-4 shrink-0 text-brand-600" />
+                <span>{item.name}</span>
               </NavLink>
             </li>
           );

@@ -118,30 +118,28 @@ export const CitizenReportForm = ({ onSubmitSuccess }) => {
   return (
     <Card>
       <CardHeader>
-        <div>
-          <span className="text-xs text-brand-600 font-bold">Citizen Verification Portal</span>
-          <CardTitle className="text-lg mt-0.5 flex items-center gap-1">
-            <ShieldAlert className="h-4.5 w-4.5 text-brand-600" /> Report Infrastructure Damage
-          </CardTitle>
-        </div>
+        <CardTitle className="text-base sm:text-lg font-bold flex items-center gap-2 text-brand-900">
+          <ShieldAlert className="h-5 w-5 text-accent-600" />
+          <span>Report Infrastructure Damage</span>
+        </CardTitle>
       </CardHeader>
       
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           {projectsError && (
-            <div role="status" className="p-3 bg-amber-50 border border-amber-200 rounded-md text-amber-800 text-xs">{projectsError}</div>
+            <div role="status" className="p-3 bg-amber-50 border border-amber-200 rounded-md text-amber-900 text-xs font-medium">{projectsError}</div>
           )}
 
           {error && (
-            <div role="alert" className="p-3.5 bg-rose-50 border border-rose-100 rounded-xl text-rose-700 text-xs font-medium">
+            <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-md text-red-900 text-xs font-medium">
               {error}
             </div>
           )}
 
           {success && (
-            <div role="status" className="p-3.5 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-700 text-xs font-medium flex items-center gap-1.5 animate-fadeIn">
-              <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
-              <span>Report filed. The automated review is shown below.</span>
+            <div role="status" className="p-3 bg-emerald-50 border border-emerald-200 rounded-md text-emerald-900 text-xs font-medium flex items-center gap-1.5">
+              <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
+              <span>Report filed. Verification status is shown below.</span>
             </div>
           )}
 

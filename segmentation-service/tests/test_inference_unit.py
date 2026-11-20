@@ -6,8 +6,6 @@ import numpy as np
 import pytest
 
 from inference import (
-    CLASS_ALIASES,
-    ModelState,
     decode_image,
     load_model,
     measure,
@@ -110,13 +108,32 @@ def test_load_model_missing_file():
     assert "not found" in state.unavailable_reason
 
 
-def test_load_model_missing_classes():
+def test_load_model_missing_classes(tmp_path):
     class DummyDetector:
         def __init__(self, path):
             self.task = "detect"
             self.names = {0: "car", 1: "tree"}
 
-    state = load_model("dummy.onnx", frozenset({"pothole"}), loader=DummyDetector)
-    # Even if path exists or doesn't, load_model checks os.path.isfile first
-    # So with a mock file:
-    pass
+    dummy_file = tmp_path / "model.onnx"
+    dummy_file.write_bytes(b"dummy weights content")
+
+    state = load_model(str(dummy_file), frozenset({"pothole"}), loader=DummyDetector)
+    assert state.loaded is False
+    assert state.unavailable_reason is not None
+    assert "weights lack required classes" in state.unavailable_reason
+    assert "pothole" in state.unavailable_reason
+    assert state.classes == ["car", "tree"]
+
+
+def test_load_model_load_exception(tmp_path):
+    class BrokenDetector:
+        def __init__(self, path):
+            raise RuntimeError("Corrupt ONNX header")
+
+    dummy_file = tmp_path / "model.onnx"
+    dummy_file.write_bytes(b"corrupt")
+
+    state = load_model(str(dummy_file), frozenset({"pothole"}), loader=BrokenDetector)
+    assert state.loaded is False
+    assert state.unavailable_reason is not None
+    assert "weights could not be loaded (RuntimeError)" in state.unavailable_reason

@@ -176,7 +176,7 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
       case 'Inspector Assigned':
       case 'Inspection Scheduled':
       case 'Inspector Uploads Verification':
-        return 'bg-blue-50 text-blue-700 border-blue-100';
+        return 'bg-brand-50 text-brand-800 border-brand-200';
       default:
         return 'bg-amber-50 text-amber-700 border-amber-100';
     }
@@ -487,7 +487,7 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                           type="submit"
                           loading={loadingAction}
                           disabled={loadingAction || !inspectorFile}
-                          className="w-full py-2 bg-blue-600 hover:bg-blue-700"
+                          className="w-full py-2 bg-brand-800 hover:bg-brand-900 text-white"
                         >
                           Submit Verification Proof
                         </Button>

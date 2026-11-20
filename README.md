@@ -47,7 +47,7 @@ GramSetu addresses these challenges by combining structured grievance state mach
 flowchart TD
     subgraph ClientLayer["Frontend Client (React + Vite)"]
         UI["Web App (Tailwind CSS, React Router 7)"]
-        A11y["Accessible GovTech UI (Navy / Beige / Saffron)"]
+        A11y["Accessible GovTech UI (Warm Beige / Dark Earthy Brown / Restrained Amber)"]
     end
 
     subgraph ServerLayer["API Server (Express / Node.js)"]
@@ -118,15 +118,15 @@ GramSetu/
 │   ├── settings.py             # Pydantic environment configuration
 │   └── tests/                  # Pytest unit and integration test suites
 ├── assets/                     # Demonstration and branding assets
-│   ├── branding/               # Vector brand assets and logo
-│   ├── samples/                # Sample road defects (before/after) and tender documents
-│   └── screenshots/            # Live application captures for documentation
+│   ├── branding/               # Vector brand assets, SVG logo, and icons
+│   └── samples/                # Curated demonstration road defects (potholes, cracks, before/after pairs) and tender PDFs
 ├── docs/                       # Technical architecture and compliance documentation
 │   ├── ARCHITECTURE.md         # Detailed architectural specification
 │   ├── SECURITY.md             # Security controls, session lifecycle, and risk mitigations
 │   ├── AI_LIMITATIONS.md       # Documented AI constraints and non-measurement boundaries
 │   ├── TESTING.md              # Test layer documentation and instructions
 │   ├── DEPLOYMENT.md           # Production deployment runbooks
+│   ├── screenshots/            # Live application captures for documentation
 │   └── teamContributions/      # Authorship and team contribution records
 │       └── CONTRIBUTIONS.md
 ├── scripts/                    # Automation and screenshot generation scripts
@@ -140,15 +140,15 @@ GramSetu/
 
 | Citizen Sign-in | Citizen Defect Reporting |
 | :---: | :---: |
-| ![Sign-in](assets/screenshots/login-page.png) | ![Reporting](assets/screenshots/citizen-reporting-page.png) |
+| ![Sign-in](docs/screenshots/login-page.png) | ![Reporting](docs/screenshots/citizen-reporting-page.png) |
 
 | Official Oversight Dashboard | Tender Intelligence |
 | :---: | :---: |
-| ![Dashboard](assets/screenshots/main-dashboard-page.png) | ![Tenders](assets/screenshots/tender-intelligence-page.png) |
+| ![Dashboard](docs/screenshots/main-dashboard-page.png) | ![Tenders](docs/screenshots/tender-intelligence-page.png) |
 
 | Project Monitoring & Lifecycle | Mobile Responsive Interface |
 | :---: | :---: |
-| ![Monitoring](assets/screenshots/project-monitoring-page.png) | ![Mobile](assets/screenshots/mobile-responsive.png) |
+| ![Monitoring](docs/screenshots/project-monitoring-page.png) | ![Mobile](docs/screenshots/mobile-responsive.png) |
 
 ---
 

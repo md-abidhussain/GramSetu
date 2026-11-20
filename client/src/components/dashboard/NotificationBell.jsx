@@ -30,7 +30,7 @@ export const NotificationBell = () => {
       case 'danger':
         return <AlertCircle className="h-4 w-4 text-rose-500 shrink-0" />;
       default:
-        return <Info className="h-4 w-4 text-blue-500 shrink-0" />;
+        return <Info className="h-4 w-4 text-brand-600 shrink-0" />;
     }
   };
 

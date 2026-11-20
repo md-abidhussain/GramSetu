@@ -10,42 +10,38 @@ export const Topbar = ({ title }) => {
   const isAuthority = Boolean(user) && user.role !== 'citizen' && !user.isCitizen;
 
   return (
-    <header className="z-30 border-b border-slate-200 bg-white">
-      <div className="flex min-h-[4.5rem] flex-wrap items-center justify-between gap-4 px-4 py-3 sm:px-6">
+    <header className="z-30 border-b border-surface-border bg-white">
+      <div className="flex min-h-[4.25rem] flex-wrap items-center justify-between gap-3 px-4 py-2.5 sm:px-6">
         <div className="flex min-w-0 items-center gap-3">
-          <Logo className="h-9 w-9 shrink-0" />
+          <Logo className="h-8 w-8 shrink-0 md:hidden" />
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-brand-800">GramSetu</p>
-            {/* The page name is the heading for the content below it, so it is
-                the h1 rather than decorative text. */}
-            <h1 className="truncate text-xl font-semibold tracking-tight text-slate-900">
+            <p className="text-xs font-semibold text-brand-700 tracking-wide uppercase">GramSetu</p>
+            <h1 className="truncate text-lg sm:text-xl font-bold tracking-tight text-brand-900">
               {title}
             </h1>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           {isAuthority && <NotificationBell />}
 
           {user ? (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               <div className="hidden text-right sm:block">
-                <p className="text-sm font-medium text-slate-900">{user.name}</p>
-                <p className="text-sm capitalize text-slate-600">{user.role}</p>
+                <p className="text-sm font-semibold text-brand-900 truncate max-w-[180px]">{user.name}</p>
+                <p className="text-xs capitalize text-stone-500">{user.role}</p>
               </div>
               <span
                 aria-hidden="true"
-                className="flex h-10 w-10 items-center justify-center rounded-md border border-brand-100 bg-brand-50 text-base font-semibold text-brand-700"
+                className="flex h-9 w-9 items-center justify-center rounded-md border border-brand-200 bg-brand-50 text-sm font-semibold text-brand-800"
               >
                 {user.name.charAt(0).toUpperCase()}
               </span>
             </div>
           ) : (
-            // Nobody is signed in, so no name is shown. It used to read
-            // "Citizen User / Public Guest", which looked like an account.
             <Link
               to="/login"
-              className="inline-flex items-center gap-2 rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-brand-700"
+              className="inline-flex items-center gap-2 rounded-md bg-brand-800 px-3.5 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-brand-900"
             >
               <LogIn className="h-4 w-4" aria-hidden="true" />
               Sign in

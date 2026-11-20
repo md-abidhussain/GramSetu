@@ -16,15 +16,15 @@ export const ContractorScoreCard = ({ contractor }) => {
 
   // Determine score colors
   const getScoreColor = (score) => {
-    if (score >= 90) return 'text-emerald-600 bg-emerald-50 border-emerald-100';
-    if (score >= 70) return 'text-blue-600 bg-blue-50 border-blue-100';
-    return 'text-rose-600 bg-rose-50 border-rose-100';
+    if (score >= 90) return 'text-emerald-700 bg-emerald-50 border-emerald-200';
+    if (score >= 70) return 'text-brand-800 bg-brand-50 border-brand-200';
+    return 'text-rose-700 bg-rose-50 border-rose-200';
   };
 
   const getProgressBarColor = (score) => {
-    if (score >= 90) return 'bg-emerald-500';
-    if (score >= 70) return 'bg-blue-500';
-    return 'bg-rose-500';
+    if (score >= 90) return 'bg-emerald-600';
+    if (score >= 70) return 'bg-brand-700';
+    return 'bg-rose-600';
   };
 
   return (
@@ -74,7 +74,7 @@ export const ContractorScoreCard = ({ contractor }) => {
           </div>
 
           <div className="p-3 bg-slate-50 rounded-xl text-center border border-slate-100">
-            <TrendingUp className="h-4.5 w-4.5 text-blue-500 mx-auto mb-1.5" />
+            <TrendingUp className="h-4.5 w-4.5 text-brand-600 mx-auto mb-1.5" />
             <p className="text-base font-bold text-dark-800 leading-none">
               {averageBudgetVariance > 0 ? `+${averageBudgetVariance}%` : `${averageBudgetVariance}%`}
             </p>

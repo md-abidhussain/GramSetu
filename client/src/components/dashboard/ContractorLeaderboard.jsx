@@ -16,18 +16,18 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
 
   const getRankBadge = (index) => {
     const badgeColors = [
-      'bg-slate-800 text-white',
-      'bg-slate-200 text-slate-700',
-      'bg-slate-100 text-slate-600'
+      'bg-brand-900 text-white',
+      'bg-surface-200 text-brand-900',
+      'bg-surface-100 text-brand-700'
     ];
-    const colorClass = badgeColors[index] || 'bg-slate-50 text-slate-500';
+    const colorClass = badgeColors[index] || 'bg-surface-50 text-slate-500';
     return <span className={`h-5 w-5 rounded font-bold text-xs flex items-center justify-center shrink-0 ${colorClass}`}>{index + 1}</span>;
   };
 
   const getScoreColor = (score) => {
-    if (score >= 90) return 'text-emerald-700 bg-emerald-50 border border-emerald-100';
-    if (score >= 70) return 'text-blue-700 bg-blue-50 border border-blue-100';
-    return 'text-rose-700 bg-rose-50 border border-rose-100';
+    if (score >= 90) return 'text-emerald-700 bg-emerald-50 border border-emerald-200';
+    if (score >= 70) return 'text-brand-800 bg-brand-50 border border-brand-200';
+    return 'text-rose-700 bg-rose-50 border border-rose-200';
   };
 
   return (
@@ -87,7 +87,7 @@ export const ContractorLeaderboard = ({ contractors = [] }) => {
           <div className="bg-white rounded-lg border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden">
             
             {/* Modal Header */}
-            <div className="bg-slate-800 text-white p-5 flex items-center justify-between">
+            <div className="bg-brand-900 text-white p-5 flex items-center justify-between">
               <div>
                 <span className="text-sm text-slate-300">Contractor record</span>
                 <h3 className="text-base font-bold flex items-center gap-2 mt-0.5">

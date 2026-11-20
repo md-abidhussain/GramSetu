@@ -1,12 +1,12 @@
 /** @type {import('tailwindcss').Config} */
 
-// Navy carries the brand, as most Indian government service portals do, on a
-// warm beige page rather than stark white. Saffron is the accent, and only at
-// shade 700 when it carries text, because lighter saffron does not meet the
-// contrast GIGW asks for.
-//
-// Green is kept out of the brand scale on purpose: the app uses green to mean
-// verified or resolved, and a green button would blur that.
+// Premium Beige & Earthy Brown Design System for GramSetu GovTech Platform.
+// Palette reflects public infrastructure, civil roads, and trustworthy governance.
+// - Canvas: Warm Beige (#F9F6F0) with soft neutral raised cards (#FFFFFF).
+// - Primary: Dark Earthy Brown (#2E221A / #423429) for header, sidebar, and primary actions.
+// - Secondary: Muted Brown (#7A6657) for secondary actions and subtle elements.
+// - Accent: Restrained Warm Amber / Ochre (#C27803 / #854D0E) for active states.
+// - Text: Deep charcoal-brown (#1F1611) meeting strict WCAG 2.1 AA/AAA contrast.
 
 export default {
   content: [
@@ -17,39 +17,40 @@ export default {
     extend: {
       colors: {
         brand: {
-          50: '#f2f6fb',
-          100: '#e3ecf7',
-          200: '#c2d5ec',
-          300: '#93b4db',
-          400: '#5c8bc6',
-          500: '#336aae',
-          600: '#1b4f91', // 8.16:1 on white, and white on it - AAA both ways
-          700: '#143c6f',
-          800: '#0e2c53', // sidebar and header chrome
-          900: '#091d38',
+          50: '#F8F6F2',
+          100: '#EBE5DC',
+          200: '#D8CFC3',
+          300: '#C2B4A3',
+          400: '#A49280',
+          500: '#7E6B5A', // muted earthy brown
+          600: '#5C4C3E', // accessible brown text & icons (7.8:1)
+          700: '#44372C', // deep brown
+          800: '#2E231B', // primary dark brown chrome (sidebar, navbar)
+          900: '#1D1611', // deepest charcoal brown
         },
         surface: {
-          DEFAULT: '#f7f4ee', // warm beige page, so white cards lift off it
-          raised: '#ffffff',
+          DEFAULT: '#F8F5F0', // warm natural beige canvas
+          raised: '#FFFFFF',  // clean white elevated cards
+          subtle: '#F1ECE3',  // warm neutral card background
+          border: '#E4DDD2',  // soft warm divider border
         },
         accent: {
-          50: '#fff8ed',
-          100: '#ffecd1',
-          200: '#fed7aa',
-          500: '#e07b00',
-          600: '#c26400', // large text and UI only - 4.10:1
-          700: '#9a4f00', // 6.01:1, safe for ordinary text
+          50: '#FDFCF9',
+          100: '#FDF7EC',
+          200: '#F9EBCF',
+          500: '#C27803', // restrained warm amber
+          600: '#A16207',
+          700: '#854D0E', // accessible amber text (5.8:1)
         },
-        dark: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          800: '#1e293b',
-          900: '#0f172a',
-          950: '#020617',
+        gov: {
+          success: '#15803D',
+          warning: '#B45309',
+          danger: '#B91C1C',
+          info: '#475569',
         }
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
       }
     },
   },
