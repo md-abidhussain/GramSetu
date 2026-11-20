@@ -17,7 +17,12 @@ import Tender from '../../models/Tender.js';
 import Project from '../../models/Project.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-export const asset = (name) => readFileSync(path.join(here, '../../../test-assets', name));
+export const asset = (name) => {
+  if (name === 'sample-tender.pdf' || name === 'sample-road-repair-tender.pdf') {
+    return readFileSync(path.join(here, '../../../assets/samples/tenderDocuments/sample-road-repair-tender.pdf'));
+  }
+  return readFileSync(path.join(here, '../../../test-assets', name));
+};
 
 export const ORIGIN = 'http://localhost:3000';
 export const PASSWORD = 'correct-horse-battery';

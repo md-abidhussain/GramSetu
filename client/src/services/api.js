@@ -21,6 +21,7 @@ export class ApiError extends Error {
  * cookie that JavaScript cannot read; the browser attaches it. A 401 on any
  * call except the session check announces that the session has ended, so the
  * app can return to the sign-in page instead of showing stale screens.
+ * Unrelated API failures (e.g. 400, 403, 404, 500) do not clear the session.
  */
 export const request = async (endpoint, options = {}) => {
   const headers = { ...options.headers };
@@ -38,8 +39,7 @@ export const request = async (endpoint, options = {}) => {
     response = await fetch(apiUrl(endpoint), {
       ...options,
       headers,
-      // Same-origin in production (Vercel rewrites /api); "include" only matters
-      // if VITE_API_BASE_URL points at another origin during development.
+      // Same-origin in local / rewrite mode; 'include' when targeting a remote API base URL.
       credentials: import.meta.env.VITE_API_BASE_URL ? 'include' : 'same-origin',
       signal: controller.signal
     });

@@ -138,17 +138,21 @@ GramSetu/
 
 ## 7. Application Screenshots & Visual Evidence
 
-| Citizen Sign-in | Citizen Defect Reporting |
+| Citizen Sign-in with Demo Access | Citizen Oversight Dashboard |
 | :---: | :---: |
-| ![Sign-in](docs/screenshots/login-page.png) | ![Reporting](docs/screenshots/citizen-reporting-page.png) |
+| ![Sign-in with Demo Access](docs/screenshots/login-demo-access.png) | ![Citizen Dashboard](docs/screenshots/citizen-dashboard.png) |
 
-| Official Oversight Dashboard | Tender Intelligence |
+| Citizen Defect Reporting Form | Citizen Submitted Reports (My Reports) |
 | :---: | :---: |
-| ![Dashboard](docs/screenshots/main-dashboard-page.png) | ![Tenders](docs/screenshots/tender-intelligence-page.png) |
+| ![New Report Form](docs/screenshots/citizen-new-report.png) | ![My Reports Tracking](docs/screenshots/citizen-my-reports.png) |
 
-| Project Monitoring & Lifecycle | Mobile Responsive Interface |
+| Official Oversight Dashboard | Tender Intelligence & Risk Extraction |
 | :---: | :---: |
-| ![Monitoring](docs/screenshots/project-monitoring-page.png) | ![Mobile](docs/screenshots/mobile-responsive.png) |
+| ![Official Dashboard](docs/screenshots/official-dashboard.png) | ![Tender Intelligence](docs/screenshots/tender-intelligence.png) |
+
+| Civil Infrastructure Lifecycle Monitoring | Mobile-First Citizen Reporting Interface |
+| :---: | :---: |
+| ![Project Monitoring](docs/screenshots/project-monitoring.png) | ![Mobile Reporting](docs/screenshots/mobile-citizen-reporting.png) |
 
 ---
 

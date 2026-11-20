@@ -12,14 +12,30 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     let cancelled = false;
     request('/auth/me')
-      .then((profile) => { if (!cancelled) setUser(profile?._id ? profile : null); })
-      .catch(() => { if (!cancelled) setUser(null); })
-      .finally(() => { if (!cancelled) setLoading(false); });
-    return () => { cancelled = true; };
+      .then((profile) => {
+        if (!cancelled) {
+          if (profile?._id) {
+            setUser(profile);
+          } else {
+            setUser((current) => current || null);
+          }
+        }
+      })
+      .catch(() => {
+        // Do not wipe out a user if signIn() succeeded while /auth/me was resolving
+        if (!cancelled) {
+          setUser((current) => current || null);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  // Any API call that comes back 401 means the session ended (expired, or
-  // signed out elsewhere). Drop the user so route guards send them to sign in.
+  // When a verified 401 confirms the session ended, drop the user so route guards send them to sign in.
   useEffect(() => {
     const onExpired = () => {
       setUser((current) => {
@@ -35,6 +51,7 @@ export const AuthProvider = ({ children }) => {
     const data = await request(endpoint, { method: 'POST', body: JSON.stringify(body) });
     setSessionExpired(false);
     setUser(data);
+    setLoading(false);
     return data;
   }, []);
 

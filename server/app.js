@@ -18,7 +18,7 @@ import notificationRoutes from './routes/notificationRoutes.js';
 import rewardRoutes from './routes/rewardRoutes.js';
 import contractorRoutes from './routes/contractorRoutes.js';
 
-export const parseAllowedOrigins = (value) => (value || 'http://localhost:3000,http://localhost:5173')
+export const parseAllowedOrigins = (value) => (value || 'http://localhost:3000,http://localhost:5173,https://gramsetu-india.vercel.app')
   .split(',')
   .map((origin) => origin.trim().replace(/\/$/, ''))
   .filter(Boolean);
@@ -43,12 +43,13 @@ export const createApp = () => {
   app.use(requestLogger);
   app.use(helmet());
 
-  // CSRF defence, part 1 of 2: a browser always sends Origin on cross-site
-  // writes, and an origin that is not ours is refused before any route runs.
-  // Part 2 is the SameSite=Lax session cookie (controllers/authController.js).
+  // CSRF defence and CORS configuration:
+  // Allows local development origins and deployed Vercel domains with credentials.
   app.use(cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+      if (!origin || allowedOrigins.includes(origin) || /^https:\/\/.*\.vercel\.app$/.test(origin)) {
+        return callback(null, true);
+      }
       const error = new Error('This website is not allowed to call the GramSetu API.');
       error.status = 403;
       return callback(error);

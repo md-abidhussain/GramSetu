@@ -13,7 +13,7 @@ enforces it and the test that checks it, so a reviewer can verify rather than tr
 
 | Property | Implementation | Test |
 | --- | --- | --- |
-| Session token only in an `HttpOnly; SameSite=Lax` cookie (`Secure` in production); never in a response body | `controllers/authController.js` (`setSessionCookie`) | `tests/http/auth.test.js` |
+| Session token only in an `HttpOnly` cookie (`SameSite=None; Secure; Partitioned` in production cross-site environments, `SameSite=Lax` in local development); never in a response body | `controllers/authController.js` (`setSessionCookie`) | `tests/http/auth.test.js` |
 | No `Authorization` header fallback: JavaScript never holds a token | `middleware/authMiddleware.js` (`readSessionToken`) | auth: "a Bearer header is not accepted" |
 | JWT pinned to HS256, 24 h expiry, carries `kind` (citizen/authority) so a citizen id can never be looked up as an official | `signSession`, `resolveSession` | auth: "kind is checked" |
 | Logout revokes **all** sessions for the account (`tokenVersion` bump), so a copied token stops working | `logout` | auth: "logout revokes the token everywhere" |
@@ -27,9 +27,7 @@ enforces it and the test that checks it, so a reviewer can verify rather than tr
 
 ## CSRF
 
-Two layers. (1) The session cookie is `SameSite=Lax`, so browsers do not send
-it on cross-site POST/PATCH. (2) Every request carrying an `Origin` header not
-in `CLIENT_ORIGINS` is refused with 403 before any route runs (`app.js`).
+Two layers. (1) In cross-site deployments (frontend on Vercel, backend on Render), the session cookie is configured with `SameSite=None; Secure; Partitioned`, while in same-origin/local environments it uses `SameSite=Lax`. (2) Every request carrying an `Origin` header not in `CLIENT_ORIGINS` (or allowed domains) is refused with 403 before any route runs (`app.js`).
 State never changes on GET. Test: platform "a write from a website that is not ours is refused".
 
 ## Authorization

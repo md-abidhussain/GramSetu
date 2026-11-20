@@ -5,7 +5,7 @@ import { Button } from '../components/ui/Button.jsx';
 import IdentityBand from '../components/layout/IdentityBand.jsx';
 import Logo from '../components/ui/Logo.jsx';
 import SiteFooter from '../components/layout/SiteFooter.jsx';
-import { AlertCircle, Info, Lock } from 'lucide-react';
+import { AlertCircle, Info, Lock, ShieldCheck, User } from 'lucide-react';
 
 const fieldStyle =
   'w-full rounded-md border border-surface-border bg-white px-3.5 py-2.5 text-base text-brand-900 placeholder-stone-400 focus:border-brand-700 focus:outline-none focus:ring-1 focus:ring-brand-700 disabled:bg-stone-50 transition-colors';
@@ -66,6 +66,31 @@ export const LoginPage = () => {
       }
     } catch (err) {
       setError(err.message || 'Those details were not accepted. Please check them and try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDemoLogin = async (role) => {
+    setError(null);
+    setLoading(true);
+    try {
+      if (role === 'authority') {
+        setAudience('authority');
+        setIdentifier('authority@gramsetu.gov');
+        setPassword('authority123');
+        await loginAuthority('authority@gramsetu.gov', 'authority123');
+        navigate('/dashboard');
+      } else {
+        setAudience('citizen');
+        setMode('login');
+        setIdentifier('citizen@gmail.com');
+        setPassword('citizen123');
+        await loginCitizen('citizen@gmail.com', 'citizen123');
+        navigate('/verify');
+      }
+    } catch (err) {
+      setError(err.message || 'Demo login failed. Please ensure the server is running.');
     } finally {
       setLoading(false);
     }
@@ -200,6 +225,54 @@ export const LoginPage = () => {
                   </span>
                 </div>
               )}
+
+              {/* Quick Demo Access */}
+              <div className="mt-6 border-t border-surface-border pt-5">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-bold uppercase tracking-wider text-brand-800">
+                    Quick Demo Access
+                  </span>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-amber-50 text-amber-900 border border-amber-200">
+                    Sample Data
+                  </span>
+                </div>
+
+                <p className="text-xs text-stone-600 mb-3">
+                  Sign in immediately using pre-configured demonstration accounts:
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <button
+                    type="button"
+                    disabled={loading}
+                    onClick={() => handleDemoLogin('citizen')}
+                    className="flex flex-col items-start p-3 text-left rounded-md border border-brand-200 bg-surface-50 hover:bg-brand-50/50 hover:border-brand-400 transition-colors"
+                  >
+                    <div className="flex items-center gap-1.5 font-semibold text-xs text-brand-900">
+                      <User className="h-3.5 w-3.5 text-brand-700" />
+                      <span>Demo Citizen</span>
+                    </div>
+                    <span className="text-[11px] text-stone-500 mt-0.5 truncate">citizen@gmail.com</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={loading}
+                    onClick={() => handleDemoLogin('authority')}
+                    className="flex flex-col items-start p-3 text-left rounded-md border border-brand-200 bg-surface-50 hover:bg-brand-50/50 hover:border-brand-400 transition-colors"
+                  >
+                    <div className="flex items-center gap-1.5 font-semibold text-xs text-brand-900">
+                      <ShieldCheck className="h-3.5 w-3.5 text-brand-700" />
+                      <span>Demo Official</span>
+                    </div>
+                    <span className="text-[11px] text-stone-500 mt-0.5 truncate">authority@gramsetu.gov</span>
+                  </button>
+                </div>
+
+                <p className="mt-3 text-[11px] text-stone-500 leading-normal">
+                  Demonstration access operates with an isolated sample dataset. No administrative master privileges or production citizen records are accessible.
+                </p>
+              </div>
             </div>
           </div>
         </div>

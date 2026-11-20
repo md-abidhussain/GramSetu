@@ -29,11 +29,17 @@ export const signSession = (user, kind) =>
   });
 
 const cookieFlags = () => {
-  // SameSite=Lax: the browser will not attach the cookie to cross-site POSTs,
-  // which together with the Origin allowlist in app.js blocks CSRF. The app is
-  // served same-origin (Vercel rewrites /api to the backend), so Lax works.
-  const flags = ['Path=/', 'HttpOnly', 'SameSite=Lax'];
-  if (isProduction() || process.env.COOKIE_SECURE === 'true') flags.push('Secure');
+  // Cross-site environments (e.g. frontend on vercel.app and backend on onrender.com)
+  // require SameSite=None and Secure for the browser to attach the session cookie on fetch calls.
+  // In local development or when explicitly requested, SameSite=Lax can be used.
+  const sameSite = process.env.COOKIE_SAMESITE || (isProduction() ? 'None' : 'Lax');
+  const flags = ['Path=/', 'HttpOnly', `SameSite=${sameSite}`];
+  if (isProduction() || process.env.COOKIE_SECURE === 'true' || sameSite.toLowerCase() === 'none') {
+    flags.push('Secure');
+    if (sameSite.toLowerCase() === 'none') {
+      flags.push('Partitioned');
+    }
+  }
   return flags;
 };
 
