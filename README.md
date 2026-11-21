@@ -140,20 +140,47 @@ GramSetu/
 
 GramSetu is actively deployed at **https://gramsetu-india.vercel.app** with live backend services at **https://gramsetu-31ax.onrender.com**. Below are authentic interface captures from the deployed system:
 
-| Citizen Sign-in & Quick Demo Access | Official Oversight Dashboard |
-| :---: | :---: |
-| <img src="docs/screenshots/verification/01-deployed-login.png" width="360" alt="Sign-in with Demo Access" /> | <img src="docs/screenshots/verification/02-deployed-dashboard.png" width="360" alt="Official Oversight Dashboard" /> |
-| *Role-based authentication with one-click demo credentials for instant evaluator inspection.* | *Consolidated district telemetry showing active works, regional map pins, and risk distribution.* |
+### 7.1 Citizen Sign-in & Demonstration Access
+Role-based authentication with one-click demo credentials for district authorities, field inspectors, and citizens for immediate evaluator inspection.
 
-| Contractor Performance Registry | Contractor Deep-Dive Analysis View |
-| :---: | :---: |
-| <img src="docs/screenshots/verification/03-deployed-contractors.png" width="360" alt="Contractor Registry" /> | <img src="docs/screenshots/verification/04-deployed-contractor-analysis.png" width="360" alt="Contractor Analysis" /> |
-| *Corporate civil registry tracking verified engineering credentials, contacts, and trust scores.* | *Historical project delivery outcomes, work distribution charts, and citizen audit remarks.* |
+<p align="center">
+  <img src="docs/screenshots/verification/01-deployed-login.png" width="480" alt="Citizen Sign-in with Quick Demo Access" />
+</p>
 
-| Civil Infrastructure Projects Monitoring | Citizen Grievance Ground Verification |
-| :---: | :---: |
-| <img src="docs/screenshots/verification/05-deployed-projects.png" width="360" alt="Project Monitoring" /> | <img src="docs/screenshots/verification/06-deployed-citizen-verify.png" width="360" alt="Citizen Verification" /> |
-| *Photographic before-and-after audit ledger with AI completion scores and lifecycle tracking.* | *Closed-loop citizen reporting with GPS tagging, YOLOv8 defect detection, and inspector dispatch.* |
+### 7.2 District Oversight Telemetry Dashboard
+Consolidated district telemetry showing active works, regional map pins, live risk assessment distribution, and contractor trust rankings.
+
+<p align="center">
+  <img src="docs/screenshots/verification/02-deployed-dashboard.png" width="480" alt="Official District Oversight Dashboard" />
+</p>
+
+### 7.3 Corporate Contractor Registry
+Corporate civil registry tracking verified engineering credentials, headquarter locations, contacts, and multi-factor trust scores.
+
+<p align="center">
+  <img src="docs/screenshots/verification/03-deployed-contractors.png" width="480" alt="Corporate Contractor Registry" />
+</p>
+
+### 7.4 Contractor Performance Deep-Dive & Analytics
+Historical project delivery outcomes, work distribution charts, average AI completion verification scores, and citizen audit remarks.
+
+<p align="center">
+  <img src="docs/screenshots/verification/04-deployed-contractor-analysis.png" width="480" alt="Contractor Performance Analytics" />
+</p>
+
+### 7.5 Civil Infrastructure Lifecycle & Photographic Ledger
+Multi-stage civil works progression, before-and-after photographic audit ledger, and AI completion verification.
+
+<p align="center">
+  <img src="docs/screenshots/verification/05-deployed-projects.png" width="480" alt="Civil Infrastructure Project Monitoring Ledger" />
+</p>
+
+### 7.6 Citizen Grievance Ground Verification & Defect Detection
+Closed-loop citizen grievance submission with GPS coordinate verification, YOLOv8 defect detection, and field inspector assignment.
+
+<p align="center">
+  <img src="docs/screenshots/verification/06-deployed-citizen-verify.png" width="480" alt="Citizen Grievance Verification" />
+</p>
 
 ---
 
