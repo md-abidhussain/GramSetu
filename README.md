@@ -138,19 +138,37 @@ GramSetu/
 
 ## 7. Application Screenshots & Visual Evidence
 
-The live deployment (https://gramsetu-india.vercel.app) is active. Below are authentic interface captures from the deployed system:
+The live deployment (https://gramsetu-india.vercel.app) is active. Below are authentic interface captures from the deployed system with live data:
 
-| Citizen Sign-in & Quick Demo Access | Official Oversight Dashboard |
-| :---: | :---: |
-| ![Sign-in with Demo Access](docs/screenshots/verification/01-deployed-login.png) | ![Official Dashboard](docs/screenshots/verification/02-deployed-dashboard.png) |
+### 7.1 Citizen Sign-in & Demonstration Access
+One-click demo credentials for district authorities, field inspectors, and citizens for immediate evaluator inspection.
 
-| Contractor Performance Registry | Contractor Deep-Dive Analysis View |
-| :---: | :---: |
-| ![Contractor Registry](docs/screenshots/verification/03-deployed-contractors.png) | ![Contractor Analysis](docs/screenshots/verification/04-deployed-contractor-analysis.png) |
+![Citizen Sign-in with Quick Demo Access](docs/screenshots/verification/01-deployed-login.png)
 
-| Civil Infrastructure Projects Monitoring | Citizen Grievance Ground Verification |
-| :---: | :---: |
-| ![Project Monitoring](docs/screenshots/verification/05-deployed-projects.png) | ![Citizen Verification](docs/screenshots/verification/06-deployed-citizen-verify.png) |
+### 7.2 District Oversight Dashboard
+Consolidated high-level telemetry displaying active civil projects, geographic map pins, risk assessment distribution, and contractor trust rankings.
+
+![Official Oversight Dashboard](docs/screenshots/verification/02-deployed-dashboard.png)
+
+### 7.3 Contractor Performance Registry
+Registry of civil engineering corporations (L&T, Afcons, NCC, H.G. Infra, PNC Infratech, Dilip Buildcon) with corporate contacts, headquarter locations, and trust scores.
+
+![Contractor Registry](docs/screenshots/verification/03-deployed-contractors.png)
+
+### 7.4 Contractor Deep-Dive Analytics & Public Feedback
+Historical project delivery outcomes, work distribution charts, AI completion scores, and verified citizen audit remarks.
+
+![Contractor Analysis](docs/screenshots/verification/04-deployed-contractor-analysis.png)
+
+### 7.5 Civil Infrastructure Lifecycle & Audit Photographic Ledger
+Before-and-after photographic comparisons across civil works, AI completion verification, and formal multi-stage lifecycle progression.
+
+![Project Monitoring](docs/screenshots/verification/05-deployed-projects.png)
+
+### 7.6 Citizen Grievance Reporting & Field Verification
+Closed-loop citizen grievance submission with GPS coordinate verification, AI defect analysis, and inspector assignment workflow.
+
+![Citizen Grievance Verification](docs/screenshots/verification/06-deployed-citizen-verify.png)
 
 ---
 

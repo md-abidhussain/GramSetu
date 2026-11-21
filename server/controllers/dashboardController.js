@@ -11,12 +11,12 @@ export const getSummary = async (req, res, next) => {
       await Promise.all([
         Project.estimatedDocumentCount(),
         Project.countDocuments({ afterImageUrl: { $exists: true, $nin: [null, ''] } }),
-        // Averaged in the database, over real AI comparisons only.
+        // Averaged in the database over scored civil projects
         Project.aggregate([
-          { $match: { 'aiAssessment.status': 'completed', completionScore: { $type: 'number' } } },
+          { $match: { completionScore: { $type: 'number', $gt: 0 } } },
           { $group: { _id: null, average: { $avg: '$completionScore' }, count: { $sum: 1 } } }
         ]),
-        Project.countDocuments({ status: 'Flagged' }),
+        Project.countDocuments({ $or: [{ status: 'Flagged' }, { riskLevel: 'High' }] }),
         CitizenReport.estimatedDocumentCount(),
         Tender.estimatedDocumentCount(),
         Project.countDocuments({ lifecycleStatus: 'Waiting for AI Verification' })

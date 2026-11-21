@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card.jsx';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { X, MapPin, ShieldCheck } from 'lucide-react';
 
-// Create styled circular divIcons
+// Create styled circular divIcons with explicit CSS sizing so markers never collapse
 const createMarkerIcon = (project) => {
-  let color = '#f59e0b'; // Pending / Under Review -> Yellow
+  let color = '#f59e0b'; // Pending / Under Review -> Amber
 
   // Green: Verified / Approved and Health is high
   if (project.status === 'Verified' && project.lifecycleStatus === 'Approved') {
@@ -19,13 +20,13 @@ const createMarkerIcon = (project) => {
 
   return L.divIcon({
     html: `
-      <div class="relative flex items-center justify-center">
-        <span class="inline-flex rounded-full h-4.5 w-4.5 border-2 border-white shadow-md" style="background-color: ${color}"></span>
+      <div style="display:flex;align-items:center;justify-content:center;width:24px;height:24px;">
+        <span style="display:block;width:16px;height:16px;border-radius:50%;background-color:${color};border:2.5px solid #ffffff;box-shadow:0 2px 6px rgba(0,0,0,0.45);cursor:pointer;"></span>
       </div>
     `,
     className: 'custom-map-marker',
-    iconSize: [18, 18],
-    iconAnchor: [9, 9]
+    iconSize: [24, 24],
+    iconAnchor: [12, 12]
   });
 };
 
