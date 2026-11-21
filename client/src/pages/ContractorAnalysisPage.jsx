@@ -1,34 +1,52 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import PageLayout from '../components/layout/PageLayout.jsx';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card.jsx';
 import { Select } from '../components/ui/Select.jsx';
 import { getContractorAnalysis, getContractors } from '../services/contractorService.js';
-import { BarChart3, TrendingUp, ShieldCheck, MessageSquareQuote, Filter } from 'lucide-react';
+import { BarChart3, TrendingUp, ShieldCheck, MessageSquareQuote, Filter, AlertCircle, Building2 } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from 'recharts';
 
 export const ContractorAnalysisPage = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedId = searchParams.get('id');
+
   const [contractors, setContractors] = useState([]);
-  const [selectedContractor, setSelectedContractor] = useState('');
+  const [selectedContractor, setSelectedContractor] = useState(requestedId || '');
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('all');
+  const [error, setError] = useState(null);
 
   useEffect(() => {
+    let isMounted = true;
     const loadContractors = async () => {
       try {
         const data = await getContractors();
+        if (!isMounted) return;
         const list = Array.isArray(data) ? data : [];
         setContractors(list);
         if (list.length > 0) {
-          setSelectedContractor(list[0]._id);
+          if (requestedId && list.some((c) => c._id === requestedId)) {
+            setSelectedContractor(requestedId);
+          } else {
+            const defaultId = list[0]._id;
+            setSelectedContractor(defaultId);
+            setSearchParams({ id: defaultId }, { replace: true });
+          }
         }
-      } catch (error) {
-        console.error(error);
+      } catch (err) {
+        if (!isMounted) return;
+        console.error(err);
+        setError('Unable to load contractor directory.');
       }
     };
 
     loadContractors();
-  }, []);
+    return () => {
+      isMounted = false;
+    };
+  }, [requestedId, setSearchParams]);
 
   useEffect(() => {
     if (!selectedContractor) return;
@@ -36,10 +54,12 @@ export const ContractorAnalysisPage = () => {
     const loadAnalysis = async () => {
       try {
         setLoading(true);
+        setError(null);
         const data = await getContractorAnalysis(selectedContractor);
         setAnalysis(data);
-      } catch (error) {
-        console.error(error);
+      } catch (err) {
+        console.error(err);
+        setError(err.message || 'Unable to load performance record for the selected contractor.');
       } finally {
         setLoading(false);
       }
@@ -47,6 +67,11 @@ export const ContractorAnalysisPage = () => {
 
     loadAnalysis();
   }, [selectedContractor]);
+
+  const handleContractorChange = (newId) => {
+    setSelectedContractor(newId);
+    setSearchParams({ id: newId });
+  };
 
   const filteredHistory = useMemo(() => {
     if (!analysis?.history) return [];
@@ -88,23 +113,66 @@ export const ContractorAnalysisPage = () => {
                   placeholder="Select contractor"
                   options={contractors.map((contractor) => ({ value: contractor._id, label: contractor.name }))}
                   value={selectedContractor}
-                  onChange={(event) => setSelectedContractor(event.target.value)}
+                  onChange={(event) => handleContractorChange(event.target.value)}
                   className="min-w-[220px]"
                 />
               </div>
             </div>
           </CardHeader>
           <CardContent>
+            {error && (
+              <div role="alert" className="mb-4 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
             {loading ? (
               <p className="text-sm text-slate-600">Loading…</p>
             ) : !analysis?.metrics ? (
-              // Guards on metrics, not just on analysis: a response without it
-              // used to crash the page on the first figure below.
               <p className="text-sm text-slate-600">
                 Choose a contractor to see their record.
               </p>
             ) : (
-              <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+              <div className="space-y-6">
+                {/* Selected Contractor Header Card */}
+                {analysis.contractor && (
+                  <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <Building2 className="h-4 w-4 text-brand-600" />
+                        <h2 className="text-base font-bold text-dark-800">{analysis.contractor.name}</h2>
+                      </div>
+                      <p className="text-xs text-slate-600 mt-1">
+                        Registration ID: <span className="font-semibold text-slate-700">{analysis.contractor.registrationId}</span>
+                        {analysis.contractor.expertise && (
+                          <> • Specialization: <span className="font-semibold text-slate-700">{analysis.contractor.expertise}</span></>
+                        )}
+                        {analysis.contractor.address && (
+                          <> • Location: <span className="font-semibold text-slate-700">{analysis.contractor.address}</span></>
+                        )}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2 text-xs">
+                      {analysis.contractor.contactPerson && (
+                        <span className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-slate-700 font-medium">
+                          Rep: {analysis.contractor.contactPerson}
+                        </span>
+                      )}
+                      {analysis.contractor.contactEmail && (
+                        <span className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-slate-700">
+                          {analysis.contractor.contactEmail}
+                        </span>
+                      )}
+                      {analysis.contractor.phone && (
+                        <span className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-slate-700">
+                          {analysis.contractor.phone}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
                 <div className="space-y-4">
                   <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                     <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
@@ -230,6 +298,7 @@ export const ContractorAnalysisPage = () => {
                   </div>
                 </div>
               </div>
+            </div>
             )}
           </CardContent>
         </Card>

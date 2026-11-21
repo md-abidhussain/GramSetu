@@ -41,7 +41,7 @@ const seedDatabase = async () => {
     const authorityPassword = await bcrypt.hash('authority123', salt);
     const inspectorPassword = await bcrypt.hash('inspector123', salt);
 
-    await Authority.create({
+    const auth1 = await Authority.create({
       name: 'Dr. Ramesh Kumar (District Magistrate)',
       email: 'authority@gramsetu.gov',
       uniqueUserId: 'AUTH-2026-9021',
@@ -233,8 +233,8 @@ const seedDatabase = async () => {
         contractor: contractors[0]._id, // sample contractor
         riskLevel: 'Low',
         location: { lat: 25.3176, lng: 82.9739, address: 'Rohaniya Block Link Rd, Varanasi, UP' },
-        beforeImageUrl: 'https://images.unsplash.com/photo-1515162305285-0293e4767cc2?q=80&w=600',
-        afterImageUrl: 'https://images.unsplash.com/photo-1544982503-9f984c14501a?q=80&w=600',
+        beforeImageUrl: '/samples/roadDamage/road-repair-before.jpg',
+        afterImageUrl: '/samples/roadDamage/road-repair-after.jpg',
         completionScore: 92,
         projectHealth: 'Healthy',
         healthPercentage: 96,
@@ -248,8 +248,8 @@ const seedDatabase = async () => {
         contractor: contractors[1]._id, // sample contractor
         riskLevel: 'Medium',
         location: { lat: 26.8467, lng: 80.9462, address: 'Vikas Nagar Central School, Lucknow, UP' },
-        beforeImageUrl: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=600',
-        afterImageUrl: 'https://images.unsplash.com/photo-1588072432836-e10032774350?q=80&w=600',
+        beforeImageUrl: null,
+        afterImageUrl: null,
         completionScore: 82,
         projectHealth: 'Healthy',
         healthPercentage: 85,
@@ -263,8 +263,8 @@ const seedDatabase = async () => {
         contractor: contractors[2]._id, // sample contractor
         riskLevel: 'Low',
         location: { lat: 25.4358, lng: 81.8463, address: 'Phaphamau Water Works, Prayagraj, UP' },
-        beforeImageUrl: 'https://images.unsplash.com/photo-1542013936693-8848e5740a7a?q=80&w=600',
-        afterImageUrl: 'https://images.unsplash.com/photo-1584267326895-d88985f71408?q=80&w=600',
+        beforeImageUrl: null,
+        afterImageUrl: null,
         completionScore: 94,
         projectHealth: 'Healthy',
         healthPercentage: 98,
@@ -278,8 +278,8 @@ const seedDatabase = async () => {
         contractor: contractors[3]._id, // sample contractor
         riskLevel: 'High',
         location: { lat: 26.7606, lng: 83.3731, address: 'Pipraich Main Health Centre, Gorakhpur, UP' },
-        beforeImageUrl: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=600',
-        afterImageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=600',
+        beforeImageUrl: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800',
+        afterImageUrl: null,
         completionScore: 68,
         projectHealth: 'At Risk',
         healthPercentage: 64,
@@ -293,7 +293,7 @@ const seedDatabase = async () => {
         contractor: contractors[4]._id, // sample contractor
         riskLevel: 'Low',
         location: { lat: 26.4499, lng: 80.3319, address: 'Ganga Canal PWD Bridge, Kanpur, UP' },
-        beforeImageUrl: 'https://images.unsplash.com/photo-1545624446-43a9cc961631?q=80&w=600',
+        beforeImageUrl: null,
         afterImageUrl: null,
         completionScore: null,
         projectHealth: 'Healthy',
@@ -308,7 +308,7 @@ const seedDatabase = async () => {
         contractor: contractors[5]._id, // sample contractor
         riskLevel: 'Medium',
         location: { lat: 25.4484, lng: 78.5685, address: 'Civil Lines Road 4, Jhansi, UP' },
-        beforeImageUrl: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=600',
+        beforeImageUrl: null,
         afterImageUrl: null,
         completionScore: null,
         projectHealth: 'Healthy',
@@ -363,7 +363,7 @@ const seedDatabase = async () => {
     await CitizenReport.create({
       citizen: demoCitizen._id,
       project: projects[0]._id, // PMGSY Rural Road Upgrade
-      citizenImageUrl: 'https://res.cloudinary.com/dqixw5mir/image/upload/v1722572097/citizen_reports/s0qip0dixbvyc2b9a71f.jpg',
+      citizenImageUrl: '/samples/roadDamage/pothole-severe.jpg',
       gps: { lat: 25.3176, lng: 82.9739 },
       description: 'Major road cracking and large pothole formed near the main junction of the road completed last week.',
       detectedIssues: ['crack', 'pothole'],
@@ -389,11 +389,11 @@ const seedDatabase = async () => {
     await CitizenReport.create({
       citizen: demoCitizen._id,
       project: projects[1]._id, // Solar Street Lighting Upgrade
-      citizenImageUrl: 'https://images.unsplash.com/photo-1515162305285-0293e4767cc2?q=80&w=600',
+      citizenImageUrl: '/samples/roadDamage/surface-cracking.jpg',
       gps: { lat: 25.3185, lng: 82.9782 },
-      description: 'The third street light pole is completely non-functional and the wiring box is left exposed.',
-      detectedIssues: ['broken_infrastructure'],
-      aiReport: 'Sample data (written by hand, not AI): exposed wiring box on a street light pole.',
+      description: 'Severe surface cracking and pavement degradation observed along the newly upgraded corridor.',
+      detectedIssues: ['crack'],
+      aiReport: 'Sample data (written by hand, not AI): extensive alligator cracking along the corridor pavement.',
       matchScore: 90,
       flaggedAsDiscrepancy: true,
       aiAssessment: { status: 'sample_data' },
@@ -409,6 +409,68 @@ const seedDatabase = async () => {
     });
 
     logger.info('seed: sample complaints created');
+
+    // 6. Seed Sample Notifications for Demo Accounts
+    await Notification.insertMany([
+      {
+        user: auth1._id,
+        userModel: 'Authority',
+        type: 'warning',
+        message: 'Citizen report filed for PMGSY Rural Road Upgrade: crack and pothole detected.',
+        read: false,
+        createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000)
+      },
+      {
+        user: auth1._id,
+        userModel: 'Authority',
+        type: 'info',
+        message: 'Bridge Rehabilitation Project (Kanpur) tender published.',
+        read: true,
+        createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000)
+      },
+      {
+        user: auth1._id,
+        userModel: 'Authority',
+        type: 'success',
+        message: 'AI verification completed for PMGSY Rural Road Upgrade (Completion score: 92%).',
+        read: true,
+        createdAt: new Date(Date.now() - 48 * 60 * 60 * 1000)
+      },
+      {
+        user: auth2._id,
+        userModel: 'Authority',
+        type: 'info',
+        message: 'You have been assigned to inspect complaint for Rohaniya Block Link Rd.',
+        read: false,
+        createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000)
+      },
+      {
+        user: auth2._id,
+        userModel: 'Authority',
+        type: 'warning',
+        message: 'Inspection scheduled tomorrow for Vikas Nagar Central School site.',
+        read: false,
+        createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000)
+      },
+      {
+        user: demoCitizen._id,
+        userModel: 'Citizen',
+        type: 'info',
+        message: 'An inspector has been assigned to your report for Rohaniya Block Link Rd.',
+        read: false,
+        createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000)
+      },
+      {
+        user: demoCitizen._id,
+        userModel: 'Citizen',
+        type: 'success',
+        message: 'Your report was verified by field inspection. 50 civic points awarded.',
+        read: true,
+        createdAt: new Date(Date.now() - 72 * 60 * 60 * 1000)
+      }
+    ]);
+
+    logger.info('seed: sample notifications created');
 
   } catch (error) {
     // A half-seeded database is worse than none: stop the server so it is noticed.

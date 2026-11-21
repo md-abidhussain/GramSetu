@@ -1,22 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import PageLayout from '../components/layout/PageLayout.jsx';
 import BeforeAfterUpload from '../components/monitoring/BeforeAfterUpload.jsx';
 import CompletionScoreCard from '../components/monitoring/CompletionScoreCard.jsx';
 import ProjectHealthCard from '../components/monitoring/ProjectHealthCard.jsx';
 import { useProjects } from '../hooks/useProjects.js';
 import ProjectLifecycleSection from '../components/monitoring/ProjectLifecycleSection.jsx';
-import { Eye, Activity, MapPin, FileText } from 'lucide-react';
+import ProjectImage from '../components/ui/ProjectImage.jsx';
+import { Activity, MapPin, FileText } from 'lucide-react';
 import { apiUrl } from '../services/api.js';
 import { SampleDataBadge } from '../components/ui/AiStatusNote.jsx';
 import { clickable } from '../lib/a11y.js';
 
 export const ProjectMonitoringPage = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedId = searchParams.get('id');
   const { projects, loading, error, addNewProject, completeExistingProject, refetchProjects } = useProjects();
   const [selectedProject, setSelectedProject] = useState(null);
+
+  // Sync selection with URL and projects array
+  useEffect(() => {
+    if (!projects || projects.length === 0) return;
+    if (requestedId) {
+      const match = projects.find((p) => p._id === requestedId);
+      if (match) {
+        setSelectedProject(match);
+        return;
+      }
+    }
+    // Default to existing selected or first project in list
+    setSelectedProject((prev) => {
+      if (prev) {
+        const stillExists = projects.find((p) => p._id === prev._id);
+        if (stillExists) return stillExists;
+      }
+      return projects[0];
+    });
+  }, [projects, requestedId]);
+
+  const handleSelectProject = (project) => {
+    setSelectedProject(project);
+    setSearchParams({ id: project._id });
+  };
 
   const handleCreated = async (formData) => {
     const result = await addNewProject(formData);
     setSelectedProject(result);
+    if (result?._id) setSearchParams({ id: result._id });
   };
 
   const handleCompleted = async (id, formData) => {
@@ -55,7 +85,7 @@ export const ProjectMonitoringPage = () => {
                 {projects.map((item) => (
                   <div
                     key={item._id}
-                    {...clickable(() => setSelectedProject(item))}
+                    {...clickable(() => handleSelectProject(item))}
                     aria-pressed={selectedProject?._id === item._id}
                     className={`flex items-center justify-between p-3 rounded-xl border text-xs cursor-pointer transition-colors ${
                       selectedProject?._id === item._id
@@ -138,31 +168,21 @@ export const ProjectMonitoringPage = () => {
                   {/* Before */}
                   <div>
                     <span className="block text-xs text-slate-600 font-bold mb-2">Before construction</span>
-                    <a href={selectedProject.beforeImageUrl} target="_blank" rel="noreferrer" className="block relative h-48 rounded-xl overflow-hidden border border-slate-200 hover:opacity-95 transition-opacity">
-                      <img src={selectedProject.beforeImageUrl} alt="Before" className="w-full h-full object-cover" />
-                      <span className="absolute bottom-2 right-2 bg-dark-900/60 text-white font-bold text-xs px-2 py-0.5 rounded flex items-center gap-1">
-                        <Eye className="h-3 w-3" /> Zoom
-                      </span>
-                    </a>
+                    <ProjectImage
+                      src={selectedProject.beforeImageUrl}
+                      alt={`Before construction - ${selectedProject.title}`}
+                      label="Initial site inspection"
+                    />
                   </div>
 
                   {/* After */}
                   <div>
                     <span className="block text-xs text-slate-600 font-bold mb-2">Verified Completion</span>
-                    {selectedProject.afterImageUrl ? (
-                      <a href={selectedProject.afterImageUrl} target="_blank" rel="noreferrer" className="block relative h-48 rounded-xl overflow-hidden border border-slate-200 hover:opacity-95 transition-opacity">
-                        <img src={selectedProject.afterImageUrl} alt="After" className="w-full h-full object-cover" />
-                        <span className="absolute bottom-2 right-2 bg-dark-900/60 text-white font-bold text-xs px-2 py-0.5 rounded flex items-center gap-1">
-                          <Eye className="h-3 w-3" /> Zoom
-                        </span>
-                      </a>
-                    ) : (
-                      <div className="h-48 rounded-xl bg-slate-100 flex flex-col items-center justify-center text-slate-600 border border-dashed border-slate-200">
-                        <Activity className="h-8 w-8 text-slate-300 mb-1" />
-                        <span className="text-xs font-semibold text-dark-800">Awaiting Completion Upload</span>
-                        <span className="text-xs text-slate-600 mt-0.5">Use the upload panel to file post-build audit</span>
-                      </div>
-                    )}
+                    <ProjectImage
+                      src={selectedProject.afterImageUrl}
+                      alt={`Verified completion - ${selectedProject.title}`}
+                      label="Post-build audit"
+                    />
                   </div>
                 </div>
               </div>

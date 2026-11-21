@@ -21,6 +21,17 @@ export const NotificationBell = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const formatNotificationTime = (createdAt) => {
+    if (!createdAt) return '';
+    const date = new Date(createdAt);
+    const now = new Date();
+    const diffHours = (now - date) / (1000 * 60 * 60);
+    if (diffHours < 24 && date.getDate() === now.getDate()) {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    return date.toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  };
+
   const getIcon = (type) => {
     switch (type) {
       case 'success':
@@ -78,7 +89,7 @@ export const NotificationBell = () => {
                       {n.message}
                     </p>
                     <span className="text-xs text-slate-600 mt-1 block">
-                      {new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {formatNotificationTime(n.createdAt)}
                     </span>
                   </div>
                 </div>

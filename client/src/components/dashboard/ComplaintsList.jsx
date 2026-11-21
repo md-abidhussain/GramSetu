@@ -22,6 +22,7 @@ import {
 import { DetectionSection } from '../citizen/DiscrepancyReport.jsx';
 import { AiStatusNote, SampleDataBadge } from '../ui/AiStatusNote.jsx';
 import { defectLabel, hasAiResult } from '../../lib/aiStatus.js';
+import ProjectImage from '../ui/ProjectImage.jsx';
 
 const DECIDING_ROLES = ['District Authority', 'Admin', 'Government Officer'];
 const ASSIGNABLE = ['Authority Notification', 'Complaint Submitted', 'Duplicate Detected', 'Need More Evidence'];
@@ -291,24 +292,14 @@ export const ComplaintsList = ({ complaints = [], onStatusUpdated }) => {
                     <span className="block text-xs text-slate-600 font-bold mb-1.5 flex items-center gap-1">
                       <ImageIcon className="h-3.5 w-3.5 text-slate-600" /> Citizen Evidence
                     </span>
-                    <a href={selectedReport.citizenImageUrl} target="_blank" rel="noreferrer" className="block relative h-32 rounded border border-slate-200 overflow-hidden bg-white hover:opacity-90 transition-opacity">
-                      <img src={selectedReport.citizenImageUrl} alt="Citizen Upload" className="w-full h-full object-cover" />
-                    </a>
+                    <ProjectImage src={selectedReport.citizenImageUrl} alt="Citizen Upload" className="h-32" />
                   </div>
 
                   <div>
                     <span className="block text-xs text-slate-600 font-bold mb-1.5 flex items-center gap-1">
                       <ImageIcon className="h-3.5 w-3.5 text-slate-600" /> Official Site Verification
                     </span>
-                    {selectedReport.inspectorAfterImageUrl ? (
-                      <a href={selectedReport.inspectorAfterImageUrl} target="_blank" rel="noreferrer" className="block relative h-32 rounded border border-slate-200 overflow-hidden bg-white hover:opacity-90 transition-opacity">
-                        <img src={selectedReport.inspectorAfterImageUrl} alt="Inspector Upload" className="w-full h-full object-cover" />
-                      </a>
-                    ) : (
-                      <div className="h-32 rounded border border-dashed border-slate-200 flex items-center justify-center text-slate-600">
-                        Inspection evidence not uploaded yet
-                      </div>
-                    )}
+                    <ProjectImage src={selectedReport.inspectorAfterImageUrl} alt="Official verification photo" className="h-32" label="Inspection evidence not uploaded yet" />
                   </div>
                 </div>
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PageLayout from '../components/layout/PageLayout.jsx';
 import AnalyticsCharts from '../components/dashboard/AnalyticsCharts.jsx';
 import RiskChart from '../components/dashboard/RiskChart.jsx';
@@ -18,6 +19,7 @@ import { getProjects } from '../services/monitoringService.js';
 import { Activity, RefreshCw } from 'lucide-react';
 
 export const DashboardPage = () => {
+  const navigate = useNavigate();
   const [summary, setSummary] = useState(null);
   const [riskAnalytics, setRiskAnalytics] = useState(null);
   const [contractors, setContractors] = useState([]);
@@ -110,7 +112,10 @@ export const DashboardPage = () => {
         </div>
 
         {/* Projects table */}
-        <ProjectsTable projects={projects} />
+        <ProjectsTable
+          projects={projects}
+          onSelectProject={(proj) => navigate(`/projects?id=${proj._id}`)}
+        />
 
         {/* Complaints list */}
         <ComplaintsList complaints={complaints} onStatusUpdated={() => fetchDashboardData(true)} />

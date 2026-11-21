@@ -6,6 +6,7 @@ import { defectLabel, hasAiResult } from '../../lib/aiStatus.js';
 import { apiUrl } from '../../services/api.js';
 import { AiStatusNote, SampleDataBadge } from '../ui/AiStatusNote.jsx';
 import { clickable } from '../../lib/a11y.js';
+import ProjectImage from '../ui/ProjectImage.jsx';
 
 // Render complaint lifecycle milestones
 const renderWorkflowMilestones = (status) => {
@@ -224,20 +225,12 @@ export const MyComplaints = ({ complaints: myComplaints, loading: loadingComplai
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-slate-600 font-semibold mb-1 text-center">Your photo</p>
-                    <div className="border border-slate-200 rounded-lg overflow-hidden h-40 bg-slate-50">
-                      <img src={selectedComplaint.citizenImageUrl} alt="Citizen before" className="w-full h-full object-cover" />
-                    </div>
+                    <ProjectImage src={selectedComplaint.citizenImageUrl} alt="Citizen before" className="h-40" />
                   </div>
 
                   <div>
                     <p className="text-sm text-slate-600 font-semibold mb-1 text-center">Official Verification Proof (After)</p>
-                    <div className="border border-slate-200 rounded-lg overflow-hidden h-40 bg-slate-50 flex items-center justify-center text-sm text-slate-600">
-                      {selectedComplaint.inspectorAfterImageUrl ? (
-                        <img src={selectedComplaint.inspectorAfterImageUrl} alt="Inspector after" className="w-full h-full object-cover" />
-                      ) : (
-                        'Inspector verification photo pending'
-                      )}
-                    </div>
+                    <ProjectImage src={selectedComplaint.inspectorAfterImageUrl} alt="Inspector after" className="h-40" label="Inspector verification photo pending" />
                   </div>
                 </div>
               </div>
