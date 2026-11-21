@@ -1,5 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Eye, ImageOff } from 'lucide-react';
+
+// Legacy placeholder IDs from initial mock seeding (pizza, church, generic stock)
+const UNRELATED_LEGACY_PATTERNS = [
+  'photo-1515162305285', // church
+  'photo-1544982503',    // pizza
+  'photo-1580582932',
+  'photo-1588072432',
+  'photo-1542013936',
+  'photo-1584267326',
+  'photo-1586528116',
+  'photo-1519494026',
+  'photo-1545624446'
+];
 
 /**
  * Renders an infrastructure project image with fallback placeholder.
@@ -14,7 +27,13 @@ export const ProjectImage = ({
 }) => {
   const [hasError, setHasError] = useState(false);
 
-  if (!src || hasError) {
+  useEffect(() => {
+    setHasError(false);
+  }, [src]);
+
+  const isLegacyUnrelated = typeof src === 'string' && UNRELATED_LEGACY_PATTERNS.some((pat) => src.includes(pat));
+
+  if (!src || hasError || isLegacyUnrelated) {
     return (
       <div
         className={`w-full ${className} rounded-xl bg-slate-100 flex flex-col items-center justify-center text-slate-500 border border-dashed border-slate-300 p-4 text-center transition-colors`}

@@ -13,9 +13,18 @@ if (problems.length > 0) {
 const { default: connectDB } = await import('./config/db.js');
 const { createApp } = await import('./app.js');
 const { default: Authority } = await import('./models/Authority.js');
+const { default: Project } = await import('./models/Project.js');
 const { default: seedDatabase } = await import('./data/seedDatabase.js');
+const { migrateSampleProjectImages } = await import('./migrations/migrateSampleProjectImages.js');
 
 await connectDB();
+
+// Safe idempotent migration for sample project images
+try {
+  await migrateSampleProjectImages(Project, logger);
+} catch (migErr) {
+  logger.warn('migration: sample project images check encountered error', { error: migErr.message });
+}
 
 // Seeding is opt-in. It once ran on every boot and wiped every collection,
 // which destroyed real data whenever the host restarted.

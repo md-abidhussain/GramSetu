@@ -27,3 +27,17 @@ This directory is the single canonical source of test fixtures and demonstration
 ## 4. Test Compatibility Aliases
 - `road-before.jpg`: Pointer to `project-1-road-before.jpg` for integration/E2E test runners.
 - `road-after.jpg`: Pointer to `project-1-road-after.jpg` for integration/E2E test runners.
+
+## 5. Frontend Serving Copy & Synchronization
+The root `test-assets/` directory is the single authoritative canonical source for all demonstration and testing fixtures.
+To allow Vite to serve these static assets during local development and production Vercel hosting at `/test-assets/<filename>`, an exact mirror is maintained in `client/public/test-assets/`.
+
+To synchronize changes from canonical `test-assets/` to `client/public/test-assets/`:
+```powershell
+# Windows PowerShell
+Copy-Item -Recurse -Force test-assets/* client/public/test-assets/
+```
+```bash
+# Unix / POSIX
+cp -r test-assets/* client/public/test-assets/
+```

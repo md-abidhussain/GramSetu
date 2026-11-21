@@ -138,7 +138,7 @@ GramSetu/
 
 ## 7. Application Screenshots & Visual Evidence
 
-The live deployment (https://gramsetu-india.vercel.app) has been verified end-to-end. Below are actual screenshots captured from the live deployed application:
+The live deployment (https://gramsetu-india.vercel.app) is active. Below are authentic interface captures from the deployed system:
 
 | Citizen Sign-in & Quick Demo Access | Official Oversight Dashboard |
 | :---: | :---: |
@@ -231,6 +231,13 @@ When `SEED_DB=true` is set in `server/.env`, starting the server populates the d
 - Realistic sample projects, civil tenders, and synthetic contractor performance records.
 
 All seeded records are explicitly stamped with `dataSource: "sample"` and `aiAssessment.status = "sample_data"` so sample records are never confused with real AI analysis.
+
+### Safe Production Data Migration
+For existing deployments where seed records were initialized previously, an idempotent migration updates sample project image pointers to `/test-assets/` without dropping or resetting collections:
+```bash
+npm run migrate:images --prefix server
+```
+This migration matches only records with `dataSource: "sample"` and verified sample project titles, exports a timestamped backup before mutation, updates only `beforeImageUrl` and `afterImageUrl`, and is completely safe to rerun. Real user/government data is never modified.
 
 ---
 

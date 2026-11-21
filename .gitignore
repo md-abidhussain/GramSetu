@@ -58,4 +58,7 @@ client/playwright-report/
 
 # Python tool caches
 .pytest_cache/
+
+# Migration backups
+server/data/backups/
 .ruff_cache/
