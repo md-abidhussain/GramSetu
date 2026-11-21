@@ -142,17 +142,17 @@ GramSetu is actively deployed at **https://gramsetu-india.vercel.app** with live
 
 | Citizen Sign-in & Quick Demo Access | Official Oversight Dashboard |
 | :---: | :---: |
-| ![Sign-in with Demo Access](docs/screenshots/verification/01-deployed-login.png) | ![Official Dashboard](docs/screenshots/verification/02-deployed-dashboard.png) |
+| <img src="docs/screenshots/verification/01-deployed-login.png" width="360" alt="Sign-in with Demo Access" /> | <img src="docs/screenshots/verification/02-deployed-dashboard.png" width="360" alt="Official Oversight Dashboard" /> |
 | *Role-based authentication with one-click demo credentials for instant evaluator inspection.* | *Consolidated district telemetry showing active works, regional map pins, and risk distribution.* |
 
 | Contractor Performance Registry | Contractor Deep-Dive Analysis View |
 | :---: | :---: |
-| ![Contractor Registry](docs/screenshots/verification/03-deployed-contractors.png) | ![Contractor Analysis](docs/screenshots/verification/04-deployed-contractor-analysis.png) |
+| <img src="docs/screenshots/verification/03-deployed-contractors.png" width="360" alt="Contractor Registry" /> | <img src="docs/screenshots/verification/04-deployed-contractor-analysis.png" width="360" alt="Contractor Analysis" /> |
 | *Corporate civil registry tracking verified engineering credentials, contacts, and trust scores.* | *Historical project delivery outcomes, work distribution charts, and citizen audit remarks.* |
 
 | Civil Infrastructure Projects Monitoring | Citizen Grievance Ground Verification |
 | :---: | :---: |
-| ![Project Monitoring](docs/screenshots/verification/05-deployed-projects.png) | ![Citizen Verification](docs/screenshots/verification/06-deployed-citizen-verify.png) |
+| <img src="docs/screenshots/verification/05-deployed-projects.png" width="360" alt="Project Monitoring" /> | <img src="docs/screenshots/verification/06-deployed-citizen-verify.png" width="360" alt="Citizen Verification" /> |
 | *Photographic before-and-after audit ledger with AI completion scores and lifecycle tracking.* | *Closed-loop citizen reporting with GPS tagging, YOLOv8 defect detection, and inspector dispatch.* |
 
 ---
