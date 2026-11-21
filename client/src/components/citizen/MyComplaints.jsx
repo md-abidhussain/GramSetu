@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card.jsx';
 import { formatDate } from '../../lib/formatDate.js';
 import { FileText, MapPin, Clock, UserCheck, Calendar, CheckCircle2, ListFilter } from 'lucide-react';
 import { defectLabel, hasAiResult } from '../../lib/aiStatus.js';
-import { apiUrl } from '../../services/api.js';
+import { downloadFileBlob } from '../../services/api.js';
 import { AiStatusNote, SampleDataBadge } from '../ui/AiStatusNote.jsx';
 import { clickable } from '../../lib/a11y.js';
 import ProjectImage from '../ui/ProjectImage.jsx';
@@ -117,7 +117,7 @@ export const MyComplaints = ({ complaints: myComplaints, loading: loadingComplai
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-xs text-slate-600">Complaint ID: #{selectedComplaint._id.toString().slice(-6).toUpperCase()}</span>
                     <button
-                      onClick={() => window.open(apiUrl(`/citizen-reports/${selectedComplaint._id}/report`), '_blank', 'noopener')}
+                      onClick={() => downloadFileBlob(`/citizen-reports/${selectedComplaint._id}/report`, `citizen-report-${selectedComplaint._id}.pdf`)}
                       className="inline-flex items-center gap-1 px-2 py-0.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-semibold rounded text-slate-700 transition-colors"
                     >
                       <FileText className="h-3 w-3 text-slate-600" /> Export PDF

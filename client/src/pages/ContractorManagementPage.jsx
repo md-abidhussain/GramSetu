@@ -6,6 +6,7 @@ import { Button } from '../components/ui/Button.jsx';
 import { createContractor, getContractors } from '../services/contractorService.js';
 import { Search, PlusCircle, Building2, Mail, Phone, MapPin, ShieldCheck, Briefcase, FileText, BadgeCheck, ArrowRight } from 'lucide-react';
 import { clickable } from '../lib/a11y.js';
+import { resolveContractorProfile } from '../data/contractorProfiles.js';
 
 const initialForm = {
   name: '',
@@ -100,35 +101,38 @@ export const ContractorManagementPage = () => {
               <p className="text-sm text-slate-500">No contractor records available.</p>
             ) : (
               <div className="space-y-3 max-h-[540px] overflow-y-auto pr-1">
-                {filteredContractors.map((contractor) => (
-                  <div
-                    key={contractor._id}
-                    {...clickable(() => navigate(`/contractors-analysis?id=${contractor._id}`))}
-                    aria-label={`View performance analysis for ${contractor.name}`}
-                    className="group rounded-2xl border border-slate-200 bg-slate-50/70 p-4 transition-all duration-150 hover:border-brand-500 hover:bg-brand-50/20 hover:shadow-sm cursor-pointer"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="font-semibold text-dark-800 group-hover:text-brand-700 transition-colors">{contractor.name}</p>
-                        <p className="text-sm text-slate-600">{contractor.registrationId}</p>
+                {filteredContractors.map((rawContractor) => {
+                  const contractor = resolveContractorProfile(rawContractor);
+                  return (
+                    <div
+                      key={contractor._id}
+                      {...clickable(() => navigate(`/contractors-analysis?id=${contractor._id}`))}
+                      aria-label={`View performance analysis for ${contractor.name}`}
+                      className="group rounded-2xl border border-slate-200 bg-slate-50/70 p-4 transition-all duration-150 hover:border-brand-500 hover:bg-brand-50/20 hover:shadow-sm cursor-pointer"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="font-semibold text-dark-800 group-hover:text-brand-700 transition-colors">{contractor.name}</p>
+                          <p className="text-sm text-slate-600">{contractor.registrationId}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                            {contractor.performanceScore}% trust
+                          </span>
+                          <span className="inline-flex items-center gap-1 text-xs font-semibold text-brand-700 group-hover:translate-x-0.5 transition-transform">
+                            Details <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
-                          {contractor.performanceScore}% trust
-                        </span>
-                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-brand-700 group-hover:translate-x-0.5 transition-transform">
-                          Details <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-                        </span>
+                      <div className="mt-3 grid gap-2 text-xs text-slate-600 sm:grid-cols-2">
+                        <div className="flex items-center gap-2"><Mail className="h-3.5 w-3.5 text-slate-400" /> {contractor.contactEmail || 'No email'}</div>
+                        <div className="flex items-center gap-2"><Phone className="h-3.5 w-3.5 text-slate-400" /> {contractor.phone || 'No phone'}</div>
+                        <div className="flex items-center gap-2"><MapPin className="h-3.5 w-3.5 text-slate-400" /> {contractor.address || 'No address'}</div>
+                        <div className="flex items-center gap-2"><ShieldCheck className="h-3.5 w-3.5 text-slate-400" /> {contractor.expertise || 'No specialization'}</div>
                       </div>
                     </div>
-                    <div className="mt-3 grid gap-2 text-xs text-slate-600 sm:grid-cols-2">
-                      <div className="flex items-center gap-2"><Mail className="h-3.5 w-3.5 text-slate-400" /> {contractor.contactEmail || 'No email'}</div>
-                      <div className="flex items-center gap-2"><Phone className="h-3.5 w-3.5 text-slate-400" /> {contractor.phone || 'No phone'}</div>
-                      <div className="flex items-center gap-2"><MapPin className="h-3.5 w-3.5 text-slate-400" /> {contractor.address || 'No address'}</div>
-                      <div className="flex items-center gap-2"><ShieldCheck className="h-3.5 w-3.5 text-slate-400" /> {contractor.expertise || 'No specialization'}</div>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </CardContent>

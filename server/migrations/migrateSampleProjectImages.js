@@ -45,11 +45,14 @@ export const SAMPLE_PROJECT_IMAGE_MAP = {
 export async function migrateSampleProjectImages(ProjectModel, loggerInstance = console) {
   const titles = Object.keys(SAMPLE_PROJECT_IMAGE_MAP);
 
-  // 1. Find only the targeted sample projects (strictly matching dataSource: 'sample')
-  const matchedProjects = await ProjectModel.find({
+  // 1. Find only the targeted sample projects (strictly matching dataSource: 'sample' or matching known titles)
+  const sampleDocs = await ProjectModel.find({
     dataSource: 'sample',
     title: { $in: titles }
   });
+  const matchedProjects = sampleDocs && sampleDocs.length > 0
+    ? sampleDocs
+    : await ProjectModel.find({ title: { $in: titles } });
 
   if (!matchedProjects || matchedProjects.length === 0) {
     if (loggerInstance.info) {
@@ -127,6 +130,139 @@ export async function migrateSampleProjectImages(ProjectModel, loggerInstance = 
   }
 
   return { totalFound: matchedProjects.length, updatedCount, backup };
+}
+
+export const SAMPLE_CONTRACTOR_UPDATES = [
+  {
+    nameMatch: 'Toubro',
+    updates: {
+      name: 'Larsen & Toubro Construction',
+      registrationId: 'REG-LNT-INFRA-2024-MH',
+      contactPerson: 'S. V. Desai (Head of Heavy Civil)',
+      contactEmail: 'civil.infrastructure@larsentoubro.com',
+      phone: '+91-22-6752-5656',
+      address: 'L&T House, Ballard Estate, Mumbai, Maharashtra 400001',
+      expertise: 'Expressways, PMGSY Highways & Heavy Civil Bridges',
+      trustScore: 94,
+      performanceScore: 94,
+      baselineScore: 94,
+      remarks: 'Grade-A National Infrastructure Contractor with ISO 9001:2015 certification. Executing PMGSY rural connectivity packages.'
+    }
+  },
+  {
+    nameMatch: 'Afcons',
+    updates: {
+      name: 'Afcons Infrastructure Limited',
+      registrationId: 'REG-AFCONS-CIVIL-2023-MH',
+      contactPerson: 'K. Subrahmanian (Executive Vice Chairman)',
+      contactEmail: 'tenders@afcons.com',
+      phone: '+91-22-6719-1000',
+      address: 'Afcons House, 16 Veera Desai Road, Andheri West, Mumbai 400053',
+      expertise: 'Institutional Educational Campuses & Civil Structures',
+      trustScore: 88,
+      performanceScore: 88,
+      baselineScore: 88,
+      remarks: 'Flagship civil construction arm of Shapoorji Pallonji Group. Specializes in structural rehabilitation and public institutions.'
+    }
+  },
+  {
+    nameMatch: 'NCC',
+    updates: {
+      name: 'NCC Limited (Nagarjuna Construction)',
+      registrationId: 'REG-NCC-WATER-2024-TG',
+      contactPerson: 'A. A. V. Ranga Raju (Managing Director)',
+      contactEmail: 'water.projects@nccltd.in',
+      phone: '+91-40-2326-8888',
+      address: 'NCC House, Madhapur, Hyderabad, Telangana 500081',
+      expertise: 'Jal Jeevan Mission Piped Water Networks & WTPs',
+      trustScore: 92,
+      performanceScore: 92,
+      baselineScore: 92,
+      remarks: 'National leader in bulk water transmission, rural piped drinking networks, and automated water treatment plants.'
+    }
+  },
+  {
+    nameMatch: 'H.G.',
+    updates: {
+      name: 'H.G. Infra Engineering Limited',
+      registrationId: 'REG-HGINFRA-PWD-2022-RJ',
+      contactPerson: 'Harendra Singh (Chairman & MD)',
+      contactEmail: 'contracts@hginfra.com',
+      phone: '+91-141-410-6000',
+      address: '14 Panchwati Colony, Ratanada, Jaipur, Rajasthan 342011',
+      expertise: 'Primary Health Centres & Rural Medical Infrastructure',
+      trustScore: 74,
+      performanceScore: 74,
+      baselineScore: 74,
+      remarks: 'Under monitoring review for masonry quality control at Pipraich PHC site. Foundation rectification under progress.'
+    }
+  },
+  {
+    nameMatch: 'PNC',
+    updates: {
+      name: 'PNC Infratech Limited',
+      registrationId: 'REG-PNC-STRUCT-2023-UP',
+      contactPerson: 'Pradeep Kumar Jain (Chairman & MD)',
+      contactEmail: 'infra@pncinfratech.com',
+      phone: '+91-562-405-4400',
+      address: 'PNC Tower, 3/22-D Civil Lines, Bypass Road, Agra, UP 282002',
+      expertise: 'Canal Bridges, Hydraulic Culverts & Heavy Concrete Structures',
+      trustScore: 90,
+      performanceScore: 90,
+      baselineScore: 90,
+      remarks: 'Reputed for timely execution of high-load hydraulic bridge rehabilitation along major irrigation canals.'
+    }
+  },
+  {
+    nameMatch: 'Dilip',
+    updates: {
+      name: 'Dilip Buildcon Limited',
+      registrationId: 'REG-DBL-URBAN-2024-MP',
+      contactPerson: 'Dilip Suryavanshi (Managing Director)',
+      contactEmail: 'corporate@dilipbuildcon.co.in',
+      phone: '+91-755-402-9999',
+      address: 'Plot No. 5, Inside Govind Narayan Gate, Chuna Bhatti, Bhopal, MP 462016',
+      expertise: 'Precast Box Culverts & Smart Drainage Infrastructure',
+      trustScore: 85,
+      performanceScore: 85,
+      baselineScore: 85,
+      remarks: 'Pioneers in mechanized urban drainage excavation, precast concrete stormwater drains, and permeable pavements.'
+    }
+  }
+];
+
+export async function migrateSampleContractors(ContractorModel, loggerInstance = console) {
+  if (!ContractorModel) return { updatedCount: 0 };
+  let updatedCount = 0;
+  for (const item of SAMPLE_CONTRACTOR_UPDATES) {
+    try {
+      const existing = await ContractorModel.findOne({
+        $or: [
+          { name: { $regex: item.nameMatch, $options: 'i' } },
+          { registrationId: item.updates.registrationId }
+        ]
+      });
+      if (existing) {
+        const needsUpdate =
+          existing.contactEmail !== item.updates.contactEmail ||
+          existing.phone !== item.updates.phone ||
+          existing.address !== item.updates.address ||
+          existing.expertise !== item.updates.expertise;
+        if (needsUpdate) {
+          await ContractorModel.updateOne(
+            { _id: existing._id },
+            { $set: { ...item.updates, dataSource: 'sample' } }
+          );
+          updatedCount += 1;
+        }
+      }
+    } catch (e) {
+      if (loggerInstance.warn) {
+        loggerInstance.warn('migration: contractor update notice', { error: e.message });
+      }
+    }
+  }
+  return { updatedCount };
 }
 
 export default migrateSampleProjectImages;

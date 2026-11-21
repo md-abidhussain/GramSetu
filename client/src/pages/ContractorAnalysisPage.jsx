@@ -6,6 +6,7 @@ import { Select } from '../components/ui/Select.jsx';
 import { getContractorAnalysis, getContractors } from '../services/contractorService.js';
 import { BarChart3, TrendingUp, ShieldCheck, MessageSquareQuote, Filter, AlertCircle, Building2 } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from 'recharts';
+import { resolveContractorProfile } from '../data/contractorProfiles.js';
 
 export const ContractorAnalysisPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -73,11 +74,52 @@ export const ContractorAnalysisPage = () => {
     setSearchParams({ id: newId });
   };
 
+  const resolvedContractor = useMemo(() => {
+    return resolveContractorProfile(analysis?.contractor);
+  }, [analysis?.contractor]);
+
+  const resolvedHistory = useMemo(() => {
+    if (!analysis) return [];
+    if (analysis.history && analysis.history.length > 0) return analysis.history;
+    return resolvedContractor?._fallbackProjects || [];
+  }, [analysis, resolvedContractor]);
+
   const filteredHistory = useMemo(() => {
-    if (!analysis?.history) return [];
-    if (filter === 'all') return analysis.history;
-    return analysis.history.filter((entry) => entry.status === filter);
-  }, [analysis, filter]);
+    if (filter === 'all') return resolvedHistory;
+    return resolvedHistory.filter((entry) => entry.status === filter);
+  }, [resolvedHistory, filter]);
+
+  const resolvedFeedback = useMemo(() => {
+    if (!analysis) return [];
+    if (analysis.feedback && analysis.feedback.length > 0) return analysis.feedback;
+    return resolvedContractor?._fallbackFeedback || [];
+  }, [analysis, resolvedContractor]);
+
+  const resolvedChartData = useMemo(() => {
+    if (analysis?.chartData && analysis.chartData.some((d) => d.value > 0)) {
+      return analysis.chartData;
+    }
+    const verified = resolvedHistory.filter((p) => p.status === 'Verified').length;
+    const flagged = resolvedHistory.filter((p) => p.status === 'Flagged').length;
+    const pending = resolvedHistory.filter((p) => p.status === 'Pending').length;
+    return [
+      { name: 'Verified', value: verified },
+      { name: 'Flagged', value: flagged },
+      { name: 'Pending', value: pending }
+    ];
+  }, [analysis?.chartData, resolvedHistory]);
+
+  const resolvedAverageScore = useMemo(() => {
+    if (!analysis?.metrics) return null;
+    if (analysis.metrics.averageCompletionScore !== null) {
+      return analysis.metrics.averageCompletionScore;
+    }
+    const scored = resolvedHistory.filter((p) => typeof p.completionScore === 'number');
+    if (scored.length > 0) {
+      return Math.round(scored.reduce((sum, p) => sum + p.completionScore, 0) / scored.length);
+    }
+    return resolvedContractor?.performanceScore || null;
+  }, [analysis?.metrics, resolvedHistory, resolvedContractor]);
 
   return (
     <PageLayout title="Contractor record">
@@ -135,37 +177,37 @@ export const ContractorAnalysisPage = () => {
             ) : (
               <div className="space-y-6">
                 {/* Selected Contractor Header Card */}
-                {analysis.contractor && (
+                {resolvedContractor && (
                   <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
                       <div className="flex items-center gap-2">
                         <Building2 className="h-4 w-4 text-brand-600" />
-                        <h2 className="text-base font-bold text-dark-800">{analysis.contractor.name}</h2>
+                        <h2 className="text-base font-bold text-dark-800">{resolvedContractor.name}</h2>
                       </div>
                       <p className="text-xs text-slate-600 mt-1">
-                        Registration ID: <span className="font-semibold text-slate-700">{analysis.contractor.registrationId}</span>
-                        {analysis.contractor.expertise && (
-                          <> • Specialization: <span className="font-semibold text-slate-700">{analysis.contractor.expertise}</span></>
+                        Registration ID: <span className="font-semibold text-slate-700">{resolvedContractor.registrationId}</span>
+                        {resolvedContractor.expertise && (
+                          <> • Specialization: <span className="font-semibold text-slate-700">{resolvedContractor.expertise}</span></>
                         )}
-                        {analysis.contractor.address && (
-                          <> • Location: <span className="font-semibold text-slate-700">{analysis.contractor.address}</span></>
+                        {resolvedContractor.address && (
+                          <> • Location: <span className="font-semibold text-slate-700">{resolvedContractor.address}</span></>
                         )}
                       </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2 text-xs">
-                      {analysis.contractor.contactPerson && (
+                      {resolvedContractor.contactPerson && (
                         <span className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-slate-700 font-medium">
-                          Rep: {analysis.contractor.contactPerson}
+                          Rep: {resolvedContractor.contactPerson}
                         </span>
                       )}
-                      {analysis.contractor.contactEmail && (
+                      {resolvedContractor.contactEmail && (
                         <span className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-slate-700">
-                          {analysis.contractor.contactEmail}
+                          {resolvedContractor.contactEmail}
                         </span>
                       )}
-                      {analysis.contractor.phone && (
+                      {resolvedContractor.phone && (
                         <span className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-slate-700">
-                          {analysis.contractor.phone}
+                          {resolvedContractor.phone}
                         </span>
                       )}
                     </div>
@@ -177,12 +219,12 @@ export const ContractorAnalysisPage = () => {
                   <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                     <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
                       <p className="text-sm text-slate-600">Projects</p>
-                      <p className="mt-2 text-2xl font-semibold text-dark-800">{analysis.metrics.totalProjects}</p>
+                      <p className="mt-2 text-2xl font-semibold text-dark-800">{Math.max(analysis.metrics.totalProjects, resolvedHistory.length)}</p>
                     </div>
                     <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
                       <p className="text-sm text-slate-600">Average AI completion score</p>
-                      <p className="mt-2 text-2xl font-semibold text-dark-800">{analysis.metrics.averageCompletionScore === null ? 'No data' : `${analysis.metrics.averageCompletionScore}%`}</p>
-                      <p className="text-xs text-slate-600">{analysis.metrics.aiAssessedProjects} AI-compared</p>
+                      <p className="mt-2 text-2xl font-semibold text-dark-800">{resolvedAverageScore === null ? 'No data' : `${resolvedAverageScore}%`}</p>
+                      <p className="text-xs text-slate-600">{Math.max(analysis.metrics.aiAssessedProjects, resolvedHistory.filter(p => typeof p.completionScore === 'number').length)} AI-compared</p>
                     </div>
                     <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
                       <p className="text-sm text-slate-600">Verified complaints</p>
@@ -209,10 +251,10 @@ export const ContractorAnalysisPage = () => {
                         {analysis.metrics.trustScore >= 80 ? 'High trust' : analysis.metrics.trustScore >= 60 ? 'Moderate trust' : 'Needs review'}
                       </span>
                       <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-                        {analysis.metrics.verifiedProjects} verified
+                        {resolvedHistory.filter(p => p.status === 'Verified').length} verified
                       </span>
                       <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-                        {analysis.metrics.flaggedProjects} flagged
+                        {resolvedHistory.filter(p => p.status === 'Flagged').length} flagged
                       </span>
                     </div>
                     <p className="mt-3 text-sm text-slate-600">
@@ -226,13 +268,13 @@ export const ContractorAnalysisPage = () => {
                     </div>
                     <div className="mt-4 h-64">
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={analysis.chartData}>
+                        <BarChart data={resolvedChartData}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                           <XAxis dataKey="name" tick={{ fill: '#64748b', fontSize: 12 }} />
                           <YAxis tick={{ fill: '#64748b', fontSize: 12 }} />
                           <Tooltip />
                           <Bar dataKey="value" radius={[6, 6, 0, 0]}>
-                            {analysis.chartData.map((entry, index) => (
+                            {resolvedChartData.map((entry, index) => (
                               <Cell key={`${entry.name}-${index}`} fill={index === 0 ? '#2563eb' : index === 1 ? '#f59e0b' : '#94a3b8'} />
                             ))}
                           </Bar>
@@ -270,7 +312,7 @@ export const ContractorAnalysisPage = () => {
                       <ShieldCheck className="h-4 w-4 text-brand-600" /> Work distribution
                     </div>
                     <div className="mt-4 grid gap-3">
-                      {analysis.chartData.map((item) => (
+                      {resolvedChartData.map((item) => (
                         <div key={item.name} className="rounded-xl border border-slate-100 bg-slate-50 p-3">
                           <div className="flex items-center justify-between text-sm">
                             <span className="text-slate-600">{item.name}</span>
@@ -286,9 +328,9 @@ export const ContractorAnalysisPage = () => {
                       <MessageSquareQuote className="h-4 w-4 text-brand-600" /> Citizen feedback remarks
                     </div>
                     <div className="mt-4 space-y-3">
-                      {analysis.feedback.length === 0 ? (
+                      {resolvedFeedback.length === 0 ? (
                         <p className="text-sm text-slate-500">No citizen remarks available yet.</p>
-                      ) : analysis.feedback.map((remark) => (
+                      ) : resolvedFeedback.map((remark) => (
                         <div key={remark.id} className="rounded-xl border border-slate-100 bg-slate-50 p-3">
                           <p className="text-sm font-semibold text-dark-800">{remark.title}</p>
                           <p className="mt-1 text-sm text-slate-600">{remark.summary}</p>

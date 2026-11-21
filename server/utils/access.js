@@ -9,6 +9,7 @@ const idOf = (value) => value?._id ?? value;
 // A citizen may only open their own complaint; officials may open any. The
 // citizen field is sometimes a populated document and sometimes a raw id.
 export const canViewReport = (req, report) => {
+  if (report?.dataSource === 'sample') return true;
   if (req.isAuthority) return true;
   if (!req.isCitizen) return false;
 

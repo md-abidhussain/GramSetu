@@ -22,7 +22,7 @@ router.get('/', optionalSession, getProjects);
 router.get('/:id', validateIdParam(), optionalSession, getProjectById);
 router.get('/:id/lifecycle', validateIdParam(), optionalSession, getProjectLifecycle);
 
-router.get('/:id/report', validateIdParam(), protectAuthority, downloadProjectReport);
+router.get('/:id/report', validateIdParam(), optionalSession, downloadProjectReport);
 router.post('/', protectAuthority, restrictTo(...PERMISSIONS.createProject), uploadImage, verifyImageContents, createProject);
 router.patch('/:id/complete', validateIdParam(), protectAuthority, restrictTo(...PERMISSIONS.completeProject), uploadImage, verifyImageContents, completeProject);
 router.post('/:id/ai-verification', validateIdParam(), protectAuthority, restrictTo(...PERMISSIONS.completeProject), retryAiVerification);

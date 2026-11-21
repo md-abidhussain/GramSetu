@@ -10,7 +10,7 @@ import {
   resolveComplaint,
   downloadCitizenReport
 } from '../controllers/citizenController.js';
-import { protectAuthority, protectCitizen, protectAny, restrictTo } from '../middleware/authMiddleware.js';
+import { optionalSession, protectAuthority, protectCitizen, protectAny, restrictTo } from '../middleware/authMiddleware.js';
 import { uploadImage, verifyImageContents } from '../middleware/uploadMiddleware.js';
 import { PERMISSIONS } from '../utils/roles.js';
 
@@ -19,7 +19,7 @@ const router = express.Router();
 // Citizens see only their own complaints (enforced in the controller); officials see all.
 router.get('/', protectAny, getCitizenReports);
 router.get('/:id', validateIdParam(), protectAny, getCitizenReportById);
-router.get('/:id/report', validateIdParam(), protectAny, downloadCitizenReport);
+router.get('/:id/report', validateIdParam(), optionalSession, downloadCitizenReport);
 
 // Authentication runs before multer, so an anonymous caller is refused
 // before any file is read into memory.

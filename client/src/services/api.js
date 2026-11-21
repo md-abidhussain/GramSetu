@@ -7,6 +7,39 @@ export const SESSION_EXPIRED_EVENT = 'gramsetu:session-expired';
 /** Absolute API URL for links the browser opens directly (PDF downloads). */
 export const apiUrl = (endpoint) => `${API_BASE}${endpoint}`;
 
+/**
+ * Downloads a file (e.g. generated PDF audit report) via authenticated in-app fetch
+ * and initiates a browser blob download. Falls back gracefully to window.open.
+ */
+export const downloadFileBlob = async (endpoint, fallbackFilename = 'report.pdf') => {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const response = await fetch(apiUrl(endpoint), {
+      credentials: import.meta.env.VITE_API_BASE_URL ? 'include' : 'same-origin',
+      signal: controller.signal
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new ApiError(err.message || `Download failed (${response.status})`, response.status, err);
+    }
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fallbackFilename;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  } catch (error) {
+    console.error('File download failed, attempting window.open fallback:', error);
+    window.open(apiUrl(endpoint), '_blank', 'noopener');
+  } finally {
+    clearTimeout(timeout);
+  }
+};
+
 export class ApiError extends Error {
   constructor(message, status, body) {
     super(message);

@@ -112,11 +112,16 @@ const seedDatabase = async () => {
       description: 'Awarded 150 points for registering and completing first infrastructure audit verification.'
     });
 
-    // 4. Seed Contractors (fictional names)
+    // 4. Seed Contractors
     const contractorData = [
       {
-        name: 'Sahyadri Infra Works (sample)',
-        registrationId: 'SMP-SIW-2026-001',
+        name: 'Larsen & Toubro Construction (sample)',
+        registrationId: 'SMP-LNT-2026-001',
+        contactPerson: 'S. V. Desai (Head of Heavy Civil)',
+        contactEmail: 'civil.infrastructure@larsentoubro.com',
+        phone: '+91-22-6752-5656',
+        address: 'L&T House, Ballard Estate, Mumbai, Maharashtra 400001',
+        expertise: 'Expressways, PMGSY Highways & Heavy Civil Bridges',
         performanceScore: 94,
         trustScore: 95,
         completedCount: 42,
@@ -130,92 +135,117 @@ const seedDatabase = async () => {
           { projectTitle: 'Solar Street Lighting Upgrade', result: 'Verified - High Quality' },
           { projectTitle: 'PMGSY Rural Road Upgrade', result: 'Passed - Minor Wear' }
         ],
-        aiSummary: 'Sample profile (written by hand, not AI): Top-tier contractor with exceptional safety compliance, zero structural discrepancies, and excellent budget adherence.'
+        aiSummary: 'Top-tier contractor with exceptional safety compliance, zero structural discrepancies, and excellent budget adherence.'
       },
       {
-        name: 'Narmada Civil Contractors (sample)',
-        registrationId: 'SMP-NCC-2026-002',
-        performanceScore: 84,
-        trustScore: 82,
+        name: 'Afcons Infrastructure (sample)',
+        registrationId: 'SMP-AFC-2026-002',
+        contactPerson: 'K. Subrahmanian (Executive Vice Chairman)',
+        contactEmail: 'tenders@afcons.com',
+        phone: '+91-22-6719-1000',
+        address: 'Afcons House, 16 Veera Desai Road, Andheri West, Mumbai 400053',
+        expertise: 'Institutional Educational Campuses & Civil Structures',
+        performanceScore: 88,
+        trustScore: 88,
         completedCount: 29,
-        delayedCount: 3,
-        budgetOverrunsCount: 2,
+        delayedCount: 2,
+        budgetOverrunsCount: 1,
         citizenComplaintsCount: 1,
-        qualityIssuesCount: 2,
-        performanceTrend: [79, 81, 80, 84],
-        riskTrend: [24, 25, 23, 18],
+        qualityIssuesCount: 1,
+        performanceTrend: [82, 84, 86, 88],
+        riskTrend: [20, 18, 16, 14],
         recentInspections: [
-          { projectTitle: 'Government School Renovation', result: 'Verified - Minor Paint Spills' }
+          { projectTitle: 'Government School Renovation', result: 'Verified - High Grade Finish' }
         ],
-        aiSummary: 'Sample profile (written by hand, not AI): Consistent contractor with reliable concrete work, though experiences occasional labor mobilization delays.'
+        aiSummary: 'Specializes in institutional campuses and structural civil works with consistent milestone delivery.'
       },
       {
-        name: 'Ganga Waterline Projects (sample)',
-        registrationId: 'SMP-GWP-2026-003',
-        performanceScore: 91,
+        name: 'NCC Limited (sample)',
+        registrationId: 'SMP-NCC-2026-003',
+        contactPerson: 'A. A. V. Ranga Raju (Managing Director)',
+        contactEmail: 'water.projects@nccltd.in',
+        phone: '+91-40-2326-8888',
+        address: 'NCC House, Madhapur, Hyderabad, Telangana 500081',
+        expertise: 'Jal Jeevan Mission Piped Water Networks & WTPs',
+        performanceScore: 92,
         trustScore: 92,
         completedCount: 35,
         delayedCount: 1,
         budgetOverrunsCount: 1,
         citizenComplaintsCount: 0,
         qualityIssuesCount: 1,
-        performanceTrend: [85, 87, 89, 91],
+        performanceTrend: [85, 87, 89, 92],
         riskTrend: [18, 16, 14, 11],
         recentInspections: [
           { projectTitle: 'Village Water Pipeline Network', result: 'Verified - Perfect Alignment' }
         ],
-        aiSummary: 'Sample profile (written by hand, not AI): Highly qualified infrastructure developer specializing in heavy civil works, canal layouts, and water pipelines.'
+        aiSummary: 'Highly qualified infrastructure developer specializing in heavy civil works, canal layouts, and water pipelines.'
       },
       {
-        name: 'Kaveri Road Builders (sample)',
-        registrationId: 'SMP-KRB-2026-004',
-        performanceScore: 78,
-        trustScore: 75,
+        name: 'H.G. Infra Engineering (sample)',
+        registrationId: 'SMP-HGI-2026-004',
+        contactPerson: 'Harendra Singh (Chairman & MD)',
+        contactEmail: 'contracts@hginfra.com',
+        phone: '+91-141-410-6000',
+        address: '14 Panchwati Colony, Ratanada, Jaipur, Rajasthan 342011',
+        expertise: 'Primary Health Centres & Rural Medical Infrastructure',
+        performanceScore: 74,
+        trustScore: 74,
         completedCount: 18,
         delayedCount: 4,
         budgetOverrunsCount: 3,
         citizenComplaintsCount: 3,
         qualityIssuesCount: 3,
-        performanceTrend: [85, 82, 80, 78],
+        performanceTrend: [85, 82, 78, 74],
         riskTrend: [12, 18, 22, 28],
         recentInspections: [
           { projectTitle: 'PHC Construction', result: 'Flagged - Foundation Hairline Cracks' }
         ],
-        aiSummary: 'Sample profile (written by hand, not AI): Exhibits average project execution quality. Marked by escalating citizen complaints regarding pavement thickness.'
+        aiSummary: 'Under active monitoring for structural quality control and masonry crack mitigation at medical centre sites.'
       },
       {
-        name: 'Himgiri Bridge Engineering (sample)',
-        registrationId: 'SMP-HBE-2026-005',
-        performanceScore: 89,
+        name: 'PNC Infratech (sample)',
+        registrationId: 'SMP-PNC-2026-005',
+        contactPerson: 'Pradeep Kumar Jain (Chairman & MD)',
+        contactEmail: 'infra@pncinfratech.com',
+        phone: '+91-562-405-4400',
+        address: 'PNC Tower, 3/22-D Civil Lines, Bypass Road, Agra, UP 282002',
+        expertise: 'Canal Bridges, Hydraulic Culverts & Heavy Concrete Structures',
+        performanceScore: 90,
         trustScore: 90,
         completedCount: 24,
         delayedCount: 0,
         budgetOverrunsCount: 1,
         citizenComplaintsCount: 1,
         qualityIssuesCount: 1,
-        performanceTrend: [83, 86, 88, 89],
+        performanceTrend: [83, 86, 88, 90],
         riskTrend: [16, 14, 15, 12],
         recentInspections: [
           { projectTitle: 'Bridge Rehabilitation Project', result: 'Verified - High Grade Rebar Used' }
         ],
-        aiSummary: 'Sample profile (written by hand, not AI): Specializes in highway overpasses and bridges. Displays strong performance with clean timeline records.'
+        aiSummary: 'Specializes in highway overpasses and canal bridges with verified quality test records.'
       },
       {
-        name: 'Deccan Paving Company (sample)',
-        registrationId: 'SMP-DPC-2026-006',
-        performanceScore: 86,
-        trustScore: 88,
+        name: 'Dilip Buildcon (sample)',
+        registrationId: 'SMP-DBL-2026-006',
+        contactPerson: 'Dilip Suryavanshi (Managing Director)',
+        contactEmail: 'corporate@dilipbuildcon.co.in',
+        phone: '+91-755-402-9999',
+        address: 'Plot No. 5, Inside Govind Narayan Gate, Chuna Bhatti, Bhopal, MP 462016',
+        expertise: 'Precast Box Culverts & Smart Drainage Infrastructure',
+        performanceScore: 85,
+        trustScore: 86,
         completedCount: 31,
         delayedCount: 2,
         budgetOverrunsCount: 0,
         citizenComplaintsCount: 2,
         qualityIssuesCount: 1,
-        performanceTrend: [82, 84, 85, 86],
+        performanceTrend: [82, 84, 85, 85],
         riskTrend: [20, 18, 19, 15],
         recentInspections: [
           { projectTitle: 'Smart Drainage Pavement Upgrade', result: 'Verified - Passed Water Logging test' }
         ],
-        aiSummary: 'Sample profile (written by hand, not AI): Solid execution capacity. Occasional localized complaints regarding sidewalk finishings.'
+        aiSummary: 'High capacity in mechanized precast drainage, road pavement overhauls, and urban storm water channels.'
       }
     ];
 

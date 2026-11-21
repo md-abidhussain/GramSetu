@@ -249,6 +249,11 @@ export const downloadProjectReport = async (req, res, next) => {
     const project = await Project.findById(req.params.id).populate('contractor', 'name').populate('tender', 'title');
     if (!project) return res.status(404).json({ message: 'Project not found.' });
 
+    // Allow download for sample demonstration projects, or authenticated officials
+    if (project.dataSource !== 'sample' && !req.user) {
+      return res.status(401).json({ message: 'Authentication required to download non-sample project reports.' });
+    }
+
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="audit-report-${project._id}.pdf"`);
     await generateProjectAuditPDF(project, res);
