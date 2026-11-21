@@ -1,6 +1,7 @@
 import test, { describe } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import path from 'node:path';
 
 describe('Seed Data Integrity', () => {
   const seedFile = fs.readFileSync(new URL('../../data/seedDatabase.js', import.meta.url), 'utf8');
@@ -29,7 +30,7 @@ describe('Seed Data Integrity', () => {
     assert.match(seedFile, /userModel:\s*'Citizen'/);
   });
 
-  test('all project image entries in projectsData use valid https URLs, relative paths, or null for unuploaded stages', () => {
+  test('all project image entries in projectsData reference existing files in test-assets or valid https', () => {
     // Extract the projectsData array slice from seedDatabase.js
     const projectsDataSlice = seedFile.slice(seedFile.indexOf('const projectsData = ['), seedFile.indexOf('const projects = [];'));
     const imageMatches = [...projectsDataSlice.matchAll(/(beforeImageUrl|afterImageUrl):\s*([^,\n]+)/g)];
@@ -39,9 +40,13 @@ describe('Seed Data Integrity', () => {
       const trimmed = value.trim().replace(/['"]/g, '');
       if (trimmed !== 'null') {
         assert.ok(
-          trimmed.startsWith('https://') || trimmed.startsWith('/'),
-          `${field} must be a valid https URL or relative path, got: ${trimmed}`
+          trimmed.startsWith('https://') || trimmed.startsWith('/test-assets/'),
+          `${field} must be a valid https URL or /test-assets/ path, got: ${trimmed}`
         );
+        if (trimmed.startsWith('/test-assets/')) {
+          const localFile = new URL(`../../../test-assets/${path.basename(trimmed)}`, import.meta.url);
+          assert.ok(fs.existsSync(localFile), `Local asset must exist on disk: ${trimmed}`);
+        }
       }
     }
   });

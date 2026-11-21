@@ -233,8 +233,8 @@ const seedDatabase = async () => {
         contractor: contractors[0]._id, // sample contractor
         riskLevel: 'Low',
         location: { lat: 25.3176, lng: 82.9739, address: 'Rohaniya Block Link Rd, Varanasi, UP' },
-        beforeImageUrl: '/samples/roadDamage/road-repair-before.jpg',
-        afterImageUrl: '/samples/roadDamage/road-repair-after.jpg',
+        beforeImageUrl: '/test-assets/project-1-road-before.jpg',
+        afterImageUrl: '/test-assets/project-1-road-after.jpg',
         completionScore: 92,
         projectHealth: 'Healthy',
         healthPercentage: 96,
@@ -248,8 +248,8 @@ const seedDatabase = async () => {
         contractor: contractors[1]._id, // sample contractor
         riskLevel: 'Medium',
         location: { lat: 26.8467, lng: 80.9462, address: 'Vikas Nagar Central School, Lucknow, UP' },
-        beforeImageUrl: null,
-        afterImageUrl: null,
+        beforeImageUrl: '/test-assets/project-2-school-before.jpg',
+        afterImageUrl: '/test-assets/project-2-school-after.jpg',
         completionScore: 82,
         projectHealth: 'Healthy',
         healthPercentage: 85,
@@ -263,8 +263,8 @@ const seedDatabase = async () => {
         contractor: contractors[2]._id, // sample contractor
         riskLevel: 'Low',
         location: { lat: 25.4358, lng: 81.8463, address: 'Phaphamau Water Works, Prayagraj, UP' },
-        beforeImageUrl: null,
-        afterImageUrl: null,
+        beforeImageUrl: '/test-assets/project-3-pipeline-before.jpg',
+        afterImageUrl: '/test-assets/project-3-pipeline-after.jpg',
         completionScore: 94,
         projectHealth: 'Healthy',
         healthPercentage: 98,
@@ -278,8 +278,8 @@ const seedDatabase = async () => {
         contractor: contractors[3]._id, // sample contractor
         riskLevel: 'High',
         location: { lat: 26.7606, lng: 83.3731, address: 'Pipraich Main Health Centre, Gorakhpur, UP' },
-        beforeImageUrl: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800',
-        afterImageUrl: null,
+        beforeImageUrl: '/test-assets/project-4-healthcentre-before.jpg',
+        afterImageUrl: '/test-assets/project-4-healthcentre-after.jpg',
         completionScore: 68,
         projectHealth: 'At Risk',
         healthPercentage: 64,
@@ -293,8 +293,8 @@ const seedDatabase = async () => {
         contractor: contractors[4]._id, // sample contractor
         riskLevel: 'Low',
         location: { lat: 26.4499, lng: 80.3319, address: 'Ganga Canal PWD Bridge, Kanpur, UP' },
-        beforeImageUrl: null,
-        afterImageUrl: null,
+        beforeImageUrl: '/test-assets/project-5-bridge-before.jpg',
+        afterImageUrl: '/test-assets/project-5-bridge-after.jpg',
         completionScore: null,
         projectHealth: 'Healthy',
         healthPercentage: 100,
@@ -308,8 +308,8 @@ const seedDatabase = async () => {
         contractor: contractors[5]._id, // sample contractor
         riskLevel: 'Medium',
         location: { lat: 25.4484, lng: 78.5685, address: 'Civil Lines Road 4, Jhansi, UP' },
-        beforeImageUrl: null,
-        afterImageUrl: null,
+        beforeImageUrl: '/test-assets/project-6-drainage-before.jpg',
+        afterImageUrl: '/test-assets/project-6-drainage-after.jpg',
         completionScore: null,
         projectHealth: 'Healthy',
         healthPercentage: 100,
@@ -363,7 +363,7 @@ const seedDatabase = async () => {
     await CitizenReport.create({
       citizen: demoCitizen._id,
       project: projects[0]._id, // PMGSY Rural Road Upgrade
-      citizenImageUrl: '/samples/roadDamage/pothole-severe.jpg',
+      citizenImageUrl: '/test-assets/citizen-pothole.jpg',
       gps: { lat: 25.3176, lng: 82.9739 },
       description: 'Major road cracking and large pothole formed near the main junction of the road completed last week.',
       detectedIssues: ['crack', 'pothole'],
@@ -389,7 +389,7 @@ const seedDatabase = async () => {
     await CitizenReport.create({
       citizen: demoCitizen._id,
       project: projects[1]._id, // Solar Street Lighting Upgrade
-      citizenImageUrl: '/samples/roadDamage/surface-cracking.jpg',
+      citizenImageUrl: '/test-assets/citizen-surface-cracking.jpg',
       gps: { lat: 25.3185, lng: 82.9782 },
       description: 'Severe surface cracking and pavement degradation observed along the newly upgraded corridor.',
       detectedIssues: ['crack'],

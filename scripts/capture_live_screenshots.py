@@ -43,8 +43,8 @@ MOCK_PROJECTS = [
             "discrepancyFlag": False,
             "comparisonNotes": "Surface profile matches approved specifications. Drainage alignment confirmed."
         },
-        "beforeImage": "/samples/roadDamage/road-repair-before.jpg",
-        "afterImage": "/samples/roadDamage/road-repair-after.jpg",
+        "beforeImage": "/test-assets/project-1-road-before.jpg",
+        "afterImage": "/test-assets/project-1-road-after.jpg",
         "createdAt": "2026-08-15T10:00:00.000Z"
     },
     {
@@ -63,8 +63,8 @@ MOCK_PROJECTS = [
             "discrepancyFlag": True,
             "comparisonNotes": "Severe longitudinal cracking detected along chainage 1+200. Pavement thickness variance flagged."
         },
-        "beforeImage": "/samples/roadDamage/pothole-severe.jpg",
-        "afterImage": "/samples/roadDamage/surface-cracking.jpg",
+        "beforeImage": "/test-assets/citizen-pothole.jpg",
+        "afterImage": "/test-assets/citizen-surface-cracking.jpg",
         "createdAt": "2026-09-01T09:30:00.000Z"
     },
     {
@@ -89,7 +89,7 @@ MOCK_COMPLAINTS = [
         "description": "Deep edge pothole causing severe vehicle damage and water stagnation after rain.",
         "severity": "High",
         "status": "Inspector Assigned",
-        "imageUrl": "/samples/roadDamage/pothole-severe.jpg",
+        "imageUrl": "/test-assets/citizen-pothole.jpg",
         "segmentation": {
             "status": "completed",
             "defects": [
@@ -106,7 +106,7 @@ MOCK_COMPLAINTS = [
         "description": "Extensive cracking along the asphalt surface following culvert installation.",
         "severity": "Medium",
         "status": "Authority Notification",
-        "imageUrl": "/samples/roadDamage/surface-cracking.jpg",
+        "imageUrl": "/test-assets/citizen-surface-cracking.jpg",
         "segmentation": {
             "status": "completed",
             "defects": [

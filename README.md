@@ -2,7 +2,7 @@
 
 Public Infrastructure Monitoring and Citizen Reporting GovTech Platform.
 
-GramSetu improves transparency and accountability in public works through verified citizen reporting, automated road defect segmentation, and AI-assisted tender analysis.
+GramSetu improves transparency and accountability in public works through verified citizen reporting, automated road defect detection (YOLOv8 bounding boxes), and AI-assisted tender analysis.
 
 - Repository: https://github.com/md-abidhussain/GramSetu
 - Live Deployment: https://gramsetu-india.vercel.app
@@ -24,7 +24,7 @@ Public infrastructure management in local governance often suffers from several 
 - **Contractor Accountability**: Contractor reputations are rarely linked dynamically to past field performance or verified community defects.
 - **Tender Opacity**: Complex procurement documents make it challenging to audit compliance terms, timelines, and defect liability periods.
 
-GramSetu addresses these challenges by combining structured grievance state machines, objective computer vision defect segmentation, and large language model tender extraction into a verifiable audit trail.
+GramSetu addresses these challenges by combining structured grievance state machines, objective computer vision defect detection, and large language model tender extraction into a verifiable audit trail.
 
 ---
 
@@ -33,7 +33,7 @@ GramSetu addresses these challenges by combining structured grievance state mach
 - **Citizen Reporting**: Report civil defects with photographs, description, and GPS coordinates. Privacy is protected by automatically stripping EXIF and device metadata prior to storage.
 - **Closed-Loop Verification Engine**: Formal state machine for grievance tracking: `Submitted` -> `UnderReview` -> `InspectorAssigned` -> `Accepted` / `Rejected` -> `Resolved`.
 - **Incentive & Civic Points**: Verified complaints award civic reward points to citizens via idempotent database transactions to prevent double-crediting.
-- **Road Defect Detection Microservice**: Lightweight FastAPI service running a trained ONNX YOLO model to detect potholes, cracks, and open manholes. Every response is honestly categorized as `real_inference`, `demo_simulation`, or `model_unavailable` (HTTP 503).
+- **Road Defect Detection Microservice**: Lightweight FastAPI service running a trained YOLOv8 ONNX model to detect potholes, cracks, and open manholes via bounding boxes. Every response is honestly categorized as `real_inference`, `demo_simulation`, or `model_unavailable` (HTTP 503).
 - **Tender Intelligence with Gemini AI**: Structured extraction of tender liability periods, milestones, and penalty clauses from uploaded PDF documents with schema validation and fallback safety.
 - **Civil Infrastructure Lifecycle Tracking**: Milestone tracking from initial tender award to maintenance handover, disallowing arbitrary bypassing of required verification stages.
 - **Contractor Performance Scorecard**: Dynamic scoring (0 to 100) combining project delivery history and verified citizen grievances.
@@ -117,9 +117,9 @@ GramSetu/
 │   ├── inference.py            # Image decoding, YOLO ONNX inference, honest measurements
 │   ├── settings.py             # Pydantic environment configuration
 │   └── tests/                  # Pytest unit and integration test suites
-├── assets/                     # Demonstration and branding assets
-│   ├── branding/               # Vector brand assets, SVG logo, and icons
-│   └── samples/                # Curated demonstration road defects (potholes, cracks, before/after pairs) and tender PDFs
+├── assets/                     # Brand identity and visual assets
+│   └── branding/               # Vector brand assets, SVG logo, and icons
+├── test-assets/                # Single unified test folder: sample infrastructure images (before/after), defect photos, and tender PDFs
 ├── docs/                       # Technical architecture and compliance documentation
 │   ├── ARCHITECTURE.md         # Detailed architectural specification
 │   ├── SECURITY.md             # Security controls, session lifecycle, and risk mitigations
@@ -138,21 +138,19 @@ GramSetu/
 
 ## 7. Application Screenshots & Visual Evidence
 
-| Citizen Sign-in with Demo Access | Citizen Oversight Dashboard |
-| :---: | :---: |
-| ![Sign-in with Demo Access](docs/screenshots/login-demo-access.png) | ![Citizen Dashboard](docs/screenshots/citizen-dashboard.png) |
+The live deployment (https://gramsetu-india.vercel.app) has been verified end-to-end. Below are actual screenshots captured from the live deployed application:
 
-| Citizen Defect Reporting Form | Citizen Submitted Reports (My Reports) |
+| Citizen Sign-in & Quick Demo Access | Official Oversight Dashboard |
 | :---: | :---: |
-| ![New Report Form](docs/screenshots/citizen-new-report.png) | ![My Reports Tracking](docs/screenshots/citizen-my-reports.png) |
+| ![Sign-in with Demo Access](docs/screenshots/verification/01-deployed-login.png) | ![Official Dashboard](docs/screenshots/verification/02-deployed-dashboard.png) |
 
-| Official Oversight Dashboard | Tender Intelligence & Risk Extraction |
+| Contractor Performance Registry | Contractor Deep-Dive Analysis View |
 | :---: | :---: |
-| ![Official Dashboard](docs/screenshots/official-dashboard.png) | ![Tender Intelligence](docs/screenshots/tender-intelligence.png) |
+| ![Contractor Registry](docs/screenshots/verification/03-deployed-contractors.png) | ![Contractor Analysis](docs/screenshots/verification/04-deployed-contractor-analysis.png) |
 
-| Civil Infrastructure Lifecycle Monitoring | Mobile-First Citizen Reporting Interface |
+| Civil Infrastructure Projects Monitoring | Citizen Grievance Ground Verification |
 | :---: | :---: |
-| ![Project Monitoring](docs/screenshots/project-monitoring.png) | ![Mobile Reporting](docs/screenshots/mobile-citizen-reporting.png) |
+| ![Project Monitoring](docs/screenshots/verification/05-deployed-projects.png) | ![Citizen Verification](docs/screenshots/verification/06-deployed-citizen-verify.png) |
 
 ---
 
@@ -160,7 +158,7 @@ GramSetu/
 
 ### Prerequisites
 - Node.js version 22 or higher
-- Python version 3.11 or higher (optional, required only for defect segmentation)
+- Python version 3.11 or higher (optional, required only for defect detection)
 - MongoDB instance (MongoDB Community locally or MongoDB Atlas free tier)
 
 ### 1. Clone the Repository
@@ -261,7 +259,7 @@ The repository maintains automated test suites across all layers.
 
 ### Server Test Suite
 ```bash
-# Run 129+ unit and domain rule tests
+# Run 132 unit and domain rule tests
 npm run test:unit --prefix server
 
 # Run linting check
@@ -270,7 +268,7 @@ npm run lint --prefix server
 
 ### Client Test Suite
 ```bash
-# Run Vitest component tests (38 tests)
+# Run Vitest component tests (48 tests across 10 suites)
 npm test --prefix client
 
 # Run client production build
@@ -280,19 +278,16 @@ npm run build --prefix client
 cd client && E2E_MONGODB_URI=mongodb://127.0.0.1:27017/gramsetu_e2e npm run test:e2e
 ```
 
-### Python Segmentation Service Tests
-Tests are divided into lightweight unit suites and model integration tests:
+### Python Defect Detection Microservice Tests
+Tests are divided into fast unit suites and model integration tests:
 ```bash
 cd segmentation-service
 
-# Run lightweight unit tests (image decode, scale formulas, mock detector) - 0.2s
-pytest -m unit -v
+# Run lightweight unit tests (image decode, bounding-box parsing, scaling, mock detector)
+pytest tests/test_inference_unit.py -v
 
-# Run model integration tests using local model.onnx weights
-pytest -m integration -v
-
-# Run all 35 tests
-pytest -v
+# Run model integration test using local model.onnx weights
+pytest tests/test_inference_real_model.py -v
 ```
 
 ---
@@ -329,10 +324,10 @@ GramSetu isolates all AI operations from primary transactional business logic.
 - Non-transient errors (invalid keys, bad requests) fail fast; transient network errors use bounded exponential backoff.
 - **Graceful Fallback**: If `GEMINI_API_KEY` is omitted or quota is exhausted, the system records `aiAssessment.status = "not_configured"` or `"unavailable"`. The application continues without crashing, storing the upload safely and allowing manual review.
 
-### 2. Defect Segmentation Service (`segmentation-service/`)
-- Powered by a YOLOv8 ONNX model exported for CPU inference.
+### 2. Defect Detection Microservice (`segmentation-service/`)
+- Powered by a YOLOv8 ONNX model exported for CPU inference, producing object bounding boxes for potholes, cracks, and open manholes (not pixel-level segmentation masks).
 - Every detection specifies `measurementBasis` (`bounding_box` or `mask`).
-- Physical dimensions (`cm`, `cm²`) are calculated only when an optional physical calibration scale (`scale_cm_per_pixel`) is supplied. Depth is explicitly set to `None` because single-view 2D RGB imagery cannot measure optical depth.
+- Physical dimensions (`cm`, `cm²`) are calculated only when an optional physical calibration scale (`scale_cm_per_pixel`) is supplied. Depth is explicitly reported as `None` because single-view 2D RGB imagery cannot measure optical depth.
 
 ---
 

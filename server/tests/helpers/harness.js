@@ -18,9 +18,6 @@ import Project from '../../models/Project.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 export const asset = (name) => {
-  if (name === 'sample-tender.pdf' || name === 'sample-road-repair-tender.pdf') {
-    return readFileSync(path.join(here, '../../../assets/samples/tenderDocuments/sample-road-repair-tender.pdf'));
-  }
   return readFileSync(path.join(here, '../../../test-assets', name));
 };
 
